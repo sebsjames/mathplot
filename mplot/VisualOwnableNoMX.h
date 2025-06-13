@@ -197,8 +197,14 @@ namespace mplot {
             }
 
             // Calculate model view transformation - transforming from "model space" to "worldspace".
+            // This is where we could make a 1st person view from one of the models
             sm::mat44<float> sceneview;
-            if (this->ptype == perspective_type::orthographic || this->ptype == perspective_type::perspective) {
+            // third person could be a ptype?
+            if (this->thirdperson != nullptr) {
+                sm::vec<float> thirdperson_trans = -this->thirdperson->getViewMatrix().translation();
+                sceneview.translate (thirdperson_trans + this->scenetrans); // incorp mouse
+
+            } else if (this->ptype == perspective_type::orthographic || this->ptype == perspective_type::perspective) {
                 // This line translates from model space to world space. Avoid in cyl?
                 sceneview.translate (this->scenetrans); // send backwards into distance
             }

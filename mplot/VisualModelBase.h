@@ -191,6 +191,7 @@ namespace mplot {
 
         //! Setter for the viewmatrix
         void setViewMatrix (const sm::mat44<float>& mv) { this->viewmatrix = mv; }
+        sm::mat44<float> getViewMatrix() const { return this->viewmatrix; }
 
         virtual void setSceneMatrixTexts (const sm::mat44<float>& sv) = 0;
 

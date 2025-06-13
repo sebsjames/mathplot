@@ -208,6 +208,16 @@ namespace mplot {
             return static_cast<T*>(this->vm.back().get());
         }
 
+        // Special - add this visual model as a 'third person viewer' of the scene
+        template <typename T>
+        T* addVisualModelThirdPerson (std::unique_ptr<T>& model)
+        {
+            std::unique_ptr<mplot::VisualModel<glver>> vmp = std::move(model);
+            this->vm.push_back (std::move(vmp));
+            this->thirdperson = this->vm.back().get(); // save the third person pointer
+            return static_cast<T*>(this->vm.back().get());
+        }
+
         /*!
          * Test the pointer vmp. Return vmp if it is owned by a unique_ptr in
          * Visual::vm. If it is not present, return nullptr.
@@ -605,6 +615,11 @@ namespace mplot {
 
         void set_winsize (int _w, int _h) { this->window_w = _w; this->window_h = _h; }
 
+        //! The look-forward direction for third person view
+        sm::vec<float> thirdperson_fwd = {1, 0, 0}; // x axis by default
+        //! The up direction for third person view (axes always right handed)
+        sm::vec<float> thirdperson_up = {0, 0, 1}; // z axis by default
+
     protected:
 
         //! Set up a perspective projection based on window width and height. Not public.
@@ -639,6 +654,9 @@ namespace mplot {
         //! A vector of pointers to all the mplot::VisualModels (HexGridVisual,
         //! ScatterVisual, etc) which are going to be rendered in the scene.
         std::vector<std::unique_ptr<mplot::VisualModel<glver>>> vm;
+
+        // A pointer to a 'thirdperson' visual model. If set, you see the scene from this perspective
+        mplot::VisualModel<glver>* thirdperson = nullptr;
 
         // Initialize OpenGL shaders, set some flags (Alpha, Anti-aliasing), read in any external
         // state from json, and set up the coordinate arrows and any VisualTextModels that will be

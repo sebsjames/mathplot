@@ -714,8 +714,6 @@ namespace mplot {
 
         //! A scene transformation
         sm::mat44<float> scene;
-        //! Scene transformation inverse
-        sm::mat44<float> invscene;
 
     public:
 
@@ -1021,11 +1019,16 @@ namespace mplot {
 
                 // Now inverse apply the rotation of the scene to the rotation axis (vec<float,3>),
                 // so that we rotate the model the right way.
-                sm::vec<float, 4> tmp_4D = this->invscene * this->rotationAxis;
+                sm::vec<float, 4> tmp_4D = this->scene.invert() * this->rotationAxis;
                 this->rotationAxis.set_from (tmp_4D); // Set rotationAxis from 4D result
 
+                // Can I make this a rotation that is applied after the translation to
+                // whatever the current sceneview matrix is? rotation becomes "current
+                // additive rotation"
+
                 // Update rotation from the saved position.
-                this->rotation = this->savedRotation;
+                this->rotation = this->savedRotation; // so this would not be required
+
                 sm::quaternion<float> rotnQuat (this->rotationAxis, -rotamount * sm::mathconst<float>::deg2rad);
                 this->rotation.postmultiply (rotnQuat); // combines rotations
                 needs_render = true;
@@ -1086,7 +1089,6 @@ namespace mplot {
                 // Get the scene's rotation at the start of the mouse movement:
                 this->scene.setToIdentity();
                 this->scene.rotate (this->savedRotation);
-                this->invscene = this->scene.invert();
             }
 
             if (button == mplot::mousebutton::left) { // Primary button means rotate

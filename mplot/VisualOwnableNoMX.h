@@ -197,13 +197,13 @@ namespace mplot {
             }
 
             // Calculate model view transformation - transforming from "model space" to "worldspace".
-            sm::mat44<float> sceneview;
+            sm::mat44<float> sceneview = scene; // just 'scene' now
             if (this->ptype == perspective_type::orthographic || this->ptype == perspective_type::perspective) {
                 // This line translates from model space to world space. Avoid in cyl?
-                sceneview.translate (this->scenetrans); // send backwards into distance
+                // sceneview.translate (this->scenetrans); // send backwards into distance
             }
             // And this rotation completes the transition from model to world
-            sceneview.prerotate (this->rotation);
+            //sceneview.prerotate (this->rotation);
 
             // Clear color buffer and **also depth buffer**
             glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

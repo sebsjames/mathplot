@@ -203,13 +203,13 @@ namespace mplot {
             }
 
             // Calculate model view transformation - transforming from "model space" to "worldspace".
-            sm::mat44<float> sceneview;
+            sm::mat44<float> sceneview = this->scene;
             if (this->ptype == perspective_type::orthographic || this->ptype == perspective_type::perspective) {
                 // This line translates from model space to world space. Avoid in cyl?
-                sceneview.translate (this->scenetrans); // send backwards into distance
+                //sceneview.translate (this->scenetrans); // send backwards into distance
             }
             // And this rotation completes the transition from model to world
-            sceneview.prerotate (this->rotation);
+            //sceneview.prerotate (this->rotation);
 
             // Clear color buffer and **also depth buffer**
             this->glfn->Clear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -259,7 +259,7 @@ namespace mplot {
             }
 
             sm::mat44<float> scenetransonly;
-            scenetransonly.translate (this->scenetrans);
+            scenetransonly.translate (this->scene.translation());
 
             auto vmi = this->vm.begin();
             while (vmi != this->vm.end()) {
@@ -438,17 +438,24 @@ namespace mplot {
                 std::ifstream fi;
                 fi.open ("/tmp/Visual.json", std::ios::in);
                 fi >> vconf;
-                this->scenetrans[0] = vconf.contains("scenetrans_x") ? vconf["scenetrans_x"].get<float>() : this->scenetrans[0];
-                this->scenetrans[1] = vconf.contains("scenetrans_y") ? vconf["scenetrans_y"].get<float>() : this->scenetrans[1];
-                this->scenetrans[2] = vconf.contains("scenetrans_z") ? vconf["scenetrans_z"].get<float>() : this->scenetrans[2];
+                sm::vec<float> scenetrans = this->scene.translation();
+                scenetrans[0] = vconf.contains("scenetrans_x") ? vconf["scenetrans_x"].get<float>() : scenetrans[0];
+                scenetrans[1] = vconf.contains("scenetrans_y") ? vconf["scenetrans_y"].get<float>() : scenetrans[1];
+                scenetrans[2] = vconf.contains("scenetrans_z") ? vconf["scenetrans_z"].get<float>() : scenetrans[2];
+                this->scene.translate (scenetrans);
                 // Place the same numbers into scenetrans_default, too.
-                this->scenetrans_default[0] = this->scenetrans[0];
-                this->scenetrans_default[1] = this->scenetrans[1];
-                this->scenetrans_default[2] = this->scenetrans[2];
-                this->rotation.w = vconf.contains("scenerotn_w") ? vconf["scenerotn_w"].get<float>() : this->rotation.w;
-                this->rotation.x = vconf.contains("scenerotn_x") ? vconf["scenerotn_x"].get<float>() : this->rotation.x;
-                this->rotation.y = vconf.contains("scenerotn_y") ? vconf["scenerotn_y"].get<float>() : this->rotation.y;
-                this->rotation.z = vconf.contains("scenerotn_z") ? vconf["scenerotn_z"].get<float>() : this->rotation.z;
+                this->scenetrans_default[0] = scenetrans[0];
+                this->scenetrans_default[1] = scenetrans[1];
+                this->scenetrans_default[2] = scenetrans[2];
+
+                sm::quaternion<float> rotation;
+                rotation.w = vconf.contains("scenerotn_w") ? vconf["scenerotn_w"].get<float>() : rotation.w;
+                rotation.x = vconf.contains("scenerotn_x") ? vconf["scenerotn_x"].get<float>() : rotation.x;
+                rotation.y = vconf.contains("scenerotn_y") ? vconf["scenerotn_y"].get<float>() : rotation.y;
+                rotation.z = vconf.contains("scenerotn_z") ? vconf["scenerotn_z"].get<float>() : rotation.z;
+                // Apply to scene
+                this->scene.rotate (rotation);
+
             } catch (...) {
                 // No problem if we couldn't read /tmp/Visual.json
             }

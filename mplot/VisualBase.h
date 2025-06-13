@@ -322,7 +322,7 @@ namespace mplot {
 
             // Add the depth at which the object lies.  Use forward projection to determine the
             // correct z coordinate for the inverse projection. This assumes only one object.
-            sm::vec<float, 4> point =  { 0.0f, 0.0f, this->scenetrans.z(), 1.0f };
+            sm::vec<float, 4> point =  { 0.0f, 0.0f, this->scene.translation().z(), 1.0f };
             sm::vec<float, 4> pp = this->projection * point;
             float coord_z = pp[2]/pp[3]; // divide by pp[3] is divide by/normalise by 'w'.
 
@@ -335,7 +335,9 @@ namespace mplot {
             // the screen
             this->coordArrows->setSceneTranslation (v0);
             // Apply rotation to the coordArrows model
-            this->coordArrows->setViewRotation (this->rotation);
+            try {
+                this->coordArrows->setViewRotation (this->scene.rotation());
+            } catch (...) {}
         }
 
         // Update the coordinate axes labels
@@ -431,15 +433,28 @@ namespace mplot {
         //! Set the scene's x and y values at the same time.
         void setSceneTransXY (const float _x, const float _y)
         {
-            this->scenetrans[0] = _x;
-            this->scenetrans[1] = _y;
-            this->scenetrans_default[0] = _x;
-            this->scenetrans_default[1] = _y;
+            sm::vec<float> scenetrans = this->scene.translation();
+            scenetrans[0] = _x;
+            scenetrans[1] = _y;
+            this->scene.translate (scenetrans);
+            this->scenetrans_default = scenetrans;
         }
         //! Set the scene's y value. Use this to shift your scene objects left or right
-        void setSceneTransX (const float _x) { this->scenetrans[0] = _x; this->scenetrans_default[0] = _x; }
+        void setSceneTransX (const float _x)
+        {
+            sm::vec<float> scenetrans = this->scene.translation();
+            scenetrans[0] = _x;
+            this->scene.translate (scenetrans);
+            this->scenetrans_default = scenetrans;
+        }
         //! Set the scene's y value. Use this to shift your scene objects up and down
-        void setSceneTransY (const float _y) { this->scenetrans[1] = _y; this->scenetrans_default[1] = _y; }
+        void setSceneTransY (const float _y)
+        {
+            sm::vec<float> scenetrans = this->scene.translation();
+            this->scenetrans[1] = _y;
+            this->scene.translate (scenetrans);
+            this->scenetrans_default[1] = _y;
+        }
         //! Set the scene's z value. Use this to bring the 'camera' closer to your scene
         //! objects (that is, your mplot::VisualModel objects).
         void setSceneTransZ (const float _z)
@@ -447,34 +462,37 @@ namespace mplot {
             if (_z > 0.0f) {
                 std::cerr << "WARNING setSceneTransZ(): Normally, the default z value is negative.\n";
             }
-            this->scenetrans[2] = _z;
-            this->scenetrans_default[2] = _z;
+            sm::vec<float> scenetrans = this->scene.translation();
+            scenetrans[2] = _z;
+            this->scene.translate (scenetrans);
+            this->scenetrans_default[2] = scenetrans;
         }
         void setSceneTrans (float _x, float _y, float _z)
         {
             if (_z > 0.0f) {
                 std::cerr << "WARNING setSceneTrans(): Normally, the default z value is negative.\n";
             }
-            this->scenetrans[0] = _x;
+            sm::vec<float> scenetrans = {};
+            scenetrans[0] = _x;
             this->scenetrans_default[0] = _x;
-            this->scenetrans[1] = _y;
+            scenetrans[1] = _y;
             this->scenetrans_default[1] = _y;
-            this->scenetrans[2] = _z;
+            scenetrans[2] = _z;
             this->scenetrans_default[2] = _z;
+            this->scene.translate (scenetrans);
         }
         void setSceneTrans (const sm::vec<float, 3>& _xyz)
         {
             if (_xyz[2] > 0.0f) {
                 std::cerr << "WARNING setSceneTrans(vec<>&): Normally, the default z value is negative.\n";
             }
-            this->scenetrans = _xyz;
             this->scenetrans_default = _xyz;
+            this->scene.translate (_xyz);
         }
 
         void setSceneRotation (const sm::quaternion<float>& _rotn)
         {
-            this->rotation = _rotn;
-            this->rotation_default = _rotn;
+            // writeme
         }
 
         void lightingEffects (const bool effects_on = true)
@@ -699,11 +717,11 @@ namespace mplot {
         //! The default z position for VisualModels should be 'away from the screen' (negative) so we can see them!
         constexpr static float zDefault = -5.0f;
 
-        //! Holds the translation coordinates for the current location of the entire scene
-        sm::vec<float, 3> scenetrans = {0.0f, 0.0f, zDefault};
+        //! Holds the translation coordinates for the current location of the entire scene (get from scene now)
+        //sm::vec<float, 3> scenetrans = {0.0f, 0.0f, zDefault};
 
         //! Default for scenetrans. This is a scene position that can be reverted to, to
-        //! 'reset the view'. This is copied into scenetrans when user presses Ctrl-a.
+        //! 'reset the view'. This is set into scene when user presses Ctrl-a.
         sm::vec<float, 3> scenetrans_default = { 0.0f, 0.0f, zDefault };
 
         //! The world depth at which text objects should be rendered
@@ -716,13 +734,13 @@ namespace mplot {
         sm::vec<float, 3> rotationAxis = { 0.0f, 0.0f, 0.0f };
 
         //! A rotation quaternion. You could have guessed that, right?
-        sm::quaternion<float> rotation;
+        //sm::quaternion<float> rotation;
 
         //! The default rotation of the scene
         sm::quaternion<float> rotation_default;
 
         //! A rotation that is saved between mouse button callbacks
-        sm::quaternion<float> savedRotation;
+        //sm::quaternion<float> savedRotation;
 
         //! The projection matrix is a member of this class
         sm::mat44<float> projection;
@@ -824,25 +842,31 @@ namespace mplot {
             }
 
             if (_key == key::z && (mods & keymod::control) && action == keyaction::press) {
+                sm::vec<float> scenetrans = this->scene.translation();
+                sm::quaternion<float> rotation;
+                try {
+                    rotation = this->scene.rotation();
+                } catch (...) {}
+
                 std::cout << "Scenetrans setup code:\n    v.setSceneTrans (sm::vec<float,3>{ float{"
-                          << this->scenetrans.x() << "}, float{"
-                          << this->scenetrans.y() << "}, float{"
-                          << this->scenetrans.z()
+                          << scenetrans.x() << "}, float{"
+                          << scenetrans.y() << "}, float{"
+                          << scenetrans.z()
                           << "} });"
                           <<  "\n    v.setSceneRotation (sm::quaternion<float>{ float{"
-                          << this->rotation.w << "}, float{" << this->rotation.x << "}, float{"
-                          << this->rotation.y << "}, float{" << this->rotation.z << "} });\n";
+                          << rotation.w << "}, float{" << rotation.x << "}, float{"
+                          << rotation.y << "}, float{" << rotation.z << "} });\n";
                 std::cout << "Writing scene trans/rotation into /tmp/Visual.json... ";
                 std::ofstream fout;
                 fout.open ("/tmp/Visual.json", std::ios::out|std::ios::trunc);
                 if (fout.is_open()) {
-                    fout << "{\"scenetrans_x\":" << this->scenetrans.x()
-                         << ", \"scenetrans_y\":" << this->scenetrans.y()
-                         << ", \"scenetrans_z\":" << this->scenetrans.z()
-                         << ",\n \"scenerotn_w\":" << this->rotation.w
-                         << ", \"scenerotn_x\":" <<  this->rotation.x
-                         << ", \"scenerotn_y\":" <<  this->rotation.y
-                         << ", \"scenerotn_z\":" <<  this->rotation.z << "}\n";
+                    fout << "{\"scenetrans_x\":" << scenetrans.x()
+                         << ", \"scenetrans_y\":" << scenetrans.y()
+                         << ", \"scenetrans_z\":" << scenetrans.z()
+                         << ",\n \"scenerotn_w\":" << rotation.w
+                         << ", \"scenerotn_x\":" <<  rotation.x
+                         << ", \"scenerotn_y\":" <<  rotation.y
+                         << ", \"scenerotn_z\":" <<  rotation.z << "}\n";
                     fout.close();
                     std::cout << "Success.\n";
                 } else {
@@ -924,10 +948,12 @@ namespace mplot {
                 && _key == key::a && (mods & keymod::control) && action == keyaction::press) {
                 std::cout << "Reset to default view\n";
                 // Reset translation
-                this->scenetrans = this->scenetrans_default;
+                this->scene.setToIdentity();
+                this->scene.translate (scenetrans_default);
                 this->cyl_cam_pos = this->cyl_cam_pos_default;
                 // Reset rotation
-                this->rotation = this->rotation_default;
+                this->scene.rotate (this->rotation_default);
+                // or more likely: this->scene = this->scene_default;
 
                 needs_render = true;
             }
@@ -1005,7 +1031,7 @@ namespace mplot {
 
                 // Add the depth at which the object lies.  Use forward projection to determine the
                 // correct z coordinate for the inverse projection. This assumes only one object.
-                sm::vec<float, 4> point =  { 0.0f, 0.0f, this->scenetrans.z(), 1.0f };
+                sm::vec<float, 4> point =  { 0.0f, 0.0f, this->scene.translation().z(), 1.0f };
                 sm::vec<float, 4> pp = this->projection * point;
                 float coord_z = pp[2]/pp[3]; // divide by pp[3] is divide by/normalise by 'w'.
 
@@ -1045,10 +1071,12 @@ namespace mplot {
                 // additive rotation"
 
                 // Update rotation from the saved position.
-                this->rotation = this->savedRotation; // so this would not be required
-
                 sm::quaternion<float> rotnQuat (this->rotationAxis, -rotamount * sm::mathconst<float>::deg2rad);
-                this->rotation.postmultiply (rotnQuat); // combines rotations
+
+                // Update scene here
+                scene.rotate (rotnQuat);
+                std::cout << "scene matrix is now\n" << scene << std::endl;
+
                 needs_render = true;
 
             } else if (this->state.test (visual_state::translateMode)) { // allow only rotate OR translate for a single mouse movement
@@ -1065,7 +1093,7 @@ namespace mplot {
 
                 // Add the depth at which the object lies.  Use forward projection to determine the
                 // correct z coordinate for the inverse projection. This assumes only one object.
-                sm::vec<float, 4> point =  { 0.0f, 0.0f, this->scenetrans.z(), 1.0f };
+                sm::vec<float, 4> point =  { 0.0f, 0.0f, this->scene.translation().z(), 1.0f };
                 sm::vec<float, 4> pp = this->projection * point;
                 float coord_z = pp[2]/pp[3]; // divide by pp[3] is divide by/normalise by 'w'.
 
@@ -1081,8 +1109,10 @@ namespace mplot {
                 // Note: mouseMoveWorld[2] is unmodified
 
                 // We "translate the whole scene" - used by 2D projection shaders (ignored by cyl shader)
-                this->scenetrans[0] += mouseMoveWorld[0];
-                this->scenetrans[1] -= mouseMoveWorld[1];
+                sm::vec<float> scenetrans = {};
+                scenetrans[0] += mouseMoveWorld[0];
+                scenetrans[1] -= mouseMoveWorld[1];
+                this->scene.pretranslate (scenetrans);
 
                 // Also translate our cylindrical camera position (used in cyl shader, ignored in proj. shader)
                 this->cyl_cam_pos[0] -= mouseMoveWorld[0];
@@ -1103,10 +1133,10 @@ namespace mplot {
             if (action == keyaction::press) { // Button down
                 this->mousePressPosition = this->cursorpos;
                 // Save the rotation at the start of the mouse movement
-                this->savedRotation = this->rotation;
+                // this->savedRotation = this->rotation;
                 // Get the scene's rotation at the start of the mouse movement:
-                this->scene.setToIdentity();
-                this->scene.rotate (this->savedRotation);
+                //this->scene.setToIdentity();
+                //this->scene.rotate (this->savedRotation);
             }
 
             if (button == mplot::mousebutton::left) { // Primary button means rotate
@@ -1158,16 +1188,20 @@ namespace mplot {
             } else { // perspective_type::perspective or perspective_type::cylindrical
 
                 // xoffset does what mouse drag left/right in rotateModMode does (L/R scene trans)
-                this->scenetrans[0] -= xoffset * this->scenetrans_stepsize;
+                sm::vec<float> scenetrans = this->scene.translation();
+                scenetrans[0] -= xoffset * this->scenetrans_stepsize;
                 this->cyl_cam_pos[0] += xoffset * this->scenetrans_stepsize;
 
                 // yoffset does the 'in-out zooming'
                 sm::vec<float, 4> scroll_move_y = { 0.0f, static_cast<float>(yoffset) * this->scenetrans_stepsize, 0.0f, 1.0f };
-                this->scenetrans[2] += scroll_move_y[1];
+                scenetrans[2] += scroll_move_y[1];
                 // Translate scroll_move_y then add it to cyl_cam_pos here
                 sm::mat44<float> sceneview_rotn;
-                sceneview_rotn.rotate (this->rotation);
+                sm::quaternion<float> rotation;
+                sceneview_rotn.rotate (rotation);
                 this->cyl_cam_pos += sceneview_rotn * scroll_move_y;
+
+                this->scene.pretranslate (scenetrans);
             }
             return true; // needs_render
         }

@@ -1188,7 +1188,7 @@ namespace mplot {
             } else { // perspective_type::perspective or perspective_type::cylindrical
 
                 // xoffset does what mouse drag left/right in rotateModMode does (L/R scene trans)
-                sm::vec<float> scenetrans = this->scene.translation();
+                sm::vec<float> scenetrans = {};
                 scenetrans[0] -= xoffset * this->scenetrans_stepsize;
                 this->cyl_cam_pos[0] += xoffset * this->scenetrans_stepsize;
 

@@ -505,6 +505,8 @@ if(HAVE_STD_FORMAT)
   add_executable(zernike zernike.cpp)
   target_link_libraries(zernike OpenGL::GL glfw Freetype::Freetype)
 
-  add_executable(vonmises vonmises.cpp)
-  target_link_libraries(vonmises OpenGL::GL glfw Freetype::Freetype)
 endif()
+
+# This requires std::format. What CI platforms can't build it?
+add_executable(vonmises vonmises.cpp)
+target_link_libraries(vonmises OpenGL::GL glfw Freetype::Freetype)

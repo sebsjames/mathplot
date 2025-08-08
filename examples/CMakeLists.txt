@@ -274,10 +274,9 @@ if(HAVE_STD_FORMAT)
 
   add_executable(graph_histo graph_histo.cpp)
   target_link_libraries(graph_histo OpenGL::GL glfw Freetype::Freetype)
-
-  add_executable(graph_distributions graph_distributions.cpp)
-  target_link_libraries(graph_distributions OpenGL::GL glfw Freetype::Freetype)
 endif()
+add_executable(graph_distributions graph_distributions.cpp)
+target_link_libraries(graph_distributions OpenGL::GL glfw Freetype::Freetype)
 
 add_executable(graph_dynamic_x2 graph_dynamic_x2.cpp)
 target_link_libraries(graph_dynamic_x2 OpenGL::GL glfw Freetype::Freetype)

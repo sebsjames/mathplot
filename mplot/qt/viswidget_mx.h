@@ -44,7 +44,22 @@ namespace mplot {
                 static_assert (widget_index < mplot::qt::max_contexts);
                 ctx_ptrs[widget_index] = _ctx;
             }
+#if 0
+            template<int widget_index> requires (widget_index < mplot::qt::max_contexts)
+            void make_current (QSurface* surf) { ctx_ptrs[widget_index]->makeCurrent (surf); }
 
+            template<int widget_index> requires (widget_index < mplot::qt::max_contexts)
+            void done_current() { ctx_ptrs[widget_index]->doneCurrent(); }
+
+            template<int widget_index> requires (widget_index < mplot::qt::max_contexts)
+            bool supports_mt() { return ctx_ptrs[widget_index]->supportsThreadedOpenGL(); }
+
+            template<int widget_index> requires (widget_index < mplot::qt::max_contexts)
+            QOpenGLContext* share_context() { return ctx_ptrs[widget_index]->shareContext(); }
+
+            template<int widget_index> requires (widget_index < mplot::qt::max_contexts)
+            QOpenGLContextGroup* share_group() { return ctx_ptrs[widget_index]->shareGroup(); }
+#endif
             // The static getProcAddress function for the index widget_index.
             template<int widget_index>
             static QFunctionPointer getProcAddress (const char* name)
@@ -88,7 +103,7 @@ namespace mplot {
                 format.setDepthBufferSize (4);
                 format.setSamples (4);
                 format.setStencilBufferSize (8);
-                format.setVersion (4, 1);
+                format.setVersion (mplot::gl::version::major (gl_version), mplot::gl::version::minor (gl_version));
                 format.setProfile (QSurfaceFormat::CoreProfile);
                 this->setFormat (format);
                 this->setUpdateBehavior (QOpenGLWidget::NoPartialUpdate);

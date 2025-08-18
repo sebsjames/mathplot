@@ -58,7 +58,7 @@ namespace mplot {
                 format.setDepthBufferSize (4);
                 format.setSamples (4);
                 format.setStencilBufferSize (8);
-                format.setVersion (4, 1);
+                format.setVersion (mplot::gl::version::major (gl_version), mplot::gl::version::minor (gl_version));
                 format.setProfile (QSurfaceFormat::CoreProfile);
                 this->setFormat (format);
                 this->setUpdateBehavior (QOpenGLWidget::NoPartialUpdate);

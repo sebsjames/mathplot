@@ -508,3 +508,6 @@ if(HAVE_STD_FORMAT)
   add_executable(vonmises vonmises.cpp)
   target_link_libraries(vonmises OpenGL::GL glfw Freetype::Freetype)
 endif()
+
+add_executable(graph_spline graph_spline.cpp)
+target_link_libraries(graph_spline OpenGL::GL glfw Freetype::Freetype)

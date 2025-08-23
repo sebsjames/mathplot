@@ -3,7 +3,7 @@
 #include <iostream>
 #include <functional>
 
-struct QOpenGLWidget; // fwd decl
+struct QOpenGLWidget;
 
 // VisualOwnableMX is going to be owned by the QOpenGLWidget
 // Define mplot::win_t before #including mplot/VisualOwnableMX.h
@@ -44,22 +44,7 @@ namespace mplot {
                 static_assert (widget_index < mplot::qt::max_contexts);
                 ctx_ptrs[widget_index] = _ctx;
             }
-#if 0
-            template<int widget_index> requires (widget_index < mplot::qt::max_contexts)
-            void make_current (QSurface* surf) { ctx_ptrs[widget_index]->makeCurrent (surf); }
 
-            template<int widget_index> requires (widget_index < mplot::qt::max_contexts)
-            void done_current() { ctx_ptrs[widget_index]->doneCurrent(); }
-
-            template<int widget_index> requires (widget_index < mplot::qt::max_contexts)
-            bool supports_mt() { return ctx_ptrs[widget_index]->supportsThreadedOpenGL(); }
-
-            template<int widget_index> requires (widget_index < mplot::qt::max_contexts)
-            QOpenGLContext* share_context() { return ctx_ptrs[widget_index]->shareContext(); }
-
-            template<int widget_index> requires (widget_index < mplot::qt::max_contexts)
-            QOpenGLContextGroup* share_group() { return ctx_ptrs[widget_index]->shareGroup(); }
-#endif
             // The static getProcAddress function for the index widget_index.
             template<int widget_index>
             static QFunctionPointer getProcAddress (const char* name)
@@ -78,7 +63,7 @@ namespace mplot {
         // A mplot::Visual widget. You have to choose and provide a widget_index in the range [0,
         // mplot::gl::max_contexts)
         template<int widget_index>
-        struct viswidget_mx : public QOpenGLWidget //, protected QOpenGLFunctions_4_1_Core
+        struct viswidget_mx : public QOpenGLWidget
         {
             // Unlike the GLFW or mplot-in-a-QWindow schemes, we hold the mplot::VisualOwnableMX
             // inside the widget.
@@ -130,21 +115,26 @@ namespace mplot {
                 this->update();
             }
 
+            // Looks a bit like the Ogre3D renderOneFrame leads to THIS function being called! Hence the crash.
             void paintGL() override
             {
                 if (!this->newvisualmodels.empty()) {
                     // Now we iterate through newvisualmodels, finalize them and add them to mplot::Visual
                     for (unsigned int i = 0; i < newvisualmodels.size(); ++i) {
                         this->newvisualmodels[i]->finalize();
+                        std::cout <<  __func__ << " add a model..." << std::endl;
                         this->model_ptrs.push_back (this->v.addVisualModel (this->newvisualmodels[i]));
                     }
                     this->newvisualmodels.clear();
                 }
                 if (this->needs_reinit > -1) {
+                    std::cout <<  __func__ << " model reinit..." << std::endl;
                     this->model_ptrs[this->needs_reinit]->reinit();
                     this->needs_reinit = -1;
                 }
+                std::cout <<  __func__ << " v.render()...";
                 v.render();
+                std::cout << " done." << std::endl;
             }
 
             void mousePressEvent (QMouseEvent* event) override
@@ -189,7 +179,6 @@ namespace mplot {
                 event->accept();
             }
 
-            // Keyboard events...
             void keyPressEvent (QKeyEvent* event) override
             {
                 int mflg = event->modifiers();

@@ -20,7 +20,7 @@ int main()
 
     mplot::Visual v(1024, 768, "Geodesic Polyhedra (ordered vertices/faces)");
     v.showCoordArrows (true);
-    v.showUserFrame (true);
+    v.showUserFrame (true); // hmm, causes crash
     v.options.set (mplot::visual_options::rotateAboutSceneOrigin, false);
 
     try {

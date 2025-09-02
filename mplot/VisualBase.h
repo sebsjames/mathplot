@@ -898,7 +898,6 @@ namespace mplot {
             // And NOW we can proceed to init (lengths, thickness, em size for labels):
             this->coordArrows->init (sm::vec<>{0.1f, 0.1f, 0.1f}, 1.0f, 0.01f);
             this->coordArrows->finalize(); // VisualModel::finalize releases context (normally this is the right thing)...
-            this->setContext();            // ...but we've got more work to do, so re-acquire context (if we're managing it)
         }
 
         //! Show the user's frame of reference as a model in the scene coords (for debug)
@@ -915,7 +914,6 @@ namespace mplot {
             this->userFrame->face_uy = sm::vec<>::ux();
             this->userFrame->face_uz = sm::vec<>::uy();
             this->userFrame->finalize();
-            this->setContext(); // see createCoordArrows() for comments
         }
 
         /*

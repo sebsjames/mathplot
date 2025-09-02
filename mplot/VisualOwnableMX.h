@@ -256,8 +256,12 @@ namespace mplot {
 
             // New User frame thing
             if (this->options.test (visual_options::showUserFrame)) {
-                this->coordArrows->setSceneMatrix (this->sceneview);
-                this->userFrame->render();
+#if 1
+                if (this->userFrame) {
+                    //this->userFrame->setSceneMatrix (this->sceneview);
+                    this->userFrame->render();
+                }
+#endif
             }
 
             auto vmi = this->vm.begin();
@@ -436,8 +440,10 @@ namespace mplot {
             this->read_scenetrans_from_json();
 
             this->createCoordArrows();
+            this->setContext(); // ...but we've got more work to do, so re-acquire context (if we're managing it)
 
             this->createUserFrame();
+            this->setContext(); // see createCoordArrows() for comments
 
             mplot::gl::Util::checkError (__FILE__, __LINE__, this->glfn);
 

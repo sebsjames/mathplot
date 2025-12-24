@@ -90,6 +90,7 @@ namespace mplot
     {
         VisualModelBase() {}
         VisualModelBase (const sm::vec<float> _offset) { this->viewmatrix.translate (_offset); }
+        virtual ~VisualModelBase() {} // virtual deconstructor to keep clang happy
 
         // A VisualModel may contain a number of component VisualModels. When render is called, each
         // component is rendered.

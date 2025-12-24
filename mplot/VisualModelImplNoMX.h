@@ -257,6 +257,9 @@ namespace mplot
         {
             if (this->hidden() == true) { return; }
 
+            // render any components
+            for (uint32_t i = 0; i < this->components.size(); ++i) { this->components[i]->render(); }
+
             // Execute post-vertex init at render, as GL should be available.
             if (this->flags.test (vm_bools::postVertexInitRequired) == true) { this->postVertexInit(); }
 

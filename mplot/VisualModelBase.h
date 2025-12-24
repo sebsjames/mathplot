@@ -91,6 +91,19 @@ namespace mplot
         VisualModelBase() {}
         VisualModelBase (const sm::vec<float> _offset) { this->viewmatrix.translate (_offset); }
 
+        // A VisualModel may contain a number of component VisualModels. When render is called, each
+        // component is rendered.
+        std::vector<std::unique_ptr<mplot::VisualModelBase<glver>>> components;
+
+        //! Add a VisualModel as a component to this VisualModel
+        template <typename T>
+        T* addVisualModel (std::unique_ptr<T>& model)
+        {
+            std::unique_ptr<mplot::VisualModelBase<glver>> vmp = std::move(model);
+            this->components.push_back (std::move(vmp));
+            return static_cast<T*>(this->components.back().get());
+        }
+
         /*!
          * Set up the passed-in VisualTextModel with functions that need access to the parent Visual attributes.
          */
@@ -420,10 +433,16 @@ namespace mplot
 
         virtual void setSceneMatrixTexts (const sm::mat44<float>& sv) = 0;
 
+        void setSceneMatrixComponents (const sm::mat44<float>& sv)
+        {
+            for (auto& cmp : this->components) { cmp->setSceneMatrix (sv); }
+        }
+
         //! When setting the scene matrix, also have to set the text's scene matrices.
         void setSceneMatrix (const sm::mat44<float>& sv)
         {
             this->scenematrix = sv;
+            this->setSceneMatrixComponents (sv);
             this->setSceneMatrixTexts (sv);
         }
 
@@ -815,7 +834,14 @@ namespace mplot
         bool wireframe() const { return this->flags.test (vm_bools::wireframe); }
 
         void instanced (const bool val) { this->flags.set (vm_bools::instanced, val); }
-        bool instanced() const { return this->flags.test (vm_bools::instanced); }
+        bool instanced() const
+        {
+            bool cmpts_inst = this->flags.test (vm_bools::instanced);
+            for (auto& cmp : this->components) {
+                if (cmp->instanced()) { cmpts_inst = true; }
+            }
+            return cmpts_inst;
+        }
 
         //! Getter for vertex positions (for mplot::NormalsVisual)
         std::vector<float> getVertexPositions() { return this->vertexPositions; }

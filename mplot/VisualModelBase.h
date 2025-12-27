@@ -120,6 +120,7 @@ namespace mplot
             if (this->parentVis == nullptr) {
                 throw std::runtime_error ("Can't bind a model, because I am not bound");
             }
+            std::cout << "VisualModelBase::bindmodel: parentVis = " << this->parentVis << std::endl;
             model->set_parent (this->parentVis);
             model->get_shaderprogs = &mplot::VisualBase<glver>::get_shaderprogs;
             model->get_gprog = &mplot::VisualBase<glver>::get_gprog;
@@ -415,15 +416,18 @@ namespace mplot
          */
         void finalize()
         {
+            std::cout << "VisualModelBase::finalize for '" << this->name << "'" << std::endl;
             if (this->setContext != nullptr) { this->setContext (this->parentVis); }
-            this->initializeVertices();
+            this->initializeVertices(); // normally, causes VisualTextModel postVertexInit
             this->update_bb();
             this->flags.set (vm_bools::postVertexInitRequired, true);
             // Release context after creating and finalizing this VisualModel. On Visual::render(),
             // context will be re-acquired.
             if (this->releaseContext != nullptr) { this->releaseContext (this->parentVis); }
 
+            std::cout << "VisualModelBase::finalize for '" << this->name << "' call bindComponents" << std::endl;
             this->bindComponents();
+            std::cout << "VisualModelBase::finalize for '" << this->name << "' call finalizeComponents" << std::endl;
             this->finalizeComponents();
         }
 

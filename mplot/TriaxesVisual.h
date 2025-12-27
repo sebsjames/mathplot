@@ -29,10 +29,12 @@ namespace mplot
             this->x_scale.do_autoscale = true;
             this->y_scale.do_autoscale = true;
             this->z_scale.do_autoscale = true;
+            this->name = "Triaxes";
         }
 
         void initializeVertices()
         {
+            std::cout << "TriaxesVisual::initializeVertices\n";
             // First compute the x/y/z scales. Set the range_max of each to the ends of
             // the axes leaving range_mins at 0.
             this->x_scale.output_range.max = this->axis_ends[0];
@@ -207,7 +209,7 @@ namespace mplot
                 std::string s = mplot::graphing::number_format (this->xticks[i], this->xticks[i==0 ? 1 : i-1]);
                 // Issue: I need the width of the text ss.str() before I can create the
                 // VisualTextModel, so need a static method like this:
-                auto lbl = this->makeVisualTextModel (tf);
+                auto lbl = this->makeVisualTextModel (tf, std::string("x_") + s);
                 mplot::TextGeometry geom = lbl->getTextGeometry (s);
                 this->xtick_height = geom.height() > this->xtick_height ? geom.height() : this->xtick_height;
                 this->xtick_width = geom.width() > this->xtick_width ? geom.width() : this->xtick_width;
@@ -218,7 +220,7 @@ namespace mplot
 
             for (unsigned int i = 0; i < this->ytick_posns.size(); ++i) {
                 std::string s = mplot::graphing::number_format (this->yticks[i], this->yticks[i==0 ? 1 : i-1]);
-                auto lbl = this->makeVisualTextModel (tf);
+                auto lbl = this->makeVisualTextModel (tf, std::string("y_") + s);
                 mplot::TextGeometry geom = lbl->getTextGeometry (s);
                 this->ytick_height = geom.height() > this->ytick_height ? geom.height() : this->ytick_height;
                 this->ytick_width = geom.width() > this->ytick_width ? geom.width() : this->ytick_width;
@@ -229,7 +231,7 @@ namespace mplot
 
             for (unsigned int i = 0; i < this->ztick_posns.size(); ++i) {
                 std::string s = mplot::graphing::number_format (this->zticks[i], this->zticks[i==0 ? 1 : i-1]);
-                auto lbl = this->makeVisualTextModel (tf);
+                auto lbl = this->makeVisualTextModel (tf, std::string("z_") + s);
                 mplot::TextGeometry geom = lbl->getTextGeometry (s);
                 this->ztick_height = geom.height() > this->ztick_height ? geom.height() : this->ztick_height;
                 this->ztick_width = geom.width() > this->ztick_width ? geom.width() : this->ztick_width;
@@ -244,7 +246,7 @@ namespace mplot
         {
             mplot::TextFeatures tf(this->fontsize, this->fontres, false, mplot::colour::black, this->font);
             // x axis label (easy)
-            auto lbl = this->makeVisualTextModel (tf);
+            auto lbl = this->makeVisualTextModel (tf, "x_axis");
             mplot::TextGeometry geom = lbl->getTextGeometry (this->xlabel);
             sm::vec<float> lblpos;
             lblpos = {{0.5f * this->axis_ends[0] - geom.half_width(),
@@ -253,7 +255,7 @@ namespace mplot
             this->texts.push_back (std::move(lbl));
 
             // y axis label (have to rotate)
-            lbl = this->makeVisualTextModel (tf);
+            lbl = this->makeVisualTextModel (tf, "y_axis");
             this->bindmodel (lbl);
             geom = lbl->getTextGeometry (this->ylabel);
 
@@ -277,7 +279,7 @@ namespace mplot
             this->texts.push_back (std::move(lbl));
 
             // z axis
-            lbl = this->makeVisualTextModel (tf);
+            lbl = this->makeVisualTextModel (tf, "z_axis");
             geom = lbl->getTextGeometry (this->zlabel);
             lblpos = {{ -(this->axislabelgap+this->ticklabelgap+geom.width()+this->ztick_width),
                         0,
@@ -331,7 +333,7 @@ namespace mplot
         //! The positions, along the y axis (in model space) for the yticks
         std::deque<Flt> ztick_posns;
         // Default font
-        mplot::VisualFont font = mplot::VisualFont::Vera;
+        mplot::VisualFont font = mplot::VisualFont::DVSans;
         //! Font resolution - determines how textures for glyphs are generated. If your
         //! labels will be small, this should be smaller. If labels are large, then it
         //! should be increased.

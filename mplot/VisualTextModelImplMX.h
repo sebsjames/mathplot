@@ -52,15 +52,26 @@ namespace mplot
         {
             if (this->hide == true) { return; }
 
+            // Execute post-vertex init at render, as GL should be available.
+            if (this->postVertexInitReqd == true) {
+                std::cout << "In render, about to call VisualTextModelImpl::postVertexInit. (My text is "
+                          << this->getText() << ")\n";
+                this->postVertexInit();
+            }
+
             GLint prev_shader;
             GLuint tshaderprog = this->get_tprog (this->parentVis);
 
             auto _glfn = this->get_glfn (this->parentVis);
+            mplot::gl::Util::checkError (__FILE__, __LINE__, _glfn);
 
             _glfn->GetIntegerv (GL_CURRENT_PROGRAM, &prev_shader);
+            mplot::gl::Util::checkError (__FILE__, __LINE__, _glfn);
 
             // Ensure the correct program is in play for this VisualModel
+            //std::cout << "Using shader program " << tshaderprog << std::endl;
             _glfn->UseProgram (tshaderprog);
+            mplot::gl::Util::checkError (__FILE__, __LINE__, _glfn);
 
             // Set uniforms
             GLint loc_tc = _glfn->GetUniformLocation (tshaderprog, static_cast<const GLchar*>("textColor"));
@@ -73,23 +84,37 @@ namespace mplot
             if (loc_m != -1) { _glfn->UniformMatrix4fv (loc_m, 1, GL_FALSE, this->viewmatrix.mat.data()); }
 
             _glfn->ActiveTexture (GL_TEXTURE0);
+            mplot::gl::Util::checkError (__FILE__, __LINE__, _glfn);
 
             // It is only necessary to bind the vertex array object before rendering
             _glfn->BindVertexArray (this->vao);
+            mplot::gl::Util::checkError (__FILE__, __LINE__, _glfn);
 
             // We have a max of (2^32)-1 characters. Should be enough.
             for (unsigned int i = 0U; i < this->quads.size(); ++i) {
                 // Bind the right texture for the quad.
                 _glfn->BindTexture (GL_TEXTURE_2D, this->quad_ids[i]);
+                mplot::gl::Util::checkError (__FILE__, __LINE__, _glfn);
                 // This is 'draw a subset of the elements from the vertex array
                 // object'. You say how many indices to draw and which base *vertex* you
                 // start from. In my scheme, I have 4 vertices for each two triangles
                 // that are constructed. Thus, I draw 6 indices, but increment the base
                 // vertex by 4 for each letter.
-                _glfn->DrawElementsBaseVertex (GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, 4*i);
-            }
+                /*
+                  GL_INVALID_OPERATION is generated if a geometry shader is active and mode is
+                  incompatible with the input primitive type of the geometry shader in the currently
+                  installed program object.
 
+                  GL_INVALID_OPERATION is generated if a non-zero buffer object name is bound to an
+                  enabled array or the element array and the buffer object's data store is currently
+                  mapped.
+                 */
+                _glfn->DrawElementsBaseVertex (GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, 4*i);
+                mplot::gl::Util::checkError (__FILE__, __LINE__, _glfn);
+            }
+            mplot::gl::Util::checkError (__FILE__, __LINE__, _glfn);
             _glfn->BindVertexArray(0);
+            mplot::gl::Util::checkError (__FILE__, __LINE__, _glfn);
             _glfn->UseProgram (prev_shader);
 
             mplot::gl::Util::checkError (__FILE__, __LINE__, _glfn);
@@ -245,7 +270,7 @@ namespace mplot
 
             this->initializeVertices();
 
-            this->postVertexInit();
+            // this->postVertexInit(); // instead set 'needsPostVertexInit'?
         }
 
     protected:
@@ -253,6 +278,12 @@ namespace mplot
         //! Common code to call after the vertices have been set up.
         void postVertexInit() final
         {
+            if (this->postVertexInitReqd == false) {
+                std::cout << "VisualTextModelImplMX::postVertexInit already done for " << this->name << "\n";
+                return;
+            }
+            std::cout << "VisualTextModelImplMX::postVertexInit called for " << this->name << "\n";
+
             auto _glfn = this->get_glfn (this->parentVis);
             if (this->vbos == nullptr) {
                 // Create vertex array object
@@ -285,6 +316,8 @@ namespace mplot
             // Possibly release (unbind) the vertex buffers, but have to unbind vertex
             // array object first.
             _glfn->BindVertexArray(0); // carefully unbind
+
+            this->postVertexInitReqd = false;
         }
 
     public:

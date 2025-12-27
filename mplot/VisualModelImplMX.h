@@ -280,10 +280,8 @@ namespace mplot
         //! obtained by the parent Visual::render call.
         void render() // not final
         {
+            std::cout << "VisualModelImplMX::render called for '" << this->name << "'" << std::endl;
             if (this->hidden() == true) { return; }
-
-            // render any components
-            for (uint32_t i = 0; i < this->components.size(); ++i) { this->components[i]->render(); }
 
             // Execute post-vertex init at render, as GL should be available.
             if (this->flags.test (vm_bools::postVertexInitRequired) == true) { this->postVertexInit(); }
@@ -293,6 +291,8 @@ namespace mplot
             GladGLContext* _glfn = this->get_glfn (this->parentVis);
             _glfn->GetIntegerv (GL_CURRENT_PROGRAM, &prev_shader);
             // Ensure the correct program is in play for this VisualModel
+            std::cout << "VisualModelImplMX::render for '" << this->name
+                      << "': Switch to shader program " << this->get_gprog(this->parentVis) << std::endl;
             _glfn->UseProgram (this->get_gprog(this->parentVis));
 
             if (!this->indices.empty()) {
@@ -353,11 +353,24 @@ namespace mplot
             mplot::gl::Util::checkError (__FILE__, __LINE__, _glfn);
 
             // Now render any VisualTextModels
+            std::cout << "VisualModelImplMX::render for '" << this->name
+                      << "': calling text model renders..." << std::endl;
+
             _glfn->PolygonMode (GL_FRONT_AND_BACK, GL_FILL);
             auto ti = this->texts.begin();
-            while (ti != this->texts.end()) { (*ti)->render(); ti++; }
+            while (ti != this->texts.end()) {
+                std::cout << "Render my text " << (*ti)->name << ": '" << (*ti)->getText() << "'" << std::endl;
+                (*ti)->render();
+                ti++;
+            }
 
+            std::cout << "VisualModelImplMX::render for '" << this->name
+                      << "': Switch back to shader program " << prev_shader << std::endl;
             _glfn->UseProgram (prev_shader);
+            mplot::gl::Util::checkError (__FILE__, __LINE__, _glfn);
+
+            // render any components
+            for (uint32_t i = 0; i < this->components.size(); ++i) { this->components[i]->render(); }
             mplot::gl::Util::checkError (__FILE__, __LINE__, _glfn);
         }
 
@@ -375,9 +388,12 @@ namespace mplot
          *
          * See GraphVisual.h for examples.
          */
-        std::unique_ptr<mplot::VisualTextModel<glver>> makeVisualTextModel(const mplot::TextFeatures& tfeatures)
+        std::unique_ptr<mplot::VisualTextModel<glver>> makeVisualTextModel(const mplot::TextFeatures& tfeatures,
+                                                                           const std::string _name = "VTM")
         {
             auto tmup = std::make_unique<mplot::VisualTextModel<glver>> (tfeatures);
+            tmup->name = _name;
+            std::cout << "makeVisualTextModel: created one; now bindmodel...\n";
             this->bindmodel (tmup);
             return tmup;
         }

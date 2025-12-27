@@ -18,12 +18,7 @@ int main()
 {
     int rtn = -1;
 
-    mplot::Visual v(1024, 768, "mplot::ScatterVisual");
-    v.zNear = 0.001;
-    v.showCoordArrows (true);
-    v.coordArrowsInScene (true);
-    // Blueish background:
-    v.bgcolour = {0.6f, 0.6f, 0.8f, 0.5f};
+    mplot::Visual v(1024, 768, "mplot::Scatter3Visual");
     v.lightingEffects();
 
     try {
@@ -57,11 +52,14 @@ int main()
         sv->radiusFixed = 0.03f;
         sv->colourScale = scale1;
         sv->cm.setType (mplot::ColourMapType::Plasma);
-        sv->labelIndices = true;
         sv->finalize();
         v.addVisualModel (sv);
 
-        v.keepOpen();
+        std::cout << "\n\nAbout to v.render()\n\n";
+        v.render();
+        while (!v.readyToFinish()) {
+            v.waitevents (0.05);
+        }
 
     } catch (const std::exception& e) {
         std::cerr << "Caught exception: " << e.what() << std::endl;

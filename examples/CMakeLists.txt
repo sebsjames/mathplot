@@ -560,3 +560,6 @@ target_link_libraries(show_boundingboxes OpenGL::GL glfw Freetype::Freetype)
 # if have compound-ray header
 add_executable(cray_eye cray_eye.cpp)
 target_link_libraries(cray_eye OpenGL::GL glfw Freetype::Freetype)
+
+add_executable(triaxes triaxes.cpp)
+target_link_libraries(triaxes OpenGL::GL glfw Freetype::Freetype)

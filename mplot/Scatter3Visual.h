@@ -34,6 +34,7 @@ namespace mplot
             auto tax = std::make_unique<mplot::TriaxesVisual<Flt, glver>>(_offset);
             // NB: You DON'T bindmodel() a component model at this point. components will use the binding of the owning VM
             // NB: ALSO, you don't finalize before adding. The owning VM's finalize will call the component finalize()
+            this->name = "Scatter3";
             this->axes = this->addVisualModel (tax); // bindmodel and finalize have to happen when IHaveAComponentVisual::finalize runs
         }
 

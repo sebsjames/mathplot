@@ -293,6 +293,8 @@ namespace mplot
         float alpha = 1.0f;
         //! If true, then calls to VisualModel::render should return
         bool hide = false;
+        //! When postVertexInit is run, this is set false
+        bool postVertexInitReqd = true;
 
         //! Set up a vertex buffer object - bind, buffer and set vertex array object attribute
         virtual void setupVBO (GLuint& buf, std::vector<float>& dat, unsigned int bufferAttribPosition) = 0;

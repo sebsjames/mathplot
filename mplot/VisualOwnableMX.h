@@ -469,6 +469,7 @@ namespace mplot
 
             // Use coordArrowsOffset to set the location of the CoordArrows *scene*
             this->coordArrows = std::make_unique<mplot::CoordArrows<glver>>();
+            this->coordArrows->name = "Scene axes";
             // For CoordArrows, because we don't add via Visual::addVisualModel(), we
             // have to set the get_shaderprogs function here:
             this->bindmodel (this->coordArrows);
@@ -479,6 +480,7 @@ namespace mplot
 
             // Create 'user frame of reference object'
             this->userFrame = std::make_unique<mplot::RodVisual<glver>>();
+            this->userFrame->name = "User frame of ref";
             this->bindmodel (this->userFrame);
             this->userFrame->init (sm::vec<float, 3>{},
                                    sm::vec<float, 3>{0.0f, 0.0f, -100.0f}, sm::vec<float, 3>{0.1f, 0.1f, 1.0f}, 0.05f,

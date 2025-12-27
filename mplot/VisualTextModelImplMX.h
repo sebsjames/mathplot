@@ -91,6 +91,7 @@ namespace mplot
             mplot::gl::Util::checkError (__FILE__, __LINE__, _glfn);
 
             // We have a max of (2^32)-1 characters. Should be enough.
+            std::cout << "Drawing text on " << this->quads.size() << " quads\n";
             for (unsigned int i = 0U; i < this->quads.size(); ++i) {
                 // Bind the right texture for the quad.
                 _glfn->BindTexture (GL_TEXTURE_2D, this->quad_ids[i]);
@@ -100,15 +101,6 @@ namespace mplot
                 // start from. In my scheme, I have 4 vertices for each two triangles
                 // that are constructed. Thus, I draw 6 indices, but increment the base
                 // vertex by 4 for each letter.
-                /*
-                  GL_INVALID_OPERATION is generated if a geometry shader is active and mode is
-                  incompatible with the input primitive type of the geometry shader in the currently
-                  installed program object.
-
-                  GL_INVALID_OPERATION is generated if a non-zero buffer object name is bound to an
-                  enabled array or the element array and the buffer object's data store is currently
-                  mapped.
-                 */
                 _glfn->DrawElementsBaseVertex (GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, 4*i);
                 mplot::gl::Util::checkError (__FILE__, __LINE__, _glfn);
             }
@@ -127,6 +119,7 @@ namespace mplot
 
             if (!this->get_glfn) { return geom; }
             if (this->face == nullptr) {
+                std::cout << "Setting face in getTextGeometry!\n";
                 this->face = VisualResourcesMX<glver>::i().getVisualFace (this->tfeatures, this->parentVis,
                                                                           this->get_glfn(this->parentVis));
             }
@@ -135,6 +128,7 @@ namespace mplot
             std::basic_string<char32_t> utxt = mplot::unicode::fromUtf8(_txt);
             for (std::basic_string<char32_t>::const_iterator c = utxt.begin(); c != utxt.end(); c++) {
                 mplot::visgl::CharInfo ci = this->face->glchars[*c];
+                if (ci.textureID == 0) { throw std::runtime_error ("No texture ID?"); }
                 float drop = (ci.size.y() - ci.bearing.y()) * this->fontscale;
                 geom.max_drop = (drop > geom.max_drop) ? drop : geom.max_drop;
                 float bearingy = ci.bearing.y() * this->fontscale;
@@ -151,12 +145,14 @@ namespace mplot
 
             if (!this->get_glfn) { return geom; }
             if (this->face == nullptr) {
+                std::cout << "Setting face in getTextGeometry (ovld 2)!\n";
                 this->face = VisualResourcesMX<glver>::i().getVisualFace (this->tfeatures, this->parentVis,
                                                                           this->get_glfn(this->parentVis));
             }
 
             for (std::basic_string<char32_t>::const_iterator c = this->txt.begin(); c != this->txt.end(); c++) {
                 mplot::visgl::CharInfo ci = this->face->glchars[*c];
+                if (ci.textureID == 0) { throw std::runtime_error ("No texture ID?"); }
                 float drop = (ci.size.y() - ci.bearing.y()) * this->fontscale;
                 geom.max_drop = (drop > geom.max_drop) ? drop : geom.max_drop;
                 float bearingy = ci.bearing.y() * this->fontscale;
@@ -200,9 +196,13 @@ namespace mplot
         //! With the given text and font size information, create the quads for the text.
         void setupText (const std::basic_string<char32_t>& _txt)
         {
+            std::cout << "setupText...\n";
             if (this->face == nullptr) {
+                std::cout << "Getting face in setupText...\n";
                 this->face = VisualResourcesMX<glver>::i().getVisualFace (this->tfeatures, this->parentVis,
                                                                           this->get_glfn(this->parentVis));
+            } else {
+                std::cout << "face not nullptr; not getting face.\n";
             }
 
             this->txt = _txt;
@@ -219,12 +219,14 @@ namespace mplot
                     // Skip newline, but add a y offset and reset letter_pos
                     letter_pos = 0.0f;
                     mplot::visgl::CharInfo ch = this->face->glchars['h'];
+                    if (ch.textureID == 0) { throw std::runtime_error ("No texture ID?"); }
                     letter_y += this->line_spacing * -ch.size.y() * this->fontscale;
                     continue;
                 }
 
                 // Add a quad to this->quads
                 mplot::visgl::CharInfo ci = this->face->glchars[*c];
+                if (ci.textureID == 0) { throw std::runtime_error ("No texture ID?"); }
 
                 float xpos = letter_pos + ci.bearing.x() * this->fontscale;
                 float ypos = letter_y - (ci.size.y() - ci.bearing.y()) * this->fontscale;

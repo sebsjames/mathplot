@@ -7,5 +7,6 @@ int main()
     v.bindmodel (tax);
     tax->finalize();
     v.addVisualModel (tax);
-    v.keepOpen();
+    v.render();
+    while (v.readyToFinish() == false) { v.waitevents(0.02); }
 }

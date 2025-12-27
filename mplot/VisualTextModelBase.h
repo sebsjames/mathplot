@@ -142,7 +142,7 @@ namespace mplot
         }
 
     protected:
-        static constexpr bool debug_textquads = false;
+        static constexpr bool debug_textquads = true;
 
         //! Initialize the vertices that will represent the Quads.
         void initializeVertices() {

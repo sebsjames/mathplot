@@ -372,6 +372,9 @@ target_link_libraries(ellipsoid OpenGL::GL glfw Freetype::Freetype)
 add_executable(component_models component_models.cpp)
 target_link_libraries(component_models OpenGL::GL glfw Freetype::Freetype)
 
+add_executable(component_models2 component_models2.cpp)
+target_link_libraries(component_models2 OpenGL::GL glfw Freetype::Freetype)
+
 # constexpr code won't work on Apple Clang
 if(NOT APPLE)
   add_executable(icosahedron icosahedron.cpp)

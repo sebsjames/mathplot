@@ -101,9 +101,15 @@ namespace mplot
         T* addVisualModel (std::unique_ptr<T>& model)
         {
             std::unique_ptr<mplot::VisualModelBase<glver>> vmp = std::move(model);
+            vmp->name += " component";
             this->components.push_back (std::move(vmp));
             return static_cast<T*>(this->components.back().get());
         }
+
+        // Copy function bindings to the components
+        virtual void bindComponents() = 0;
+
+        void finalizeComponents() { for (auto& model : this->components) { model->finalize(); } }
 
         /*!
          * Set up the passed-in VisualTextModel with functions that need access to the parent Visual attributes.
@@ -416,6 +422,9 @@ namespace mplot
             // Release context after creating and finalizing this VisualModel. On Visual::render(),
             // context will be re-acquired.
             if (this->releaseContext != nullptr) { this->releaseContext (this->parentVis); }
+
+            this->bindComponents();
+            this->finalizeComponents();
         }
 
         //! Render the VisualModel. Note that it is assumed that the OpenGL context has been

@@ -30,14 +30,14 @@ struct IHaveAComponentVisual : public mplot::VisualModel<glver>
         this->viewmatrix.translate (_offset);
 
         // The NormalsVisual is the component
-        auto nrm = std::make_unique<mplot::NormalsVisual<>> (this);
+        auto nrm = std::make_unique<mplot::NormalsVisual<glver>> (this);
         // NB: You DON'T bindmodel() a component model at this point. components will use the binding of the owning VM
         // NB: ALSO, you don't finalize before adding. The owning VM's finalize will call the component finalize()
         this->nrms = this->addVisualModel (nrm); // bindmodel and finalize have to happen when IHaveAComponentVisual::finalize runs
     }
 
     // Holding a pointer to the component allows access to its features by client code
-    mplot::NormalsVisual<>* nrms = nullptr;
+    mplot::NormalsVisual<glver>* nrms = nullptr;
 
     void initializeVertices()
     {

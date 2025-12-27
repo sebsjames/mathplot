@@ -98,6 +98,9 @@ if(ARMADILLO_FOUND)
   add_executable(scatter_hex_mercator scatter_hex_mercator.cpp)
   target_link_libraries(scatter_hex_mercator OpenGL::GL glfw Freetype::Freetype)
 
+  add_executable(scatter3 scatter3.cpp)
+  target_link_libraries(scatter3 OpenGL::GL glfw Freetype::Freetype)
+
   add_executable(rosenbrock rosenbrock.cpp)
   target_compile_definitions(rosenbrock PUBLIC FLT=float)
   target_link_libraries(rosenbrock OpenGL::GL glfw Freetype::Freetype)

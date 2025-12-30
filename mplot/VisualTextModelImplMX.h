@@ -119,7 +119,6 @@ namespace mplot
 
             if (!this->get_glfn) { return geom; }
             if (this->face == nullptr) {
-                std::cout << "Setting face in getTextGeometry!\n";
                 this->face = VisualResourcesMX<glver>::i().getVisualFace (this->tfeatures, this->parentVis,
                                                                           this->get_glfn(this->parentVis));
             }
@@ -145,7 +144,6 @@ namespace mplot
 
             if (!this->get_glfn) { return geom; }
             if (this->face == nullptr) {
-                std::cout << "Setting face in getTextGeometry (ovld 2)!\n";
                 this->face = VisualResourcesMX<glver>::i().getVisualFace (this->tfeatures, this->parentVis,
                                                                           this->get_glfn(this->parentVis));
             }
@@ -196,13 +194,9 @@ namespace mplot
         //! With the given text and font size information, create the quads for the text.
         void setupText (const std::basic_string<char32_t>& _txt)
         {
-            std::cout << "setupText...\n";
             if (this->face == nullptr) {
-                std::cout << "Getting face in setupText...\n";
                 this->face = VisualResourcesMX<glver>::i().getVisualFace (this->tfeatures, this->parentVis,
                                                                           this->get_glfn(this->parentVis));
-            } else {
-                std::cout << "face not nullptr; not getting face.\n";
             }
 
             this->txt = _txt;
@@ -234,10 +228,10 @@ namespace mplot
                 float h = ci.size.y() * this->fontscale;
 
                 // Update extents
-                if (xpos < this->extents[0]) { this->extents[0] = xpos; } // left
-                if (xpos+w > this->extents[1]) { this->extents[1] = xpos+w; } // right
-                if (ypos < this->extents[2]) { this->extents[2] = ypos; } // bottom
-                if (ypos+h > this->extents[3]) { this->extents[3] = ypos+h; } // top
+                if (xpos < this->extents[0]) { this->extents[0] = xpos; }         // left
+                if (xpos + w > this->extents[1]) { this->extents[1] = xpos + w; } // right
+                if (ypos < this->extents[2]) { this->extents[2] = ypos; }         // bottom
+                if (ypos + h > this->extents[3]) { this->extents[3] = ypos + h; } // top
 
                 // What's the order of the vertices for the quads? It is:
                 // Bottom left, Top left, top right, bottom right.
@@ -252,15 +246,15 @@ namespace mplot
                               << ") to (" << tbox[3] << "," << tbox[4] << "," << tbox[5]
                               << ") to (" << tbox[6] << "," << tbox[7] << "," << tbox[8]
                               << ") to (" << tbox[9] << "," << tbox[10] << "," << tbox[11]
-                              << "). w="<<w<<", h="<<h<<"\n";
-                    std::cout << "Texture ID for that character is: " << ci.textureID << std::endl;
+                              << "). w=" << w << ", h=" << h
+                              << "\nTexture ID for that character is: " << ci.textureID << std::endl;
                 }
                 this->quads.push_back (tbox);
                 this->quad_ids.push_back (ci.textureID);
 
                 // The value in ci.advance has to be divided by 64 to bring it into the
                 // same units as the ci.size and ci.bearing values.
-                letter_pos += ((ci.advance>>6)*this->fontscale);
+                letter_pos += ((ci.advance >> 6) * this->fontscale);
             }
 
             // Ensure we've cleared out vertex info

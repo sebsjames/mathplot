@@ -14,6 +14,7 @@
 #pragma once
 
 #include <mplot/VisualFaceBase.h>
+#include <mplot/unicode.h>
 
 #if defined __gl3_h_ || defined __gl_h_
 // GL headers have been externally included
@@ -58,20 +59,19 @@ namespace mplot::visgl
                 // generate texture
                 unsigned int texture = 0;
 
-                if (glfn == nullptr) { throw std::runtime_error ("glfn problem"); }
+                if (glfn == nullptr) { throw std::runtime_error ("VisualFaceMX(): glfn problem"); }
                 glfn->GenTextures (1, &texture);
+                if (texture == 0u) { throw std::runtime_error ("VisualFaceMX(): GenTextures set texture 0?"); }
                 glfn->BindTexture (GL_TEXTURE_2D, texture);
-                glfn->TexImage2D(
-                    GL_TEXTURE_2D,
-                    0,
-                    GL_RED,
-                    this->face->glyph->bitmap.width,
-                    this->face->glyph->bitmap.rows,
-                    0,
-                    GL_RED,
-                    GL_UNSIGNED_BYTE,
-                    this->face->glyph->bitmap.buffer
-                    );
+                glfn->TexImage2D (GL_TEXTURE_2D,
+                                  0,
+                                  GL_RED,
+                                  this->face->glyph->bitmap.width,
+                                  this->face->glyph->bitmap.rows,
+                                  0,
+                                  GL_RED,
+                                  GL_UNSIGNED_BYTE,
+                                  this->face->glyph->bitmap.buffer);
                 // set texture options
                 glfn->TexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
                 glfn->TexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -87,13 +87,18 @@ namespace mplot::visgl
                 };
 
                 if constexpr (debug_visualface == true) {
-                    std::cout << "Inserting character into this->glchars with info: ID:" << glchar.textureID
+                    std::cout << "Inserting character " << mplot::unicode::toUtf8(c)
+                              << " into this->glchars with info: ID:" << glchar.textureID
                               << ", Size:" << glchar.size << ", Bearing:" << glchar.bearing
                               << ", Advance:" << glchar.advance << std::endl;
                 }
                 this->glchars.insert (std::pair<char32_t, mplot::visgl::CharInfo>(c, glchar));
             }
             glfn->BindTexture(GL_TEXTURE_2D, 0);
+
+            if constexpr (debug_visualface == true) {
+                std::cout << "Inserted " << this->glchars.size() << " glyphs into this->glchars\n";
+            }
 
             // At this point could FT_Done_Face() etc, I think. as we no longer do anything Freetypey with it.
             FT_Done_Face (this->face);

@@ -50,6 +50,7 @@ int main()
     sv->setScalarData (&data);
     sv->radiusFixed = 0.03f;
     sv->colourScale = scale1;
+    sv->addLabel ("test", sm::vec<>{1,0,0}, mplot::TextFeatures(0.05f)); // THIS is critical to set up textures for the component model
     sv->cm.setType (mplot::ColourMapType::Plasma);
     sv->finalize();
     v.addVisualModel (sv);

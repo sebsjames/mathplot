@@ -389,7 +389,7 @@ namespace mplot
          * See GraphVisual.h for examples.
          */
         std::unique_ptr<mplot::VisualTextModel<glver>> makeVisualTextModel(const mplot::TextFeatures& tfeatures,
-                                                                           const std::string _name = "VTM")
+                                                                           const std::string _name = "vtm")
         {
             auto tmup = std::make_unique<mplot::VisualTextModel<glver>> (tfeatures);
             tmup->name = _name;

@@ -34,7 +34,6 @@ namespace mplot
 
         void initializeVertices()
         {
-            std::cout << "TriaxesVisual::initializeVertices\n";
             // First compute the x/y/z scales. Set the range_max of each to the ends of
             // the axes leaving range_mins at 0.
             this->x_scale.output_range.max = this->axis_ends[0];

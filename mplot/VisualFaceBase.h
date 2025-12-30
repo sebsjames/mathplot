@@ -385,7 +385,7 @@ namespace mplot::visgl
             FT_Set_Pixel_Sizes (this->face, 0, fontpixels);
 
             // Can I check this->face for how many glyphs it has? Yes:
-            // std::cout << "This face (path " << fontpath << ") has " << this->face->num_glyphs << " glyphs.\n";
+            // std::cout << "This face has " << this->face->num_glyphs << " glyphs.\n";
         }
 
         //! Create a temporary font file at fontpath, using the embedded data

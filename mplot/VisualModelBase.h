@@ -90,6 +90,26 @@ namespace mplot
     {
         VisualModelBase() {}
         VisualModelBase (const sm::vec<float> _offset) { this->viewmatrix.translate (_offset); }
+        virtual ~VisualModelBase() {} // virtual deconstructor to keep clang happy
+
+        // A VisualModel may contain a number of component VisualModels. When render is called, each
+        // component is rendered.
+        std::vector<std::unique_ptr<mplot::VisualModelBase<glver>>> components;
+
+        //! Add a VisualModel as a component to this VisualModel
+        template <typename T>
+        T* addVisualModel (std::unique_ptr<T>& model)
+        {
+            std::unique_ptr<mplot::VisualModelBase<glver>> vmp = std::move(model);
+            vmp->name += " component";
+            this->components.push_back (std::move(vmp));
+            return static_cast<T*>(this->components.back().get());
+        }
+
+        // Copy function bindings to the components
+        virtual void bindComponents() = 0;
+
+        void finalizeComponents() { for (auto& model : this->components) { model->finalize(); } }
 
         /*!
          * Set up the passed-in VisualTextModel with functions that need access to the parent Visual attributes.
@@ -402,6 +422,9 @@ namespace mplot
             // Release context after creating and finalizing this VisualModel. On Visual::render(),
             // context will be re-acquired.
             if (this->releaseContext != nullptr) { this->releaseContext (this->parentVis); }
+
+            this->bindComponents();
+            this->finalizeComponents();
         }
 
         //! Render the VisualModel. Note that it is assumed that the OpenGL context has been
@@ -420,10 +443,16 @@ namespace mplot
 
         virtual void setSceneMatrixTexts (const sm::mat<float, 4>& sv) = 0;
 
+        void setSceneMatrixComponents (const sm::mat44<float>& sv)
+        {
+            for (auto& cmp : this->components) { cmp->setSceneMatrix (sv); }
+        }
+
         //! When setting the scene matrix, also have to set the text's scene matrices.
         void setSceneMatrix (const sm::mat<float, 4>& sv)
         {
             this->scenematrix = sv;
+            this->setSceneMatrixComponents (sv);
             this->setSceneMatrixTexts (sv);
         }
 
@@ -815,7 +844,14 @@ namespace mplot
         bool wireframe() const { return this->flags.test (vm_bools::wireframe); }
 
         void instanced (const bool val) { this->flags.set (vm_bools::instanced, val); }
-        bool instanced() const { return this->flags.test (vm_bools::instanced); }
+        bool instanced() const
+        {
+            bool cmpts_inst = this->flags.test (vm_bools::instanced);
+            for (auto& cmp : this->components) {
+                if (cmp->instanced()) { cmpts_inst = true; }
+            }
+            return cmpts_inst;
+        }
 
         //! Getter for vertex positions (for mplot::NormalsVisual)
         std::vector<float> getVertexPositions() { return this->vertexPositions; }

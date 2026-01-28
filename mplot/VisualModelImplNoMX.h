@@ -66,6 +66,21 @@ namespace mplot
             model->releaseContext = &mplot::VisualBase<glver>::release_context;
         }
 
+        void bindComponents()
+        {
+            for (auto& cmpt : this->components) {
+                auto model = reinterpret_cast<VisualModelImpl<glver, mx>*>(cmpt.get());
+                model->set_parent (this->parentVis);
+                model->get_shaderprogs = this->get_shaderprogs;
+                model->get_gprog = this->get_gprog;
+                model->get_tprog = this->get_tprog;
+                model->instanced_needs_update = this->instanced_needs_update;
+                model->init_instance_data = this->init_instance_data;
+                model->insert_instance_data = this->insert_instance_data;
+                model->insert_instparam_data = this->insert_instparam_data;
+            }
+        }
+
         void set_instance_data (const sm::vvec<sm::vec<float, 3>>& position) final
         {
             sm::vvec<std::array<float, 3>> c = { mplot::colour::crimson };
@@ -256,6 +271,9 @@ namespace mplot
         void render() // not final
         {
             if (this->hidden() == true) { return; }
+
+            // render any components
+            for (uint32_t i = 0; i < this->components.size(); ++i) { this->components[i]->render(); }
 
             // Execute post-vertex init at render, as GL should be available.
             if (this->flags.test (vm_bools::postVertexInitRequired) == true) { this->postVertexInit(); }

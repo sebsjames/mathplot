@@ -91,6 +91,7 @@ install(
   RingVisual.h
   RodVisual.h
   ScatterVisual.h
+  Scatter3Visual.h
   SphereVisual.h
   SphericalProjectionVisual.h
   TriangleVisual.h

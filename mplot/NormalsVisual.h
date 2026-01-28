@@ -20,6 +20,8 @@ namespace mplot
         {
             this->mymodel = _mymodel;
             this->viewmatrix = _mymodel->getViewMatrix();
+            this->name = "Normals";
+            if (!_mymodel->name.empty()) { this->name += " for " + _mymodel->name; }
             // We create the model's navmesh, in case it wasn't already done
             this->mymodel->make_navmesh();
         }

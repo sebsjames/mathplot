@@ -105,6 +105,9 @@ if(ARMADILLO_FOUND)
   add_executable(scatter_hex_mercator scatter_hex_mercator.cpp)
   target_link_libraries(scatter_hex_mercator OpenGL::GL glfw Freetype::Freetype)
 
+  add_executable(scatter3 scatter3.cpp)
+  target_link_libraries(scatter3 OpenGL::GL glfw Freetype::Freetype)
+
   add_executable(rosenbrock rosenbrock.cpp)
   target_compile_definitions(rosenbrock PUBLIC FLT=float)
   target_link_libraries(rosenbrock OpenGL::GL glfw Freetype::Freetype)
@@ -375,6 +378,12 @@ endif()
 
 add_executable(ellipsoid ellipsoid.cpp)
 target_link_libraries(ellipsoid OpenGL::GL glfw Freetype::Freetype)
+
+add_executable(component_models component_models.cpp)
+target_link_libraries(component_models OpenGL::GL glfw Freetype::Freetype)
+
+add_executable(component_models2 component_models2.cpp)
+target_link_libraries(component_models2 OpenGL::GL glfw Freetype::Freetype)
 
 # constexpr code won't work on Apple Clang
 if(NOT APPLE)

@@ -1,9 +1,9 @@
 #pragma once
 
-#include <sm/mathconst>
-#include <sm/vec>
-#include <mplot/VisualModel.h>
 #include <array>
+#include <sm/mathconst>
+import sm.vec;
+#include <mplot/VisualModel.h>
 
 namespace mplot
 {

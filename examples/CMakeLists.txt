@@ -22,6 +22,32 @@ endif()
 # All #includes in test programs have to be #include <mplot/header.h>
 include_directories(BEFORE ${PROJECT_SOURCE_DIR})
 
+# Each C++ module file has to be listed here (as they don't have a .cppm or .ixx file suffix)
+set_source_files_properties (
+  ${PROJECT_SOURCE_DIR}/maths/sm/range
+  ${PROJECT_SOURCE_DIR}/maths/sm/random
+  ${PROJECT_SOURCE_DIR}/maths/sm/vec
+  ${PROJECT_SOURCE_DIR}/maths/sm/vvec
+  ${PROJECT_SOURCE_DIR}/maths/sm/scale
+  ${PROJECT_SOURCE_DIR}/maths/sm/hdfdata
+  ${PROJECT_SOURCE_DIR}/maths/sm/quaternion
+  ${PROJECT_SOURCE_DIR}/maths/sm/mat
+  ${PROJECT_SOURCE_DIR}/maths/sm/hex
+  ${PROJECT_SOURCE_DIR}/maths/sm/bezcoord
+  ${PROJECT_SOURCE_DIR}/maths/sm/bezcurve
+  ${PROJECT_SOURCE_DIR}/maths/sm/winder
+  ${PROJECT_SOURCE_DIR}/maths/sm/bootstrap
+  ${PROJECT_SOURCE_DIR}/maths/sm/grid
+  ${PROJECT_SOURCE_DIR}/maths/sm/algo
+  ${PROJECT_SOURCE_DIR}/maths/sm/nm_simplex
+  ${PROJECT_SOURCE_DIR}/maths/sm/histo
+  ${PROJECT_SOURCE_DIR}/maths/sm/boxfilter
+  ${PROJECT_SOURCE_DIR}/maths/sm/config
+  ${PROJECT_SOURCE_DIR}/maths/sm/geometry
+  ${PROJECT_SOURCE_DIR}/maths/sm/geometry_polyhedra
+  ${PROJECT_SOURCE_DIR}/maths/sm/flags
+  PROPERTIES LANGUAGE CXX)
+
 # Screenshots used in the documentation/reference website
 if(BUILD_DOC_SCREENSHOTS)
   add_subdirectory(docs)
@@ -146,6 +172,18 @@ if(ARMADILLO_FOUND)
 endif(ARMADILLO_FOUND)
 
 add_executable(helloworld helloworld.cpp)
+target_sources(helloworld PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT_SOURCE_DIR}
+  FILES
+  ${PROJECT_SOURCE_DIR}/maths/sm/flags
+  ${PROJECT_SOURCE_DIR}/maths/sm/algo
+  ${PROJECT_SOURCE_DIR}/maths/sm/range
+  ${PROJECT_SOURCE_DIR}/maths/sm/random
+  ${PROJECT_SOURCE_DIR}/maths/sm/vec
+  ${PROJECT_SOURCE_DIR}/maths/sm/quaternion
+  ${PROJECT_SOURCE_DIR}/maths/sm/mat
+  ${PROJECT_SOURCE_DIR}/maths/sm/geometry
+  ${PROJECT_SOURCE_DIR}/maths/sm/geometry_polyhedra
+  ${PROJECT_SOURCE_DIR}/maths/sm/vvec)
 target_link_libraries(helloworld OpenGL::GL glfw Freetype::Freetype)
 
 add_executable(helloworld_nomx helloworld_nomx.cpp)

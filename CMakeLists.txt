@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.14)
-project(mathplot)
+cmake_minimum_required(VERSION 3.28.5)
+project(mathplot LANGUAGES CXX)
 # Note that the project version is encoded in mplot/version.h and not in this CMakeLists.txt
 
 message(STATUS "Install prefix: ${CMAKE_INSTALL_PREFIX}")

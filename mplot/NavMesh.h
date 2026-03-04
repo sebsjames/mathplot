@@ -20,12 +20,13 @@
 #include <stdexcept>
 #include <string_view>
 
-#include <sm/vec>
-#include <sm/vvec>
-#include <sm/flags>
-#include <sm/mat>
-#include <sm/geometry>
 #include <sm/util>
+
+import sm.vec;
+import sm.vvec;
+import sm.flags;
+import sm.mat;
+import sm.geometry;
 
 namespace mplot
 {

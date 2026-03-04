@@ -35,16 +35,17 @@
 
 #include <mplot/gl/version.h>
 
-#include <sm/geometry_polyhedra>
-#include <sm/quaternion>
-#include <sm/mat>
-#include <sm/vec>
-#include <sm/vvec>
-#include <sm/range>
 #include <sm/mathconst>
 #include <sm/base64>
-#include <sm/algo>
-#include <sm/flags>
+
+import sm.geometry_polyhedra;
+import sm.quaternion;
+import sm.mat;
+import sm.vec;
+import sm.vvec;
+import sm.range;
+import sm.algo;
+import sm.flags;
 
 #include <mplot/VisualCommon.h>
 #include <mplot/colour.h>

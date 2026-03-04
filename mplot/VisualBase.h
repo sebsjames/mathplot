@@ -18,10 +18,10 @@
 #include <functional>
 #include <cstddef>
 
-#include <sm/flags>
-#include <sm/quaternion>
-#include <sm/mat>
-#include <sm/vec>
+import sm.flags;
+import sm.quaternion;
+import sm.mat;
+import sm.vec;
 
 #include <mplot/gl/version.h>
 #include <mplot/VisualModel.h>

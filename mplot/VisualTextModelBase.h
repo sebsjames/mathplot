@@ -16,12 +16,13 @@
 #include <map>
 #include <limits>
 #include <memory>
+#include <functional>
 
 #include <mplot/gl/version.h>
 
-#include <sm/quaternion>
-#include <sm/mat>
-#include <sm/vec>
+import sm.quaternion;
+import sm.mat;
+import sm.vec;
 #include <sm/mathconst>
 
 #include <mplot/VisualCommon.h>

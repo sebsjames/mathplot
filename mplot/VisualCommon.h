@@ -11,10 +11,12 @@
 #include <cstring>
 #include <string>
 #include <array>
-#include <sm/vec>
-#include <sm/range>
-#include <sm/vvec>
-#include <sm/mat>
+
+import sm.vec;
+import sm.range;
+import sm.vvec;
+import sm.mat;
+
 #include <mplot/tools.h>
 #include <mplot/colour.h>
 

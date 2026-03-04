@@ -9,7 +9,7 @@
 #pragma once
 
 #include <array>
-#include <sm/vec>
+import sm.vec;
 #include <mplot/gl/version.h>
 #include <mplot/VisualModel.h>
 #include <mplot/colour.h>

@@ -6,7 +6,7 @@ message(STATUS "Install prefix: ${CMAKE_INSTALL_PREFIX}")
 message(STATUS "  (This can be changed with `cmake -DCMAKE_INSTALL_PREFIX=/some/place`")
 
 #
-# The base C++ version in mathplot is current C++-17 but I am considering C++20 or 23
+# We're firmly at C++20.
 #
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -44,9 +44,9 @@ else()
     set(CMAKE_CXX_FLAGS "-Wall -g -std=c++20 -xHOST -O3")
   else() # GCC or Clang
     if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
-      # Add compiler version check, to ensure gcc is version 11 or later.
-      if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 11)
-        message(FATAL_ERROR "GCC version must be at least 11")
+      # Add compiler version check, to ensure gcc is version 14? 15? or later.
+      if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 14)
+        message(FATAL_ERROR "GCC version must be at least 14")
       else()
         message(STATUS "GCC version ${CMAKE_CXX_COMPILER_VERSION} OK!")
       endif()

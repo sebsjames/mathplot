@@ -13,9 +13,6 @@
 #include <sstream>
 #include <vector>
 #include <array>
-#include <map>
-#include <limits>
-#include <memory>
 #include <functional>
 
 #include <mplot/gl/version.h>

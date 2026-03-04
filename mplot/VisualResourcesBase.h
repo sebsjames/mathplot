@@ -10,11 +10,6 @@
 
 #pragma once
 
-#include <iostream>
-#include <tuple>
-#include <set>
-#include <stdexcept>
-#include <memory>
 #include <mplot/gl/version.h>
 #include <mplot/VisualFont.h>
 // FreeType for text rendering

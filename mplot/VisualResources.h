@@ -15,10 +15,10 @@ module;
 #include <mplot/glad/gl.h>
 
 // Probably DO want to separate all things GLFW into VisualGlfw.
-#ifndef _glfw3_h_
-# define GLFW_INCLUDE_NONE
-# include <GLFW/glfw3.h>
-#endif
+//#ifndef _glfw3_h_
+//# define GLFW_INCLUDE_NONE
+//# include <GLFW/glfw3.h>
+//#endif
 
 // FreeType for text rendering
 #include <ft2build.h>
@@ -36,7 +36,6 @@ import mplot.visualcommon;
 import mplot.visualface;
 import mplot.visualfont;
 import mplot.textfeatures;
-import mplot.win_t;
 import mplot.gl.version;
 import mplot.gl.util;
 import sm.vec;
@@ -172,18 +171,15 @@ export namespace mplot
         std::map<uint32_t, GladGLContext*> visual_keyed_gladglcontexts;
         // GL shader programs used by Visual in the program, keyed by ID
         std::map<uint32_t, mplot::visgl::visual_shaderprogs> visual_keyed_shaderprogs;
-        // Window contexts
-        std::map<uint32_t, mplot::win_t*> visual_keyed_windows;
         // Does instanced data need update?
         std::map<uint32_t, bool> visual_keyed_instanced_needs_update;
 
         // win_t is GLFWwindow and this is really 'struct GLFWwindow' so we need it to be properly defined
-        uint32_t register_visual (GladGLContext* glfn, mplot::win_t* win)
+        uint32_t register_visual (GladGLContext* glfn)
         {
             uint32_t visual_id = this->next_visual_id++;
             this->visual_keyed_gladglcontexts[visual_id] = glfn;
             this->visual_keyed_shaderprogs[visual_id] = {}; // initialized empty with 0s
-            this->visual_keyed_windows[visual_id] = win;
             this->visual_keyed_instanced_needs_update[visual_id] = false;
             return visual_id;
         }
@@ -241,17 +237,6 @@ export namespace mplot
             }
             return this->visual_keyed_shaderprogs[visual_id].gprog;
         }
-
-        // Better in VisualGlfw? Or should what's in VisualGlfw come in here?
-        void setContext (const uint32_t visual_id)
-        {
-            if (visual_id == std::numeric_limits<uint32_t>::max()) {
-                throw std::runtime_error ("VisualResources::setContext(): visual_id is unset");
-            }
-            glfwMakeContextCurrent (this->visual_keyed_windows[visual_id]);
-        }
-
-        void releaseContext() { glfwMakeContextCurrent (nullptr); }
 
         bool get_instanced_needs_update (const uint32_t visual_id)
         {

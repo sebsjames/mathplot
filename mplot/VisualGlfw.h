@@ -19,6 +19,7 @@ module;
 export module mplot.visualglfw;
 
 import mplot.gl.version;
+import mplot.win_t;
 
 export namespace mplot
 {
@@ -75,6 +76,26 @@ export namespace mplot
             static VisualGlfw instance;
             return instance;
         }
+
+        // Using the visual_id obtained from VisualResources, store the GLFW window context win
+        uint32_t store_keyed_window_context (mplot::win_t* win, const uint32_t visual_id)
+        {
+            this->visual_keyed_windows[visual_id] = win;
+        }
+
+        // Window contexts
+        std::map<uint32_t, mplot::win_t*> visual_keyed_windows;
+
+        // Set the window context
+        void setContext (const uint32_t visual_id)
+        {
+            if (visual_id == std::numeric_limits<uint32_t>::max()) {
+                throw std::runtime_error ("VisualResources::setContext(): visual_id is unset");
+            }
+            glfwMakeContextCurrent (this->visual_keyed_windows[visual_id]);
+        }
+
+        void releaseContext() { glfwMakeContextCurrent (nullptr); }
     };
 
 } // namespace mplot

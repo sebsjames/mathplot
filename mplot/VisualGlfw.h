@@ -14,6 +14,9 @@ module;
 #endif
 
 #include <iostream>
+#include <cstdint>
+#include <map>
+#include <limits>
 #include <stdexcept>
 
 export module mplot.visualglfw;

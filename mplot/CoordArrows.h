@@ -59,13 +59,13 @@ export namespace mplot
                 this->reinit(); // sets context, does not release it
 
                 // Give the text labels a suitable, visible colour
-                mplot::VisualResources<glver>::i().setContext (this->parentVis);
+                mplot::VisualGlfw<glver>::i().setContext (this->parentVis);
                 auto ti = this->texts.begin();
                 while (ti != this->texts.end()) {
                     (*ti)->setVisibleOn (bgcolour);
                     ti++;
                 }
-                mplot::VisualResources<glver>::i().releaseContext();
+                mplot::VisualGlfw<glver>::i().releaseContext(); // with this, glfw is still baked into a visualmodel. not good.
             }
         }
 

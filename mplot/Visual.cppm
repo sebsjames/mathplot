@@ -22,7 +22,6 @@ module;
 # include <GLFW/glfw3.h>
 #endif // _glfw3_h_
 
-#include <mutex>
 #include <chrono>
 #include <utility>
 
@@ -117,7 +116,7 @@ export namespace mplot
         //! then obtain the context.
         void lockContext()
         {
-            this->context_mutex.lock();
+            mplot::VisualResources<glver>::i().context_mutex_lock();
             this->setContext();
         }
 
@@ -125,7 +124,7 @@ export namespace mplot
         //! context and return true. If the mutex lock is not obtained, return false.
         bool tryLockContext()
         {
-            if (this->context_mutex.try_lock()) {
+            if (mplot::VisualResources<glver>::i().context_mutex_try_lock()) {
                 this->setContext();
                 return true;
             }
@@ -136,7 +135,7 @@ export namespace mplot
         void unlockContext()
         {
             this->releaseContext();
-            this->context_mutex.unlock();
+            mplot::VisualResources<glver>::i().context_mutex_unlock();
         }
 
         //! Release the OpenGL context
@@ -236,9 +235,6 @@ export namespace mplot
         }
 
     private:
-        //! Context mutex to prevent contexts being acquired in a non-threadsafe manner.
-        std::mutex context_mutex;
-
         /*
          * GLFW callback dispatch functions
          */

@@ -28,6 +28,7 @@ module;
 #include <iostream>
 #include <map>
 #include <memory>
+#include <mutex>
 #include <mplot/gl/ssbo_mx.h>
 
 export module mplot.visualresources;
@@ -67,6 +68,9 @@ export namespace mplot
 
         //! FreeType library object. Keyed by the 'visual_id' an ID of the Visual instance.
         std::map<uint32_t, FT_Library> freetypes;
+
+        //! Context mutex to prevent contexts being acquired in a non-threadsafe manner.
+        std::mutex context_mutex;
 
     public:
         VisualResources(const VisualResources<glver>&) = delete;
@@ -268,6 +272,10 @@ export namespace mplot
             }
             this->visual_keyed_instanced_needs_update[visual_id] = val;
         }
+
+        void context_mutex_lock() { this->context_mutex.lock(); }
+        void context_mutex_unlock() { this->context_mutex.unlock(); }
+        void context_mutex_try_lock() { this->context_mutex.try_lock(); }
 
         /*!
          * We also manage some programm-wide SSBO objects for instanced rendering

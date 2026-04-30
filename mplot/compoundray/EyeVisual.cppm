@@ -290,7 +290,7 @@ export namespace mplot::compoundray
                     min_dist_to_other[i] = dist_to_other.min();
                 }
             }
-            std::cerr << "Mean ommatidial distance: " << this->min_dist_to_other.mean() << std::endl;
+            // std::cerr << "Mean ommatidial distance: " << this->min_dist_to_other.mean() << std::endl;
 
             // First find out if all focal points are 0
             this->focal_point_sum = 0.0f;
@@ -340,7 +340,7 @@ export namespace mplot::compoundray
                 }
 
             } else if (show_3d && this->focal_point_sum <= 0.0f) {
-                std::cout << "Stanza 2\n";
+                // std::cout << "Stanza 2\n";
                 // All our focal_points are 0. Don't have focal point offset to help define our
                 // cones, only acceptance angle. Use manually specified tube_length (or computed
                 // radius) to figure out the size of a cone, whose tip is the location of the

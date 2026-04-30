@@ -1960,8 +1960,9 @@ export namespace mplot
             sm::vec<float> mv_orthog = tn0 * (mv_sf.dot (tn0) / (tn0.dot (tn0)));
             sm::vec<float> mv_inplane = mv_sf - mv_orthog; // scene frame, a relative movement
             if (mv_inplane.length() == 0.0f) {
-                if constexpr (debug_move) { std::cout << "No movement, so return unchanged camera viewmatrix\n"; }
-                return cam_to_scene;
+                if constexpr (debug_move) { std::cout << "No in-plane movement, so just reapply hoverheight\n"; }
+                cam_to_surface.pretranslate (hoverheight * tn0);
+                return cam_to_surface;
             }
 
             // Now traverse those triangles! The output of this function is cam_to_surface

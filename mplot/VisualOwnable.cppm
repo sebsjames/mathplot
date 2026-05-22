@@ -337,7 +337,7 @@ export namespace mplot
             for (unsigned int modelId = 0; modelId < this->vm.size(); ++modelId) {
                 if (this->vm[modelId].get() == vm_to_follow) {
                     this->followedVM = this->vm[modelId].get();
-                    this->followedLastViewMatrix = this->followedVM->getViewMatrix();
+                    this->followedLastViewMatrix = this->followedVM->getViewMatrix().translation();
                     break;
                 }
             }
@@ -1457,7 +1457,7 @@ export namespace mplot
                     this->scenetrans_delta.zero();
                     this->savedSceneview = this->sceneview;
                     this->savedSceneview_tr = this->sceneview_tr;
-                    if (this->followedVM != nullptr) { this->followedLastViewMatrix = this->followedVM->getViewMatrix(); }
+                    if (this->followedVM != nullptr) { this->followedLastViewMatrix = this->followedVM->getViewMatrix().translation(); }
                 } else {
                     // Translate by an increment
                     if (this->currentAutoSceneviewChange.min_jerk) {
@@ -1487,7 +1487,7 @@ export namespace mplot
                     this->rotation_delta.reset();
                     this->savedSceneview = this->sceneview;
                     this->savedSceneview_tr = this->sceneview_tr;
-                    if (this->followedVM != nullptr) { this->followedLastViewMatrix = this->followedVM->getViewMatrix(); }
+                    if (this->followedVM != nullptr) { this->followedLastViewMatrix = this->followedVM->getViewMatrix().translation(); }
                 } else { // Rotate by an increment
                     if (this->currentAutoSceneviewChange.min_jerk) {
                         propn = this->compute_min_jerk (static_cast<float>(this->currentAutoSceneviewChange.transform_time_frames), 1.0f,
@@ -1515,7 +1515,7 @@ export namespace mplot
                     this->savedSceneview = this->sceneview;
                     this->savedSceneview_tr = this->sceneview_tr;
                     // Update followedLastViewMatrix now!
-                    if (this->followedVM != nullptr) { this->followedLastViewMatrix = this->followedVM->getViewMatrix(); }
+                    if (this->followedVM != nullptr) { this->followedLastViewMatrix = this->followedVM->getViewMatrix().translation(); }
                 } else { // transform, incrementally
                     if (this->currentAutoSceneviewChange.min_jerk) {
                         // propn is time from 0 to 1 of our movement. Compute min-jerk movement x(t)
@@ -1565,7 +1565,7 @@ export namespace mplot
                     this->savedSceneview = this->sceneview;
                     this->savedSceneview_tr = this->sceneview_tr;
                     // Update followedLastViewMatrix now!
-                    if (this->followedVM != nullptr) { this->followedLastViewMatrix = this->followedVM->getViewMatrix(); }
+                    if (this->followedVM != nullptr) { this->followedLastViewMatrix = this->followedVM->getViewMatrix().translation(); }
                 } else { // orbit, incrementally
                     if (this->currentAutoSceneviewChange.min_jerk) {
                         propn = this->compute_min_jerk (static_cast<float>(this->currentAutoSceneviewChange.transform_time_frames), 1.0f,
@@ -1665,12 +1665,22 @@ export namespace mplot
                 if (this->options.test (visual_options::viewFollowsVMTranslations)
                     && this->followedVM != nullptr
                     && this->state.test (visual_state::viewAutomation) == false
-                    && this->followedLastViewMatrix != this->followedVM->getViewMatrix()) {
+                    && this->followedLastViewMatrix != this->followedVM->getViewMatrix().translation()) {
 
                     // Move camera the difference between followedLastViewMatrix and
                     // followedVM->getViewMatrix() in the screen frame of reference.
-                    sm::vec<float> fol_screenframe = (this->sceneview * followedLastViewMatrix.translation()
-                                                      - this->sceneview * followedVM->getViewMatrix().translation()).less_one_dim();
+
+                    // This is complicated a bit by the models moving in the world frame, and the
+                    // sceneview moving in the sceneview frame.
+
+                    // Last viewmatrix location in the screen frame of reference
+                    sm::vec<> flvm_screenframe = (this->sceneview * followedLastViewMatrix).less_one_dim();
+
+                    // Current followedVM position in the screen frame of reference
+                    sm::vec<> fvm_screenframe = (this->sceneview * followedVM->getViewMatrix().translation()).less_one_dim();
+
+                    // The movement between frames, in the screen frame of reference
+                    sm::vec<> fol_screenframe = (flvm_screenframe - fvm_screenframe);
 
                     this->sceneview.pretranslate (fol_screenframe);
                     this->sceneview_tr.pretranslate (fol_screenframe);
@@ -1679,7 +1689,8 @@ export namespace mplot
                     this->lastSceneview.pretranslate (fol_screenframe);
                     this->lastSceneview_tr.pretranslate (fol_screenframe);
 
-                    this->followedLastViewMatrix = this->followedVM->getViewMatrix();
+                    // I think followedLastViewMatrix (now a vector) is the state to place in a 1st order model.
+                    this->followedLastViewMatrix = this->followedVM->getViewMatrix().translation();
                 }
             }
         }
@@ -1697,7 +1708,7 @@ export namespace mplot
         float followedVM_rvel = 0.0f;
 
         //! Holds the viewmatrix of the followedVM the last time we called render
-        sm::mat<float, 4> followedLastViewMatrix;
+        sm::vec<float, 3> followedLastViewMatrix;
 
         // Read-from-json code that is called from init_gl in all implementations:
         void read_scenetrans_from_json()

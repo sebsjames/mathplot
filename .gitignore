@@ -34,6 +34,7 @@
 # Build directories
 build*
 !buildtools
+.cache
 
 # Emacs auto-save files
 *~

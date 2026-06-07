@@ -1,4 +1,11 @@
 cmake_minimum_required(VERSION 3.14)
+
+# --- vcpkg
+if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+    message(STATUS "VCPKG_ROOT: $ENV{VCPKG_ROOT}")
+    set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
+endif()
+
 project(mathplot)
 # Note that the project version is encoded in mplot/version.h and not in this CMakeLists.txt
 

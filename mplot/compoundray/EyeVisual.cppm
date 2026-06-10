@@ -85,6 +85,15 @@ export namespace mplot::compoundray
             this->init (_offset, _ommData, _ommatidia, _head_mesh);
         }
 
+        EyeVisual (const sm::vec<float, 3> _offset,
+                   std::vector<std::array<float, 3>>* _ommData,
+                   std::vector<std::array<float, 3>>* _ommData2,
+                   std::vector<mplot::compoundray::Ommatidium>* _ommatidia,
+                   const mplot::meshgroup* _head_mesh = nullptr)
+        {
+            this->init (_offset, _ommData, _ommData2, _ommatidia, _head_mesh);
+        }
+
         ~EyeVisual() {}
 
         void init (const sm::vec<float, 3> _offset,
@@ -98,13 +107,28 @@ export namespace mplot::compoundray
             this->head_mesh = _head_mesh;
         }
 
+        void init (const sm::vec<float, 3> _offset,
+                   std::vector<std::array<float, 3>>* _ommData,
+                   std::vector<std::array<float, 3>>* _ommData2,
+                   std::vector<mplot::compoundray::Ommatidium>* _ommatidia,
+                   const mplot::meshgroup* _head_mesh = nullptr)
+        {
+            this->viewmatrix.translate (_offset);
+            this->ommData = _ommData;
+            this->ommData2 = _ommData2;
+            this->ommatidia = _ommatidia;
+            this->head_mesh = _head_mesh;
+        }
+
         void reinitColours()
         {
             if (ommData == nullptr) { return; }
             if (ommData->empty()) { return; }
             size_t n_verts = this->vertexColors.size(); // should be tube_vertices * n_omm
             if (n_verts == 0u) { return; } // model doesn't exist yet
+            size_t n_omm_first = ommData->size();
             size_t n_omm = ommData->size();
+            if (ommData2 != nullptr) { n_omm += ommData2->size(); }
 
             std::size_t i_3d = 0;
             if (show_3d) {
@@ -115,13 +139,19 @@ export namespace mplot::compoundray
                 } // else num_vertices = disc_vertices;
 
                 // Re-colour cones built from a focal point offset and acceptance angle
+                std::array<float, 3> colour = {};
                 for (size_t i = 0u; i < n_omm; ++i) {
+                    if (i < n_omm_first) {
+                        colour = (*ommData)[i];
+                    } else {
+                        colour = (*ommData2)[i - n_omm_first];
+                    }
                     // Update the 3 RGB values in vertexColors tube_vertices times
                     int j = 0;
                     for (; j < num_vertices; ++j) {
-                        this->vertexColors[i * num_vertices * 3 + j * 3] =     (*ommData)[i][0];
-                        this->vertexColors[i * num_vertices * 3 + j * 3 + 1] = (*ommData)[i][1];
-                        this->vertexColors[i * num_vertices * 3 + j * 3 + 2] = (*ommData)[i][2];
+                        this->vertexColors[i * num_vertices * 3 + j * 3] =     colour[0];
+                        this->vertexColors[i * num_vertices * 3 + j * 3 + 1] = colour[1];
+                        this->vertexColors[i * num_vertices * 3 + j * 3 + 2] = colour[2];
                     }
                 }
                 // i_3d is the index offset for the 3D part
@@ -133,8 +163,14 @@ export namespace mplot::compoundray
                 // Replace elements of vertexColors
                 std::size_t tcounts = 0;
                 std::size_t d_2d = 0;
+                std::array<float, 3> c = {}; // colour
                 for (std::size_t i = 0u; i < this->projections[pri].triangle_counts.size(); ++i) {
-                    auto c = (*ommData)[this->projections[pri].site_indices[i] + this->projections[pri].start_i];
+                    std::size_t ii = this->projections[pri].site_indices[i] + this->projections[pri].start_i;
+                    if (ii < n_omm_first) {
+                        c = (*ommData)[ii];
+                    } else {
+                        c = (*ommData2)[ii - n_omm_first];
+                    }
                     std::size_t d_idx = i_3d + tcounts * 9; // 3 floats per vtx, 3 vtxs per tri
                     for (std::size_t j = 0; j < 3 * this->projections[pri].triangle_counts[i]; ++j) {
                         // This is ONE colour vertex. Need 3 per triangle.
@@ -275,7 +311,9 @@ export namespace mplot::compoundray
             }
 
             // Draw ommatidia
+            size_t n_omm_first = ommData->size();
             size_t n_omm = ommData->size();
+            if (ommData2 != nullptr) { n_omm += ommData2->size(); }
 
             // Determine eye dimensions
             sm::range<sm::vec<float, 3>> ommrng = sm::range<sm::vec<float, 3>>::search_initialized();
@@ -309,9 +347,14 @@ export namespace mplot::compoundray
                 // We have focal points, so draw with the relativePosition representing the centre
                 // of the ommatidial lens - the base of a cone - which then extends back to the cone
                 // tip, which can be thought of as the location of the ommatidial 'sensor'
+                std::array<float, 3> colour = {};
                 for (size_t i = 0u; i < n_omm; ++i) {
                     // Ommatidia colour, position/shape
-                    std::array<float, 3> colour = (*ommData)[i];
+                    if (i < n_omm_first) {
+                        colour = (*ommData)[i];
+                    } else {
+                        colour = (*ommData2)[i - n_omm_first];
+                    }
                     float angle = (*ommatidia)[i].acceptanceAngleRadians;
                     float focal_point = std::abs((*ommatidia)[i].focalPointOffset);
                     sm::vec<float, 3> pos = (*ommatidia)[i].relativePosition;
@@ -351,8 +394,13 @@ export namespace mplot::compoundray
                 // cones, only acceptance angle. Use manually specified tube_length (or computed
                 // radius) to figure out the size of a cone, whose tip is the location of the
                 // ommatidial sensor AND the centre of the ommatidial lens
+                std::array<float, 3> colour = {};
                 for (size_t i = 0u; i < n_omm; ++i) {
-                    std::array<float, 3> colour = (*ommData)[i];
+                    if (i < n_omm_first) {
+                        colour = (*ommData)[i];
+                    } else {
+                        colour = (*ommData2)[i - n_omm_first];
+                    }
                     float angle = (*ommatidia)[i].acceptanceAngleRadians;
                     // pos will be the tip of the cone in this case, and the centre of the disc
                     sm::vec<float, 3> pos = (*ommatidia)[i].relativePosition;
@@ -414,7 +462,15 @@ export namespace mplot::compoundray
                         }
                     }
                     // Make 2D Voronoi of omm2d.
-                    this->voronoi2d (pri);
+                    if (this->ommData2 != nullptr) {
+                        if (pri == 0) {
+                            this->voronoi2d (pri, this->ommData);
+                        } else {
+                            this->voronoi2d (pri, this->ommData2);
+                        }
+                    } else {
+                        this->voronoi2d (pri, this->ommData);
+                    }
                 }
             }
 
@@ -451,10 +507,12 @@ export namespace mplot::compoundray
             if (this->head_mesh != nullptr) { this->computeMeshgroup (*this->head_mesh); }
         }
 
-        void voronoi2d (uint32_t pri)
+        // Pass in pointer to ommData
+        void voronoi2d (uint32_t pri, std::vector<std::array<float, 3>>* _ommData)
         {
             // Use mplot::range to find the extents of dataCoords. From these create a
             // rectangle to pass to diagram_generate.
+
             int ncoords = static_cast<int>(this->omm2d.size());
 
             jcv::manager<double> vorman; // we need double precision for projections, float may run into trouble
@@ -515,11 +573,19 @@ export namespace mplot::compoundray
                 const jcv::graphedge<double>* e = site->edges;
                 this->projections[pri].site_indices[i] = site->index;
                 std::array<float, 3> colour = mplot::colour::black;
-                if (site->index + this->projections[pri].start_i < ommData->size()) {
-                    colour = (*ommData)[site->index + this->projections[pri].start_i];
+
+                // If ommData and ommData2, it's always:
+                if (this->ommData2 != nullptr) {
+                    colour = (*_ommData)[site->index];
                 } else {
-                    std::cout << "Uh oh, can't access colour [" << site->index << " + " << this->projections[pri].start_i << "]\n";
+                    // else if only one ommData, have to do this:
+                    if (site->index + this->projections[pri].start_i < ommData->size()) {
+                        colour = (*_ommData)[site->index + this->projections[pri].start_i];
+                    } else {
+                        std::cout << "Uh oh, can't access colour [" << site->index << " + " << this->projections[pri].start_i << "]\n";
+                    }
                 }
+
                 uint32_t site_triangles = 0;
                 while (e) {
                     flat_triangles.push_back (site->p.as<float>());
@@ -563,6 +629,9 @@ export namespace mplot::compoundray
         bool cones_will_show = false;
         // The colours detected by each ommatidium
         std::vector<std::array<float, 3>>* ommData = nullptr;
+        // If not null, then half the data is in ommData2. That is, you can optionally pass separate
+        // data for the second eye via a pointer to that data
+        std::vector<std::array<float, 3>>* ommData2 = nullptr;
         // The position and orientation of each ommatidium
         std::vector<mplot::compoundray::Ommatidium>* ommatidia = nullptr;
         // This map is indexed with site index. The values are sets of the neighbour indices. Only

@@ -1284,7 +1284,7 @@ if(BUILD_EXAMPLES_EXTRA)
     ${PROJECT_SOURCE_DIR}/mplot/CurvyTellyVisual.cppm
   )
   target_link_libraries(curvytelly_pipe OpenGL::GL glfw Freetype::Freetype glad mplot_fontdata)
-  
+
   my_add_executable(curvytelly_chequered_pipe curvytelly_chequered_pipe.cpp)
   target_sources(curvytelly_chequered_pipe  PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT_SOURCE_DIR}
     FILES ${MPLOT_MATHS_CORE_MODULES} ${MPLOT_CORE_MODULES}
@@ -1316,8 +1316,8 @@ if(BUILD_EXAMPLES_EXTRA)
   my_add_executable(maketicks maketicks.cpp)
   set(MAKETICKS_MODULES
     ${SM_INTERVAL_MODULES}
-    ${SM_ALGO_MODULES}    
-    ${SM_VVEC_MODULES}    
+    ${SM_ALGO_MODULES}
+    ${SM_VVEC_MODULES}
     ${PROJECT_SOURCE_DIR}/mplot/graphing.cppm
   )
   list(REMOVE_DUPLICATES MAKETICKS_MODULES)
@@ -1330,7 +1330,7 @@ if(BUILD_EXAMPLES_EXTRA)
     FILES ${MPLOT_MATHS_CORE_MODULES} ${MPLOT_CORE_MODULES}
   )
   target_link_libraries(coordarrows OpenGL::GL glfw Freetype::Freetype glad mplot_fontdata)
-  
+
   my_add_executable(frames frames.cpp)
   target_sources(frames PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT_SOURCE_DIR}
     FILES ${MPLOT_MATHS_CORE_MODULES} ${MPLOT_CORE_MODULES}
@@ -1350,34 +1350,34 @@ if(BUILD_EXAMPLES_EXTRA)
     ${PROJECT_SOURCE_DIR}/maths/sm/histo.cppm #
     ${PROJECT_SOURCE_DIR}/maths/sm/grid.cppm  # reqd by GraphVisual
     ${PROJECT_SOURCE_DIR}/mplot/GraphVisual.cppm # reqd by PolarVisual
-    ${PROJECT_SOURCE_DIR}/mplot/PolarVisual.cppm    
+    ${PROJECT_SOURCE_DIR}/mplot/PolarVisual.cppm
   )
   target_link_libraries(polar OpenGL::GL glfw Freetype::Freetype glad mplot_fontdata)
 
   my_add_executable(zernike_radial zernike_radial.cpp)
   target_sources(zernike_radial PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT_SOURCE_DIR}
     FILES ${MPLOT_MATHS_CORE_MODULES} ${MPLOT_CORE_MODULES}
-    ${PROJECT_SOURCE_DIR}/maths/sm/histo.cppm 
-    ${PROJECT_SOURCE_DIR}/maths/sm/grid.cppm  
+    ${PROJECT_SOURCE_DIR}/maths/sm/histo.cppm
+    ${PROJECT_SOURCE_DIR}/maths/sm/grid.cppm
     ${PROJECT_SOURCE_DIR}/mplot/GraphVisual.cppm
   )
   target_link_libraries(zernike_radial OpenGL::GL glfw Freetype::Freetype glad mplot_fontdata)
-  
+
   my_add_executable(zernike zernike.cpp)
   target_sources(zernike PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT_SOURCE_DIR}
     FILES ${MPLOT_MATHS_CORE_MODULES} ${MPLOT_CORE_MODULES}
-    ${PROJECT_SOURCE_DIR}/maths/sm/histo.cppm 
-    ${PROJECT_SOURCE_DIR}/maths/sm/grid.cppm  
+    ${PROJECT_SOURCE_DIR}/maths/sm/histo.cppm
+    ${PROJECT_SOURCE_DIR}/maths/sm/grid.cppm
     ${PROJECT_SOURCE_DIR}/mplot/GraphVisual.cppm
-    ${PROJECT_SOURCE_DIR}/mplot/PolarVisual.cppm    
+    ${PROJECT_SOURCE_DIR}/mplot/PolarVisual.cppm
   )
   target_link_libraries(zernike OpenGL::GL glfw Freetype::Freetype glad mplot_fontdata)
 
   my_add_executable(vonmises vonmises.cpp)
   target_sources(vonmises PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT_SOURCE_DIR}
     FILES ${MPLOT_MATHS_CORE_MODULES} ${MPLOT_CORE_MODULES}
-    ${PROJECT_SOURCE_DIR}/maths/sm/histo.cppm 
-    ${PROJECT_SOURCE_DIR}/maths/sm/grid.cppm  
+    ${PROJECT_SOURCE_DIR}/maths/sm/histo.cppm
+    ${PROJECT_SOURCE_DIR}/maths/sm/grid.cppm
     ${PROJECT_SOURCE_DIR}/mplot/GraphVisual.cppm
   )
   target_link_libraries(vonmises OpenGL::GL glfw Freetype::Freetype glad mplot_fontdata)
@@ -1390,15 +1390,38 @@ if(BUILD_EXAMPLES_EXTRA)
     ${PROJECT_SOURCE_DIR}/maths/sm/config.cppm
   )
   target_link_libraries(show_boundingboxes OpenGL::GL glfw Freetype::Freetype glad mplot_fontdata)
-  
+
   my_add_executable(trace_boundary trace_boundary.cpp)
   target_sources(trace_boundary PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT_SOURCE_DIR}
     FILES ${MPLOT_MATHS_CORE_MODULES} ${MPLOT_CORE_MODULES}
-    ${PROJECT_SOURCE_DIR}/maths/sm/histo.cppm 
-    ${PROJECT_SOURCE_DIR}/maths/sm/grid.cppm  
+    ${PROJECT_SOURCE_DIR}/maths/sm/histo.cppm
+    ${PROJECT_SOURCE_DIR}/maths/sm/grid.cppm
     ${PROJECT_SOURCE_DIR}/mplot/GraphVisual.cppm
   )
   target_link_libraries(trace_boundary OpenGL::GL glfw Freetype::Freetype glad mplot_fontdata)
+
+  my_add_executable(pca1 pca1.cpp)
+  target_sources(pca1 PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT_SOURCE_DIR}
+    FILES ${MPLOT_MATHS_CORE_MODULES} ${MPLOT_CORE_MODULES}
+    ${PROJECT_SOURCE_DIR}/maths/sm/histo.cppm
+    ${PROJECT_SOURCE_DIR}/maths/sm/grid.cppm
+    ${PROJECT_SOURCE_DIR}/maths/tests/sklearn_iris.cppm
+    ${PROJECT_SOURCE_DIR}/maths/sm/pca.cppm
+    ${PROJECT_SOURCE_DIR}/mplot/GraphVisual.cppm
+    ${PROJECT_SOURCE_DIR}/mplot/ScatterVisual.cppm
+  )
+  target_link_libraries(pca1 OpenGL::GL glfw Freetype::Freetype glad mplot_fontdata)
+
+  my_add_executable(pca2 pca2.cpp)
+  target_sources(pca2 PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT_SOURCE_DIR}
+    FILES ${MPLOT_MATHS_CORE_MODULES} ${MPLOT_CORE_MODULES}
+    ${PROJECT_SOURCE_DIR}/maths/sm/histo.cppm
+    ${PROJECT_SOURCE_DIR}/maths/sm/grid.cppm
+    ${PROJECT_SOURCE_DIR}/maths/tests/sklearn_iris.cppm
+    ${PROJECT_SOURCE_DIR}/maths/sm/pca.cppm
+    ${PROJECT_SOURCE_DIR}/mplot/GraphVisual.cppm
+  )
+  target_link_libraries(pca2 OpenGL::GL glfw Freetype::Freetype glad mplot_fontdata)
 
 endif()
 

@@ -11,6 +11,7 @@ import sm.pca;
 import mplot.visual;
 import mplot.graphvisual;
 import mplot.scattervisual;
+import mplot.triaxesvisual;
 
 int main()
 {
@@ -22,7 +23,7 @@ int main()
     sm::pca::result<double, 4> pca_res = sm::pca::compute<double, 4> (x);
     for (std::uint32_t i = 0; i < 4; ++i) {
         std::cout << "PC " << (i + 1) << " = " << pca_res.pc_ev_real[i] << " which accounts for " << pca_res.pc_mags[i] << " of the variability\n";
-        std::cout << "\n" << pca_res.x_proj[i] << "\n";
+        //std::cout << "\n" << pca_res.x_proj[i] << "\n";
     }
 
     mplot::Visual v(1024, 768, "Made with mplot::GraphVisual");
@@ -54,6 +55,14 @@ int main()
     sv->labelIndices = false;
     sv->finalize();
     v.addVisualModel (sv);
+
+    auto tv = std::make_unique<mplot::TriaxesVisual<float>> (sm::vec<float>{1.5});
+    tv->set_parent (v.get_id());
+    tv->input_min = {-3,-3,-3};
+    tv->input_max = {3,3,3};
+    tv->axis_ends = {3,3,3};
+    tv->finalize();
+    v.addVisualModel (tv);
 
     v.keepOpen();
 }

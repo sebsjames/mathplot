@@ -1409,6 +1409,7 @@ if(BUILD_EXAMPLES_EXTRA)
     ${PROJECT_SOURCE_DIR}/maths/sm/pca.cppm
     ${PROJECT_SOURCE_DIR}/mplot/GraphVisual.cppm
     ${PROJECT_SOURCE_DIR}/mplot/ScatterVisual.cppm
+    ${PROJECT_SOURCE_DIR}/mplot/TriaxesVisual.cppm
   )
   target_link_libraries(pca1 OpenGL::GL glfw Freetype::Freetype glad mplot_fontdata)
 

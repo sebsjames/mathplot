@@ -296,7 +296,7 @@ export namespace mplot
 
         //! Set the input_min to be the values at the zero points of the graph axes
         sm::vec<Flt, 3> input_min = {0,0,0};
-        //! Set the input_min to be the values at the maxes of the graph axes
+        //! Set the input_max to be the values at the maxes of the graph axes
         sm::vec<Flt, 3> input_max = {1,1,1};
 
         // Axes parameters

@@ -23,10 +23,10 @@ int main()
     }
     sm::pca::result<double, 4> pca_res = sm::pca::compute<double, 4> (x);
     for (std::uint32_t i = 0; i < 4; ++i) {
-        std::cout << "PC " << (i + 1) << " = " << pca_res.pc_ev_real[i] << " which accounts for " << pca_res.pc_props[i] << " of the variability\n";
-        //std::cout << "\n" << pca_res.x_proj[i] << "\n";
+        std::cout << "PC " << (i + 1) << " = " << pca_res.pc_vectors[i] << " which accounts for " << pca_res.pc_proportions[i] << " of the variability\n";
     }
 
+    // 2D graph of the first two components
     mplot::Visual v(1024, 768, "Made with mplot::GraphVisual");
     auto gv = std::make_unique<mplot::GraphVisual<double>> (sm::vec<float>{});
     gv->set_parent (v.get_id());
@@ -35,6 +35,7 @@ int main()
     gv->finalize();
     v.addVisualModel (gv);
 
+    // 3D graph of the first three components
     sm::vvec<sm::vec<float, 3>> points (pca_res.x_proj[0].size());
     for (std::uint32_t i = 0; i < pca_res.x_proj[0].size(); ++i) {
         auto d = sm::vec<double>{ pca_res.x_proj[0][i], pca_res.x_proj[1][i], pca_res.x_proj[2][i] };
@@ -46,7 +47,6 @@ int main()
         id_data[i] = static_cast<float>(sklearn::iris_flowertype[i]) / 3;
     }
 
-    // FIXME: Put a TriaxesVisual around this.
     auto sv = std::make_unique<mplot::ScatterVisual<float>> (sm::vec<float>{1.5});
     sv->set_parent (v.get_id());
     sv->setDataCoords (&points);

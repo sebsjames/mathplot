@@ -1413,17 +1413,6 @@ if(BUILD_EXAMPLES_EXTRA)
   )
   target_link_libraries(pca1 OpenGL::GL glfw Freetype::Freetype glad mplot_fontdata)
 
-  my_add_executable(pca2 pca2.cpp)
-  target_sources(pca2 PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT_SOURCE_DIR}
-    FILES ${MPLOT_MATHS_CORE_MODULES} ${MPLOT_CORE_MODULES}
-    ${PROJECT_SOURCE_DIR}/maths/sm/histo.cppm
-    ${PROJECT_SOURCE_DIR}/maths/sm/grid.cppm
-    ${PROJECT_SOURCE_DIR}/maths/tests/sklearn_iris.cppm
-    ${PROJECT_SOURCE_DIR}/maths/sm/pca.cppm
-    ${PROJECT_SOURCE_DIR}/mplot/GraphVisual.cppm
-  )
-  target_link_libraries(pca2 OpenGL::GL glfw Freetype::Freetype glad mplot_fontdata)
-
   if(ARMADILLO_FOUND)
     # I made use of principle component analysis from arma in this example.
     my_add_executable(ellipse_pca ellipse_pca.cpp)

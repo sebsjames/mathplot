@@ -63,7 +63,6 @@ int main()
     arma::princomp (co, sc, lat, tsq, x);
 
     std::cout << "coeff: " << co << std::endl;
-    //std::cout << "scores: " << sc << std::endl;
     std::cout << "latent: " << lat << std::endl;
 
     // Mat access is (r, c)
@@ -101,43 +100,34 @@ int main()
     sm::pca::result<float, 2> pca_res = sm::pca::compute<float, 2> (_x);
 
     for (std::uint32_t i = 0; i < 2; ++i) {
-        std::cout << "PC " << (i + 1) << " = " << pca_res.pc_ev_real[i] << " which accounts for " << pca_res.pc_mags[i] << " of the variability\n";
+        std::cout << "PC " << (i + 1) << " = " << pca_res.pc_vectors[i] << " which accounts for " << pca_res.pc_proportions[i] << " of the variability\n";
     }
 
-    std::cout << "covariance of x\n" << pca_res.covariance << std::endl;
+    std::cout << "covariance of z\n" << pca_res.covariance << std::endl;
 
-    // What are these equivalents to?
-    std::cout << "coeff? pca_res.pc_ev_real: " <<  pca_res.pc_ev_real << std::endl;
-    std::cout << "latent? pca_res.pc_mags: " << pca_res.pc_mags << std::endl;
-
-    sm::vec<sm::mat<float, 2>::eigenpair, 2> pairs = pca_res.covariance.eigenpairs();
-    std::cout << "Eigenvalues: ";
-    for (std::uint32_t i = 0; i < 2; ++i) { std::cout << pairs[i].eigenvalue << ", "; }
-    std::cout << std::endl;
-
-    std::cout << "Eigenvectors: ";
-    for (std::uint32_t i = 0; i < 2; ++i) { std::cout << pairs[i].eigenvector << ", "; }
-    std::cout << std::endl;
+    std::cout << "PC vectors: " <<  pca_res.pc_vectors << std::endl;
+    std::cout << "PC magnitudes: " << pca_res.pc_magnitudes << std::endl;
+    std::cout << "Proportions of variability: " << pca_res.pc_proportions << std::endl;
 
     // Mat access is (r, c)
-    pc1vec = pca_res.pc_ev_real[0];
+    pc1vec = pca_res.pc_vectors[0];
     angle1 = pc1vec.angle();
     std::cout << "Angle of first component " << pc1vec << " is " << angle1 * sm::mathconst<float>::rad2deg
-              << " and length is " << pca_res.pc_mags[0] << std::endl;
-    pc2vec = pca_res.pc_ev_real[1];
+              << " and length is " << pca_res.pc_magnitudes[0] << std::endl;
+    pc2vec = pca_res.pc_vectors[1];
     angle2 = pc2vec.angle();
     std::cout << "Angle of 2nd component " << pc2vec << " is " << angle2 * sm::mathconst<float>::rad2deg
-              << " and length is " << pca_res.pc_mags[1] << std::endl;
+              << " and length is " << pca_res.pc_magnitudes[1] << std::endl;
 
     // Show 3 sigma axes
     ds2.setcolour (mplot::colour::crimson);
     ds2.datalabel = std::string("PC1 3") + mplot::unicode::toUtf8 (mplot::unicode::sigma);
-    pc1vv = { {0,0}, pc1vec * 3.0f * std::sqrt(pca_res.pc_mags[0])};
+    pc1vv = { {0,0}, pc1vec * 3.0f * std::sqrt(pca_res.pc_magnitudes[0])};
     gv2->setdata (pc1vv, ds2);
 
     ds2.setcolour (mplot::colour::orange);
     ds2.datalabel = std::string("PC2 3") + mplot::unicode::toUtf8 (mplot::unicode::sigma);
-    pc2vv = { {0,0}, pc2vec * 3.0f * std::sqrt(pca_res.pc_mags[1]) };
+    pc2vv = { {0,0}, pc2vec * 3.0f * std::sqrt(pca_res.pc_magnitudes[1]) };
     gv2->setdata (pc2vv, ds2);
 
     gv2->finalize();
@@ -156,13 +146,18 @@ int main()
     gv3->setlimits (-8, 8, -8, 8);
     ds.datalabel = "projected data";
     gv3->setdata (_scores, ds);
+    gv3->xlabel = "PC1";
+    gv3->ylabel = "PC2";
     gv3->finalize();
     v.addVisualModel (gv3);
 
+    // Projected data for sm::pca
     auto gv4 = std::make_unique<mplot::GraphVisual<float>> (sm::vec<float>{0.2f, -1.85f, 0.0f});
     gv4->set_parent (v.get_id());
     gv4->setlimits (-8, 8, -8, 8);
     gv4->setdata (pca_res.get_x_proj(), ds);
+    gv4->xlabel = "PC1";
+    gv4->ylabel = "PC2";
     gv4->finalize();
     v.addVisualModel (gv4);
 

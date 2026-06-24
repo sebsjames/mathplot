@@ -1432,6 +1432,7 @@ if(BUILD_EXAMPLES_EXTRA)
       FILES ${MPLOT_MATHS_CORE_MODULES} ${MPLOT_CORE_MODULES}
       ${PROJECT_SOURCE_DIR}/maths/sm/histo.cppm
       ${PROJECT_SOURCE_DIR}/maths/sm/grid.cppm
+      ${PROJECT_SOURCE_DIR}/maths/sm/pca.cppm
       ${PROJECT_SOURCE_DIR}/mplot/GraphVisual.cppm
     )
     target_link_libraries(ellipse_pca ${ARMADILLO_LIBRARY} ${ARMADILLO_LIBRARIES} OpenGL::GL glfw Freetype::Freetype glad mplot_fontdata)

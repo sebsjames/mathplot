@@ -1,6 +1,7 @@
-// Visualize a graph. Minimal example showing how a default graph appears
+// Principal component analysis on the scikit iris data
 #include <memory>
 #include <iostream>
+#include <cstdint>
 
 import sklearn.iris;
 import sm.vvec;
@@ -22,7 +23,7 @@ int main()
     }
     sm::pca::result<double, 4> pca_res = sm::pca::compute<double, 4> (x);
     for (std::uint32_t i = 0; i < 4; ++i) {
-        std::cout << "PC " << (i + 1) << " = " << pca_res.pc_ev_real[i] << " which accounts for " << pca_res.pc_mags[i] << " of the variability\n";
+        std::cout << "PC " << (i + 1) << " = " << pca_res.pc_ev_real[i] << " which accounts for " << pca_res.pc_props[i] << " of the variability\n";
         //std::cout << "\n" << pca_res.x_proj[i] << "\n";
     }
 
@@ -58,7 +59,6 @@ int main()
 
     auto tv = std::make_unique<mplot::TriaxesVisual<float>> (sm::vec<float>{1.5});
     tv->set_parent (v.get_id());
-    tv->input_min = {-3,-3,-3};
     tv->input_max = {3,3,3};
     tv->axis_ends = {3,3,3};
     tv->finalize();

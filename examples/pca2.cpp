@@ -1,5 +1,6 @@
 #include <memory>
 #include <iostream>
+#include <cstdint>
 
 import sklearn.iris;
 import sm.vvec;

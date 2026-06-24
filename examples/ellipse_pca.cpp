@@ -1,16 +1,16 @@
 /*
  * Applying principle component analysis (using arma) to some random data
  */
+#include <memory>
 #include <iostream>
-
-#include <sm/mathconst>
-#include <sm/random>
-#include <sm/mat>
-
 #include <armadillo>
 
-#include <mplot/Visual.h>
-#include <mplot/GraphVisual.h>
+import sm.mathconst;
+import sm.random;
+import sm.mat;
+
+import mplot.visual;
+import mplot.graphvisual;
 
 int main()
 {
@@ -32,7 +32,7 @@ int main()
     auto gv = std::make_unique<mplot::GraphVisual<float>> (sm::vec<float>{-0.5f,-0.5f,0.0f});
     mplot::DatasetStyle ds (mplot::stylepolicy::markers);
     ds.datalabel = std::string("data");
-    v.bindmodel (gv);
+    gv->set_parent (v.get_id());
     gv->setlimits (-8, 8, -8, 8);
     gv->setdata (_x, ds);
 

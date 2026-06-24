@@ -1424,17 +1424,22 @@ if(BUILD_EXAMPLES_EXTRA)
   )
   target_link_libraries(pca2 OpenGL::GL glfw Freetype::Freetype glad mplot_fontdata)
 
+  if(ARMADILLO_FOUND)
+    # I made use of principle component analysis from arma in this example.
+    my_add_executable(ellipse_pca ellipse_pca.cpp)
+    target_include_directories(ellipse_pca PUBLIC ${ARMADILLO_INCLUDE_DIR} ${ARMADILLO_INCLUDE_DIRS})
+    target_sources(ellipse_pca PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT_SOURCE_DIR}
+      FILES ${MPLOT_MATHS_CORE_MODULES} ${MPLOT_CORE_MODULES}
+      ${PROJECT_SOURCE_DIR}/maths/sm/histo.cppm
+      ${PROJECT_SOURCE_DIR}/maths/sm/grid.cppm
+      ${PROJECT_SOURCE_DIR}/mplot/GraphVisual.cppm
+    )
+    target_link_libraries(ellipse_pca ${ARMADILLO_LIBRARY} ${ARMADILLO_LIBRARIES} OpenGL::GL glfw Freetype::Freetype glad mplot_fontdata)
+  endif()
+
 endif()
 
 if (0) # During development
-
-
-
-  if(0)
-    # I made use of principle component analysis from arma in this example.
-    my_add_executable(ellipse_pca ellipse_pca.cpp)
-    target_link_libraries(ellipse_pca ${ARMADILLO_LIBRARY} ${ARMADILLO_LIBRARIES} OpenGL::GL glfw Freetype::Freetype glad mplot_fontdata)
-  endif()
 
   # Shader compute examples. Not supported on Apple, which is limited to
   # OpenGL 4.1 or Windows because I want to keep the GL header inclusion

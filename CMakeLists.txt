@@ -161,6 +161,9 @@ else()
   include_directories(${MATHS_INCLUDE_DIRS})
 endif()
 
+# Optional/debug armadillo
+find_package(Armadillo)
+
 # Use packaged nlohmann json
 # find_package(nlohmann_json REQUIRED)
 # Now nlohmann is submoduled to get an up-to-date version (for C++ modules)

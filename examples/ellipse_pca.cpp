@@ -152,6 +152,7 @@ int main()
     v.addVisualModel (gv3);
 
     // Projected data for sm::pca
+    sm::pca::transform (pca_res); // Perform the projection
     auto gv4 = std::make_unique<mplot::GraphVisual<float>> (sm::vec<float>{0.2f, -1.85f, 0.0f});
     gv4->set_parent (v.get_id());
     gv4->setlimits (-8, 8, -8, 8);

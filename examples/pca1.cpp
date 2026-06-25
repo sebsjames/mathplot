@@ -25,6 +25,8 @@ int main()
     for (std::uint32_t i = 0; i < 4; ++i) {
         std::cout << "PC " << (i + 1) << " = " << pca_res.pc_vectors[i] << " which accounts for " << pca_res.pc_proportions[i] << " of the variability\n";
     }
+    // Projecting the input data is a separate function call
+    sm::pca::transform (pca_res);
 
     // 2D graph of the first two components
     mplot::Visual v(1024, 768, "Made with mplot::GraphVisual");

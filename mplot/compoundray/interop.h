@@ -100,7 +100,13 @@ namespace mplot::compoundray
                     sm::vvec<sm::vec<float>> colr_section (posn_buf.bv_data.size(), sm::vec<float>{1,0,1});
                     if (static_cast<size_t>(mymeshes[mi]->material_idx[ii]) < mymats.size()) {
                         MaterialData::Pbr mypbr = mymats[mymeshes[mi]->material_idx[ii]];
-                        sm::vec<float> clr = { mypbr.base_color.x, mypbr.base_color.y, mypbr.base_color.z };
+                        // If a texture is present, asign a fixed green colour, else it defaults to white which is impossible to see.
+                        sm::vec<float> clr;
+                        if (mypbr.base_color.x != 0 || mypbr.metallic_roughness_tex != 0 || mypbr.normal_tex != 0) {
+                            clr.set_from (mplot::colour::darkseagreen);
+                        } else {
+                            clr = { mypbr.base_color.x, mypbr.base_color.y, mypbr.base_color.z };
+                        }
                         colr_section.set_from (clr);
                     }
                     colr.append(colr_section);

@@ -41,7 +41,7 @@ module;
 
 export module mplot.visualownable;
 
-#indef _MSC_VER
+#ifdef _MSC_VER
 import <fstream>
 #endif
 

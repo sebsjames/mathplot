@@ -18,7 +18,9 @@ module;
 
 #include <cstdint>
 #include <iostream>
-#include <fstream>
+#ifndef _MSC_VER
+# include <fstream>
+#endif
 #include <string>
 #include <array>
 #include <vector>
@@ -38,6 +40,10 @@ module;
 #include <mplot/VisualDefaultShaders.hpp>
 
 export module mplot.visualownable;
+
+#indef _MSC_VER
+import <fstream>
+#endif
 
 export import mplot.version;
 export import mplot.visualmodel;

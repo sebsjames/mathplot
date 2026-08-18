@@ -42,7 +42,7 @@ module;
 export module mplot.visualownable;
 
 #ifdef _MSC_VER
-import <fstream>;
+import <fstream>
 #endif
 
 export import mplot.version;

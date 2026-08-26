@@ -41,3 +41,11 @@ target_sources(124888_visual PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT_SOU
   ${PROJECT_SOURCE_DIR}/bugrep/124888_specific.cpp
   ${PROJECT_SOURCE_DIR}/bugrep/124888_visual.cpp
 )
+
+add_executable(nostrong nostrong_main.cpp)
+target_sources(nostrong PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT_SOURCE_DIR}
+  FILES
+  ${SM_MAT_MODULES}
+  ${PROJECT_SOURCE_DIR}/bugrep/nostrong_a.cpp
+  ${PROJECT_SOURCE_DIR}/bugrep/nostrong_b.cpp
+)

@@ -21,6 +21,7 @@ install(
   CurvyTellyVisual.cppm
   CyclicColourVisual.cppm
   DatasetStyle.cppm
+  DoubleHexGridVisual.cppm
   GeodesicVisualCE.cppm
   GeodesicVisual.cppm
   graphing.cppm

@@ -25,6 +25,20 @@ export namespace mplot
     class DoubleHexGridVisual : public mplot::HexGridVisual<T, glver>
     {
     public:
+        // If true, show the flat representation of the hexgrids, ignoring the info in ommatidia
+        bool show_flat = false;
+
+        // When showing flat, should we flip the hex positions in the x (left-right) direction?
+        bool second_grid_flip_lr = false;
+
+        // When showing flat, should we flip the hex positions in the y (up-down) direction?
+        bool second_grid_flip_ud = false;
+
+        // When showing flat, this is the translation that is applied to the hex vertices of the
+        // second grid and first grid to move them apart. -half the offset is applied to the first
+        // grid and +half to the second grid.
+        sm::vec<float, 2> grid_offset = {};
+
         DoubleHexGridVisual(const sm::hexgrid<float>* _hg, const sm::vec<float> _offset)
             : mplot::HexGridVisual<T, glver>(_hg, _offset) {}
 
@@ -198,6 +212,23 @@ export namespace mplot
             //this->computeSphere (sm::vec<float>{0,0,0}, mplot::colour::navy, 0.003f);
         }
 
+        // Apply the transforms in grid_offset and second_grid_flip_lr (etc)
+        void apply_grid_transforms (const std::uint32_t sdo, sm::vec<float>& _vtx)
+        {
+            if (this->show_flat == false) { return; }
+            if (sdo == 0) {
+                // First hexgrid
+                _vtx[0] -= this->grid_offset[0] / 2.0f;
+                _vtx[1] -= this->grid_offset[1] / 2.0f;
+            } else {
+                // Second hexgrid
+                if (this->second_grid_flip_lr) { _vtx[0] *= -1; }
+                if (this->second_grid_flip_ud) { _vtx[1] *= -1; }
+                _vtx[0] += this->grid_offset[0] / 2.0f;
+                _vtx[1] += this->grid_offset[1] / 2.0f;
+            }
+        }
+
         // Compute vertices for the patchwork quilt of hexes
         void computeHexes()
         {
@@ -244,12 +275,15 @@ export namespace mplot
             // Figure out an offset to centre the eyes about the current mv_offset. This
             // is the centroid off dataCoords
             sm::vec<float> coffs = {0,0,0};
-#if 1
+
             if (this->dataCoords != nullptr) {
                 // dataCoords is ptr to vector<vec<float>>. The mean vector will work
                 coffs = -reinterpret_cast<sm::vvec<sm::vec<float, 3>>*>(this->dataCoords)->mean();
             }
-#endif
+
+            // The rotation from the transformation in the hexgrid (if any)
+            sm::mat<float, 3> lt = this->hg->tfm.linear();
+
             for (unsigned int section = 0; section < 2; ++section) {
                 unsigned int sdo = section * nhex; // section data offset
                 for (unsigned int hi = 0; hi < nhex; ++hi) {
@@ -305,6 +339,7 @@ export namespace mplot
 
                     // Use the centre position as the first location for finding the normal vector
                     vtx_0 = this->dataCoords == nullptr ? sm::vec<float>{ _x, _y, datumC } : coordC;
+                    this->apply_grid_transforms (sdo, vtx_0);
                     this->vertex_push (this->zoom * vtx_0, this->vertexPositions);
 
                     // NE vertex
@@ -321,7 +356,8 @@ export namespace mplot
                         } else {
                             datum = datumC;
                         }
-                        vtx_1 = { (_x+sr), (_y+vne), datum };
+                        sm::vec<float> crnr = lt * sm::vec<float>{ sr, vne, 0 };
+                        vtx_1 = crnr + sm::vec<float>{ _x, _y, datum };
                     } else {
                         // Similar logic, but for the coordinate, not just the data value
                         if (this->hg->has_nne(hi) && this->hg->has_ne(hi)) {
@@ -337,6 +373,7 @@ export namespace mplot
                             vtx_1 = coordC;
                         }
                     }
+                    this->apply_grid_transforms (sdo, vtx_1);
                     this->vertex_push (this->zoom * vtx_1, this->vertexPositions);
 
                     // SE vertex
@@ -352,7 +389,8 @@ export namespace mplot
                         } else {
                             datum = datumC;
                         }
-                        vtx_2 = { (_x+sr), (_y-vne), datum };
+                        sm::vec<float> crnr = lt * sm::vec<float>{ sr, -vne, 0 };
+                        vtx_2 = crnr + sm::vec<float>{ _x, _y, datum };
                     } else {
                         if (this->hg->has_ne(hi) && this->hg->has_nse(hi)) {
                             vtx_2 = third * (coordC + coordNE + coordNSE);
@@ -366,6 +404,7 @@ export namespace mplot
                             vtx_2 = coordC;
                         }
                     }
+                    this->apply_grid_transforms (sdo, vtx_2);
                     this->vertex_push (this->zoom * vtx_2, this->vertexPositions);
 
 
@@ -382,8 +421,8 @@ export namespace mplot
                         } else {
                             datum = datumC;
                         }
-                        vtx_3 = { _x, (_y-lr), datum };
-
+                        sm::vec<float> crnr = lt * sm::vec<float>{ 0, -lr, 0 };
+                        vtx_3 = crnr + sm::vec<float>{ _x, _y, datum };
                     } else {
                         if (this->hg->has_nse(hi) && this->hg->has_nsw(hi)) {
                             vtx_3 = third * (coordC + coordNSE + coordNSW);
@@ -397,6 +436,7 @@ export namespace mplot
                             vtx_3 = coordC;
                         }
                     }
+                    this->apply_grid_transforms (sdo, vtx_3);
                     this->vertex_push (this->zoom * vtx_3, this->vertexPositions);
 
                     // SW
@@ -412,7 +452,8 @@ export namespace mplot
                         } else {
                             datum = datumC;
                         }
-                        vtx_4 = { (_x-sr), (_y-vne), datum };
+                        sm::vec<float> crnr = lt * sm::vec<float>{ -sr, -vne, 0 };
+                        vtx_4 = crnr + sm::vec<float>{ _x, _y, datum };
                     } else {
                         if (this->hg->has_nw(hi) && this->hg->has_nsw(hi)) {
                             vtx_4 = third * (coordC + coordNW + coordNSW);
@@ -426,6 +467,7 @@ export namespace mplot
                             vtx_4 = coordC;
                         }
                     }
+                    this->apply_grid_transforms (sdo, vtx_4);
                     this->vertex_push (this->zoom * vtx_4, this->vertexPositions);
 
                     // NW
@@ -441,7 +483,8 @@ export namespace mplot
                         } else {
                             datum = datumC;
                         }
-                        vtx_5 = { (_x-sr), (_y+vne), datum };
+                        sm::vec<float> crnr = lt * sm::vec<float>{ -sr, vne, 0 };
+                        vtx_5 = crnr + sm::vec<float>{ _x, _y, datum };
                     } else {
                         if (this->hg->has_nnw(hi) && this->hg->has_nw(hi)) {
                             vtx_5 = third * (coordC + coordNNW + coordNW);
@@ -455,6 +498,7 @@ export namespace mplot
                             vtx_5 = coordC;
                         }
                     }
+                    this->apply_grid_transforms (sdo, vtx_5);
                     this->vertex_push (this->zoom * vtx_5, this->vertexPositions);
 
                     // N
@@ -470,7 +514,8 @@ export namespace mplot
                         } else {
                             datum = datumC;
                         }
-                        vtx_6 = { _x, (_y+lr), datum };
+                        sm::vec<float> crnr = lt * sm::vec<float>{ 0, lr, 0 };
+                        vtx_6 = crnr + sm::vec<float>{ _x, _y, datum };
                     } else {
                         if (this->hg->has_nnw(hi) && this->hg->has_nne(hi)) {
                             vtx_6 = third * (coordC + coordNNW + coordNNE);
@@ -484,6 +529,7 @@ export namespace mplot
                             vtx_6 = coordC;
                         }
                     }
+                    this->apply_grid_transforms (sdo, vtx_6);
                     this->vertex_push (this->zoom * vtx_6, this->vertexPositions);
 
                     // From vtx_0, and any two of vtx_1 to vtx_6, compute two planes and thus the normal vector.

@@ -354,6 +354,13 @@ else()
   target_link_libraries(hexgrid_image_rect mathplot_examples)
 endif()
 
+add_executable(hexgrid_fft_image_rect hexgrid_fft_image_rect.cpp)
+if(OpenMP_CXX_FOUND)
+  target_link_libraries(hexgrid_fft_image_rect OpenMP::OpenMP_CXX mathplot_examples)
+else()
+  target_link_libraries(hexgrid_fft_image_rect mathplot_examples)
+endif()
+
 add_executable(hexgrid_image_onsphere hexgrid_image_onsphere.cpp)
 if(OpenMP_CXX_FOUND)
   target_link_libraries(hexgrid_image_onsphere OpenMP::OpenMP_CXX mathplot_examples)

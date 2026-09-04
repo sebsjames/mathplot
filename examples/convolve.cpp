@@ -11,6 +11,7 @@ import sm.random;
 import sm.scale;
 import sm.vec;
 import sm.hexgrid;
+import sm.algo.hexgrid;
 
 import mplot.visual;
 import mplot.visualdatamodel;
@@ -64,7 +65,7 @@ int main()
     std::vector<float> convolved (hg.num(), 0.0f);
 
     // Call the convolution method from hexgrid:
-    hg.convolve (kernel, kerneldata, data, convolved);
+    sm::algo::hexgrid::convolve (hg, kernel, kerneldata, data, convolved);
 
     float convolvedSum = 0.0f;
     for (float& d : convolved) { convolvedSum += d; }

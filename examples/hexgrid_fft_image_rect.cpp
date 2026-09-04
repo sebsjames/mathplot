@@ -42,11 +42,12 @@ int main()
     sm::vvec<float> hex_image_data = hg.resample_image (image_data, dims[0], image_scale, image_offset);
     std::cout << "resample complete" << std::endl;
 
-    auto hgv = std::make_unique<mplot::HexGridVisual<float>>(&hg, sm::vec<float>({0,0,0}));
+    auto hgv = std::make_unique<mplot::HexGridVisual<float>>(&hg, sm::vec<float>({-6,1.25,0}));
     hgv->set_parent (v.get_id());
     hgv->setScalarData (&hex_image_data);
     hgv->cm.setType (mplot::ColourMapType::GreyscaleInv);
     hgv->zScale.set_params (0, 0);
+    hgv->addLabel ("Input hex image", sm::vec<float>({0,-1.2,0}), mplot::TextFeatures(0.05f));
     hgv->finalize();
     v.addVisualModel (hgv);
 
@@ -93,46 +94,47 @@ int main()
     }
     mplot::png_encode ("../examples/bike256_d1.png", d1_rgb.data(), fft_data.m, fft_data.n);
 
+    float hshift1 = 0.75f;
     // Grid 1 ds.first
-    auto gv = std::make_unique<mplot::GridVisual<float>>(&grid, sm::vec<float>{-3.5f});
+    auto gv = std::make_unique<mplot::GridVisual<float>>(&grid, sm::vec<float>{-4.5f, 0.0f - hshift1});
     gv->set_parent (v.get_id());
     gv->gridVisMode = mplot::GridVisMode::RectInterp;
     gv->setScalarData (&d0);
     gv->zScale.set_params (0, 0);
     gv->cm.setType (mplot::ColourMapType::GreyscaleInv);
-    gv->addLabel ("d0", sm::vec<float>({0,-0.2,0}), mplot::TextFeatures(0.05f));
+    gv->addLabel ("d_asa.first", sm::vec<float>({0,-0.2,0}), mplot::TextFeatures(0.05f));
     gv->finalize();
     v.addVisualModel (gv);
 
-    gv = std::make_unique<mplot::GridVisual<float>>(&grid, sm::vec<float>{-3.5f, 2.5});
+    gv = std::make_unique<mplot::GridVisual<float>>(&grid, sm::vec<float>{-4.5f, 2.5f - hshift1});
     gv->set_parent (v.get_id());
     gv->gridVisMode = mplot::GridVisMode::RectInterp;
     gv->setScalarData (&d1);
     gv->zScale.set_params (0, 0);
     gv->cm.setType (mplot::ColourMapType::GreyscaleInv);
-    gv->addLabel ("d1", sm::vec<float>({0,-0.2,0}), mplot::TextFeatures(0.05f));
+    gv->addLabel ("d_asa.second", sm::vec<float>({0,-0.2,0}), mplot::TextFeatures(0.05f));
     gv->finalize();
     v.addVisualModel (gv);
 
-    gv = std::make_unique<mplot::GridVisual<float>>(&grid, sm::vec<float>{-6.0f});
+    gv = std::make_unique<mplot::GridVisual<float>>(&grid, sm::vec<float>{-1.5f, 0.0f - hshift1});
     gv->set_parent (v.get_id());
     gv->gridVisMode = mplot::GridVisMode::RectInterp;
     gv->setScalarData (&X0);
     gv->colourScale.compute_scaling (-900, 1200);
     gv->zScale.set_params (0, 0);
     gv->cm.setType (mplot::ColourMapType::GreyscaleInv);
-    gv->addLabel ("X0", sm::vec<float>({0,-0.2,0}), mplot::TextFeatures(0.05f));
+    gv->addLabel ("X_asa.first", sm::vec<float>({0,-0.2,0}), mplot::TextFeatures(0.05f));
     gv->finalize();
     v.addVisualModel (gv);
 
-    gv = std::make_unique<mplot::GridVisual<float>>(&grid, sm::vec<float>{-6.0f, 2.5});
+    gv = std::make_unique<mplot::GridVisual<float>>(&grid, sm::vec<float>{-1.5f, 2.5f - hshift1});
     gv->set_parent (v.get_id());
     gv->gridVisMode = mplot::GridVisMode::RectInterp;
     gv->setScalarData (&X1);
     gv->colourScale.compute_scaling (-900, 1200);
     gv->zScale.set_params (0, 0);
     gv->cm.setType (mplot::ColourMapType::GreyscaleInv);
-    gv->addLabel ("X1", sm::vec<float>({0,-0.2,0}), mplot::TextFeatures(0.05f));
+    gv->addLabel ("X_asa.second", sm::vec<float>({0,-0.2,0}), mplot::TextFeatures(0.05f));
     gv->finalize();
     v.addVisualModel (gv);
 
@@ -140,8 +142,10 @@ int main()
     hgv = std::make_unique<mplot::HexGridVisual<float>>(&hg, sm::vec<float>{2.5f});
     hgv->set_parent (v.get_id());
     hgv->setScalarData (&fft_r);
+    hgv->colourScale.compute_scaling (-900, 1200);
     hgv->cm.setType (mplot::ColourMapType::GreyscaleInv);
     hgv->zScale.set_params (0, 0);
+    hgv->addLabel ("Combined FFT, real", sm::vec<float>({0,-1.2,0}), mplot::TextFeatures(0.05f));
     hgv->finalize();
     v.addVisualModel (hgv);
 
@@ -149,8 +153,10 @@ int main()
     hgv = std::make_unique<mplot::HexGridVisual<float>>(&hg, sm::vec<float>{2.5f, 2.5f});
     hgv->set_parent (v.get_id());
     hgv->setScalarData (&fft_i);
+    hgv->colourScale.compute_scaling (-900, 1200);
     hgv->cm.setType (mplot::ColourMapType::GreyscaleInv);
     hgv->zScale.set_params (0, 0);
+    hgv->addLabel ("Combined FFT, imaginary", sm::vec<float>({0,-1.2,0}), mplot::TextFeatures(0.05f));
     hgv->finalize();
     v.addVisualModel (hgv);
 
@@ -167,6 +173,7 @@ int main()
     hgv->setScalarData (&ifft_r);
     hgv->cm.setType (mplot::ColourMapType::GreyscaleInv);
     hgv->zScale.set_params (0, 0);
+    hgv->addLabel ("Reconstructed from fft_data.hex_data", sm::vec<float>({-0.75,-1.2,0}), mplot::TextFeatures(0.05f));
     hgv->finalize();
     v.addVisualModel (hgv);
 
@@ -183,6 +190,7 @@ int main()
     hgv->setScalarData (&ifft_r2);
     hgv->cm.setType (mplot::ColourMapType::GreyscaleInv);
     hgv->zScale.set_params (0, 0);
+    hgv->addLabel ("Reconstructed from fft_data(.data)", sm::vec<float>({-0.75,-1.2,0}), mplot::TextFeatures(0.05f));
     hgv->finalize();
     v.addVisualModel (hgv);
 
@@ -193,6 +201,7 @@ int main()
     hgv->setScalarData (&di1);
     hgv->cm.setType (mplot::ColourMapType::GreyscaleInv);
     hgv->zScale.set_params (0, 0);
+    hgv->addLabel ("Diff of fft_data.hex_data reconstr", sm::vec<float>({-0.75,-1.2,0}), mplot::TextFeatures(0.05f));
     hgv->finalize();
     v.addVisualModel (hgv);
 
@@ -203,6 +212,7 @@ int main()
     hgv->setScalarData (&di2);
     hgv->cm.setType (mplot::ColourMapType::GreyscaleInv);
     hgv->zScale.set_params (0, 0);
+    hgv->addLabel ("Diff of fft_data.(data) reconstr", sm::vec<float>({-0.75,-1.2,0}), mplot::TextFeatures(0.05f));
     hgv->finalize();
     v.addVisualModel (hgv);
 

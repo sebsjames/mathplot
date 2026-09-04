@@ -78,6 +78,21 @@ int main()
     std::cout << "X0 mean/sd/range: " << X0.mean() << ", " << X0.std() << ", " << X0.range() << std::endl;
     std::cout << "X1 mean/sd/range: " << X1.mean() << ", " << X1.std() << ", " << X1.range() << std::endl;
 
+    // Write out png of d1 for comparative image.
+    sm::vvec<std::uint8_t> d1_rgb (fft_data.m * fft_data.n * 4);
+    std::uint32_t j = 0;
+    for (std::uint32_t i = fft_data.n - 1; i != std::numeric_limits<std::uint32_t>::max(); --i) {
+        for (std::uint32_t k = 0; k < fft_data.m; ++k) { // col
+            float val = std::round (d1[i * fft_data.m + k] * 255.0f);
+            if (val < 0.0f || val > 255.0f) { throw std::runtime_error ("uhoh"); }
+            d1_rgb[j++] = static_cast<std::uint8_t>(val);
+            d1_rgb[j++] = static_cast<std::uint8_t>(val);
+            d1_rgb[j++] = static_cast<std::uint8_t>(val);
+            d1_rgb[j++] = 255u;
+        }
+    }
+    mplot::png_encode ("../examples/bike256_d1.png", d1_rgb.data(), fft_data.m, fft_data.n);
+
     // Grid 1 ds.first
     auto gv = std::make_unique<mplot::GridVisual<float>>(&grid, sm::vec<float>{-3.5f});
     gv->set_parent (v.get_id());

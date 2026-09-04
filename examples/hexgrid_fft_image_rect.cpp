@@ -102,7 +102,7 @@ int main()
     gv->setScalarData (&d0);
     gv->zScale.set_params (0, 0);
     gv->cm.setType (mplot::ColourMapType::GreyscaleInv);
-    gv->addLabel ("d_asa.first", sm::vec<float>({0,-0.2,0}), mplot::TextFeatures(0.05f));
+    gv->addLabel ("d_asa.first (odd input rows)", sm::vec<float>({0,-0.2,0}), mplot::TextFeatures(0.05f));
     gv->finalize();
     v.addVisualModel (gv);
 
@@ -112,7 +112,7 @@ int main()
     gv->setScalarData (&d1);
     gv->zScale.set_params (0, 0);
     gv->cm.setType (mplot::ColourMapType::GreyscaleInv);
-    gv->addLabel ("d_asa.second", sm::vec<float>({0,-0.2,0}), mplot::TextFeatures(0.05f));
+    gv->addLabel ("d_asa.second (even)", sm::vec<float>({0,-0.2,0}), mplot::TextFeatures(0.05f));
     gv->finalize();
     v.addVisualModel (gv);
 
@@ -120,10 +120,10 @@ int main()
     gv->set_parent (v.get_id());
     gv->gridVisMode = mplot::GridVisMode::RectInterp;
     gv->setScalarData (&X0);
-    gv->colourScale.compute_scaling (-900, 1200);
+    //gv->colourScale.compute_scaling (-900, 1200);
     gv->zScale.set_params (0, 0);
     gv->cm.setType (mplot::ColourMapType::GreyscaleInv);
-    gv->addLabel ("X_asa.first", sm::vec<float>({0,-0.2,0}), mplot::TextFeatures(0.05f));
+    gv->addLabel ("X_asa.first (odd)", sm::vec<float>({0,-0.2,0}), mplot::TextFeatures(0.05f));
     gv->finalize();
     v.addVisualModel (gv);
 
@@ -131,10 +131,10 @@ int main()
     gv->set_parent (v.get_id());
     gv->gridVisMode = mplot::GridVisMode::RectInterp;
     gv->setScalarData (&X1);
-    gv->colourScale.compute_scaling (-900, 1200);
+    //gv->colourScale.compute_scaling (-900, 1200);
     gv->zScale.set_params (0, 0);
     gv->cm.setType (mplot::ColourMapType::GreyscaleInv);
-    gv->addLabel ("X_asa.second", sm::vec<float>({0,-0.2,0}), mplot::TextFeatures(0.05f));
+    gv->addLabel ("X_asa.second (even)", sm::vec<float>({0,-0.2,0}), mplot::TextFeatures(0.05f));
     gv->finalize();
     v.addVisualModel (gv);
 
@@ -204,6 +204,7 @@ int main()
     hgv->addLabel ("Diff of fft_data.hex_data reconstr", sm::vec<float>({-0.75,-1.2,0}), mplot::TextFeatures(0.05f));
     hgv->finalize();
     v.addVisualModel (hgv);
+    std::cout << "Mean diff for fft_data.hex_data reconstr: " << di1.abs().mean() << std::endl;
 
     // Diff 2
     sm::vvec<float> di2 = (ifft_r2 - hex_image_data).abs();
@@ -215,6 +216,7 @@ int main()
     hgv->addLabel ("Diff of fft_data.(data) reconstr", sm::vec<float>({-0.75,-1.2,0}), mplot::TextFeatures(0.05f));
     hgv->finalize();
     v.addVisualModel (hgv);
+    std::cout << "Mean diff for fft_data.(data) reconstr: " << di2.abs().mean() << std::endl;
 
     v.keepOpen();
 

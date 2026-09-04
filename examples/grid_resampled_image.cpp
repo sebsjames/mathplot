@@ -7,6 +7,7 @@ import sm.vec;
 import sm.vvec;
 import sm.grid;
 import sm.hexgrid;
+import sm.algo.hexgrid;
 
 import mplot.loadpng;
 import mplot.visual;
@@ -64,7 +65,7 @@ int main()
     // scales the interpreted image (which is interpreted as having width 1.0) to the
     // correct dimensions.
     sm::vec<float,2> hex_image_scale = { g2.width(), g2.width() };
-    sm::vvec<float> hex_image_data = hg.resample_image (image_data, dims[0], hex_image_scale, image_offset);
+    sm::vvec<float> hex_image_data = sm::algo::hexgrid::resample_image (hg, image_data, dims[0], hex_image_scale, image_offset);
 
     // Visualise original with a GridVisual
     auto gv1 = std::make_unique<mplot::GridVisual<float>>(&g1, sm::vec<float>({0,0,0}));

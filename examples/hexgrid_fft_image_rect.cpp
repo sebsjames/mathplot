@@ -26,6 +26,9 @@ int main()
     sm::hexgrid hg(0.01f, 4.0f, 0.0f);
     hg.set_rectangular_boundary (2.0f, 2.0f);
 
+    sm::hexgrid hgf(0.01f, 8.0f, 0.0f);
+    hgf.set_rectangular_boundary (4.0f, 4.0f);
+
     // Load a rectangular image with the help of mplot::loadpng().
     std::string fn = "../examples/bike256.png";
     sm::vvec<float> image_data;
@@ -52,7 +55,7 @@ int main()
     v.addVisualModel (hgv);
 
     // Transform with FFT
-    sm::hexfft::spectrum<float> fft_data = sm::hexfft::fft (hg, hex_image_data);
+    sm::hexfft::spectrum<float> fft_data = sm::hexfft::fft (hg, hex_image_data, hgf);
     sm::vvec<float> fft_r (fft_data.hex_data.size());
     sm::vvec<float> fft_i (fft_data.hex_data.size());
     for (std::uint32_t i = 0; i < fft_r.size(); ++i) {
@@ -139,7 +142,7 @@ int main()
     v.addVisualModel (gv);
 
     // Real part
-    hgv = std::make_unique<mplot::HexGridVisual<float>>(&hg, sm::vec<float>{2.5f});
+    hgv = std::make_unique<mplot::HexGridVisual<float>>(&hgf, sm::vec<float>{4.5f});
     hgv->set_parent (v.get_id());
     hgv->setScalarData (&fft_r);
     hgv->colourScale.compute_scaling (-900, 1200);
@@ -150,7 +153,7 @@ int main()
     v.addVisualModel (hgv);
 
     // Imaginary part
-    hgv = std::make_unique<mplot::HexGridVisual<float>>(&hg, sm::vec<float>{2.5f, 2.5f});
+    hgv = std::make_unique<mplot::HexGridVisual<float>>(&hgf, sm::vec<float>{4.5f, 5.0f});
     hgv->set_parent (v.get_id());
     hgv->setScalarData (&fft_i);
     hgv->colourScale.compute_scaling (-900, 1200);
@@ -160,6 +163,7 @@ int main()
     hgv->finalize();
     v.addVisualModel (hgv);
 
+#if 0
     // Reconstruct with inverse FFT
     sm::vvec<std::complex<float>> reconstructed = sm::hexfft::ifft (hg, fft_data.hex_data);
     sm::vvec<float> ifft_r (reconstructed.size());
@@ -176,7 +180,9 @@ int main()
     hgv->addLabel ("Reconstructed from fft_data.hex_data", sm::vec<float>({-0.75,-1.2,0}), mplot::TextFeatures(0.05f));
     hgv->finalize();
     v.addVisualModel (hgv);
+#endif
 
+#if 0
     // Reconstruct with inverse FFT 2
     sm::vvec<std::complex<float>> reconstructed2 = sm::hexfft::ifft (hg, fft_data);
     sm::vvec<float> ifft_r2 (reconstructed2.size());
@@ -193,7 +199,9 @@ int main()
     hgv->addLabel ("Reconstructed from fft_data(.data)", sm::vec<float>({-0.75,-1.2,0}), mplot::TextFeatures(0.05f));
     hgv->finalize();
     v.addVisualModel (hgv);
+#endif
 
+#if 0
     // Diff
     sm::vvec<float> di1 = (ifft_r - hex_image_data).abs();
     hgv = std::make_unique<mplot::HexGridVisual<float>>(&hg, sm::vec<float>{7.5f, 0.0f});
@@ -217,6 +225,7 @@ int main()
     hgv->finalize();
     v.addVisualModel (hgv);
     std::cout << "Mean diff for fft_data.(data) reconstr: " << di2.abs().mean() << std::endl;
+#endif
 
     v.keepOpen();
 

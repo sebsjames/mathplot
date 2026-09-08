@@ -15,6 +15,7 @@ import sm.vvec;
 import sm.vec;
 import sm.hex;
 import sm.hexgrid;
+import sm.algo.hexgrid;
 
 import sm.anneal;
 import sm.config;
@@ -319,7 +320,7 @@ void setup_objective()
     sm::vvec<F> convolved (hg->num(), F{0});
 
     // Call the convolution method from hexgrid:
-    hg->convolve (kernel, kerneldata, obj_f, convolved);
+    sm::algo::hexgrid::convolve (*hg, kernel, kerneldata, obj_f, convolved);
 
     obj_f.swap (convolved);
 

@@ -14,6 +14,7 @@
 import sm.vec;
 import sm.vvec;
 import sm.hexgrid;
+import sm.algo.hexgrid;
 
 import mplot.loadpng;
 import mplot.visual;
@@ -63,7 +64,7 @@ int main()
     sm::vec<float,2> image_offset = {0.0f, 0.0f};
 
     // Here's the HexGrid method that will resample the square pixel grid onto the hex grid
-    sm::vvec<float> hex_image_data = hg.resample_image (image_data, dims[0], image_scale, image_offset);
+    sm::vvec<float> hex_image_data = sm::algo::hexgrid::resample_image (hg, image_data, dims[0], image_scale, image_offset);
 
     // hg has d_x and d_y. Can make up a new container of 3D locations for each hex.
     sm::vvec<sm::vec<float, 3>> sphere_coords(hg.num());

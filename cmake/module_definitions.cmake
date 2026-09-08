@@ -43,6 +43,7 @@ macro(setup_module_variables_for_mathplot base_directory maths_directory json_di
     ${maths_directory}/sm/bezcurvepath.cppm
     ${maths_directory}/sm/hex.cppm
     ${maths_directory}/sm/hexgrid.cppm
+    ${maths_directory}/sm/algo_hexgrid.cppm
   )
 
   # The modules required for cartgrids

@@ -345,6 +345,12 @@ if(OpenMP_CXX_FOUND)
   target_link_libraries(hexgrid_fft_image OpenMP::OpenMP_CXX mathplot_examples)
 else()
   target_link_libraries(hexgrid_fft_image mathplot_examples)
+
+add_executable(hexgrid_image_mask hexgrid_image_mask.cpp)
+if(OpenMP_CXX_FOUND)
+  target_link_libraries(hexgrid_image_mask OpenMP::OpenMP_CXX mathplot_examples)
+else()
+  target_link_libraries(hexgrid_image_mask mathplot_examples)
 endif()
 
 add_executable(hexgrid_image_rect hexgrid_image_rect.cpp)

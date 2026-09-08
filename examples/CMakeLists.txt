@@ -340,11 +340,14 @@ else()
   target_link_libraries(hexgrid_image mathplot_examples)
 endif()
 
+if(0) # Disabled until hexgrid_fft_image_rect works
 add_executable(hexgrid_fft_image hexgrid_fft_image.cpp)
 if(OpenMP_CXX_FOUND)
   target_link_libraries(hexgrid_fft_image OpenMP::OpenMP_CXX mathplot_examples)
 else()
   target_link_libraries(hexgrid_fft_image mathplot_examples)
+endif()
+endif()
 
 add_executable(hexgrid_image_mask hexgrid_image_mask.cpp)
 if(OpenMP_CXX_FOUND)

@@ -11,6 +11,7 @@ import sm.vec;
 import sm.vvec;
 import sm.hexfft;
 import sm.hexgrid;
+import sm.algo.hexgrid;
 
 import mplot.loadpng;
 import mplot.visual;
@@ -33,7 +34,7 @@ int main()
     // You can shift the photo with an offset if necessary
     sm::vec<float, 2> image_offset = {0.0f, 0.0f};
     // Here's the HexGrid method that will resample the square pixel grid onto the hex grid
-    sm::vvec<float> hex_image_data = hg.resample_image (image_data, dims[1], image_scale, image_offset);
+    sm::vvec<float> hex_image_data = sm::algo::hexgrid::resample_image (hg, image_data, dims[1], image_scale, image_offset);
 
     std::cout << "image_data size " << hex_image_data.size() << std::endl;
 

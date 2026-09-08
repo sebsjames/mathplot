@@ -12,6 +12,7 @@ import sm.vec;
 import sm.vvec;
 import sm.hexfft;
 import sm.hexgrid;
+import sm.algo.hexgrid;
 import sm.grid;
 
 import mplot.loadpng;
@@ -21,7 +22,7 @@ import mplot.gridvisual;
 
 int main()
 {
-    mplot::Visual v(1600, 1000, "Demo of hexgrid::resample_image");
+    mplot::Visual v(1600, 1000, "Hexagonal FFT");
 
     sm::hexgrid hg(0.01f, 4.0f, 0.0f);
     hg.set_rectangular_boundary (2.0f, 2.0f);
@@ -42,7 +43,7 @@ int main()
 
     // Here's the hexgrid method that will resample the square pixel grid onto the hex grid
     std::cout << "Start resample..." << std::endl;
-    sm::vvec<float> hex_image_data = hg.resample_image (image_data, dims[0], image_scale, image_offset);
+    sm::vvec<float> hex_image_data = sm::algo::hexgrid::resample_image (hg, image_data, dims[0], image_scale, image_offset);
     std::cout << "resample complete" << std::endl;
 
     auto hgv = std::make_unique<mplot::HexGridVisual<float>>(&hg, sm::vec<float>({-6,1.25,0}));

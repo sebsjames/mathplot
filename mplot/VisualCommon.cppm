@@ -33,6 +33,7 @@ export namespace mplot
         greyscale,              // If true, drain the colour from the model
         instanced,              // If true, draw this VisualModel with 'instancing' 1 or more times
         show_bb,                // If true, draw vertices/indices for the bounding box frame
+        label_bb,               // If true, show the bounding box's name label
         compute_bb              // For some models, it's not useful to compute the bounding box (e.g. coordinate arrows)
     };
 

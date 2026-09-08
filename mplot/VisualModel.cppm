@@ -823,7 +823,12 @@ export namespace mplot
                 glfn->PolygonMode (GL_FRONT_AND_BACK, GL_FILL);
             }
             auto ti = this->texts.begin();
-            while (ti != this->texts.end()) { (*ti)->render(); ti++; }
+            while (ti != this->texts.end()) {
+                // The bounding box's name label is only drawn when label_bb is set (kept in step
+                // with show_bb); other texts (e.g. graph axis labels) are unaffected by this flag.
+                if (ti->get() != this->bb_label || this->flags.test (vm_bools::label_bb)) { (*ti)->render(); }
+                ti++;
+            }
 
             glfn->UseProgram (prev_shader);
             mplot::gl::Util::checkError (__FILE__, __LINE__, glfn);
@@ -1281,6 +1286,7 @@ export namespace mplot
             _flags.set (vm_bools::wireframe, false);
             _flags.set (vm_bools::greyscale, false);
             _flags.set (vm_bools::show_bb, false);
+            _flags.set (vm_bools::label_bb, false);
             _flags.set (vm_bools::compute_bb, true);
             return _flags;
         }
@@ -1289,7 +1295,17 @@ export namespace mplot
         sm::flags<vm_bools> flags = flags_defaults();
 
         // Setters for flags
-        void show_bb (const bool val) { this->flags.set (vm_bools::show_bb, val); }
+        void show_bb (const bool val)
+        {
+            this->flags.set (vm_bools::show_bb, val);
+            this->flags.set (vm_bools::label_bb, val);
+            // Lazily create a text label showing this model's name, positioned at the top corner
+            // of its bounding box. Whether it's actually drawn is gated by vm_bools::label_bb in
+            // render(), in step with the bounding box itself.
+            if (val == true && this->bb_label == nullptr && this->name.empty() == false) {
+                this->addLabel (this->name, this->bb.max, this->bb_label);
+            }
+        }
         void compute_bb (const bool val) { this->flags.set (vm_bools::compute_bb, val); }
 
         /*!
@@ -1302,6 +1318,8 @@ export namespace mplot
         sm::vec<float> bb_x = {};
         sm::vec<float> bb_y = {};
         sm::vec<float> bb_z = {};
+        // Text label showing this model's name, shown/hidden alongside show_bb()
+        mplot::VisualTextModel<glver>* bb_label = nullptr;
 
         void twodimensional (const bool val) { this->flags.set (vm_bools::twodimensional, val); }
         bool twodimensional() const { return this->flags.test (vm_bools::twodimensional); }

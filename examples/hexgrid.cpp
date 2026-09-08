@@ -35,7 +35,7 @@ int main()
 
     // Create a HexGrid to show in the scene. Hexes outside the circular boundary will
     // all be discarded.
-    sm::hexgrid hg(0.01f, 3.0f, 0.0f);
+    sm::hexgrid<float, sm::hexalign::flat_up> hg(0.01f, 3.0f, 0.0f);
     hg.set_circular_boundary (0.6f);
     std::cout << "Number of pixels in grid:" << hg.num() << std::endl;
 
@@ -48,9 +48,9 @@ int main()
 
     // Add a HexGridVisual to display the HexGrid within the sm::Visual scene
     sm::vec<float, 3> offset = { 0.0f, -0.05f, 0.0f };
-    auto hgv = std::make_unique<mplot::HexGridVisual<float, mplot::gl::version_4_1>>(&hg, offset);
+    auto hgv = std::make_unique<mplot::HexGridVisual<float, sm::hexalign::flat_up, mplot::gl::version_4_1>>(&hg, offset);
     hgv->set_parent (v.get_id());
-    hgv->wireframe (true);
+    //hgv->wireframe (true);
     hgv->cm.setType (mplot::ColourMapType::Ice);
     hgv->setScalarData (&data);
     hgv->hexVisMode = mplot::HexVisMode::HexInterp; // Or sm::HexVisMode::Triangles for a smoother surface plot

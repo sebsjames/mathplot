@@ -222,7 +222,7 @@ export namespace mplot
             // Here's a complication. In a transformed grid, we can't rely on these. Should be able
             // to *compute* them though.
             float sr = this->hg->get_sr();
-            float vne = this->hg->get_v_to_ne();
+            float dne = this->hg->get_d_to_ne();
             float lr = this->hg->get_lr();
 
             uint32_t nhex = this->hg->num();
@@ -309,6 +309,9 @@ export namespace mplot
                 // The rotation from the transformation in the hexgrid (if any)
                 sm::mat<float, 3> lt = this->hg->tfm.linear().template as<float>();
 
+                // A hexagon corner/vertex position
+                sm::vec<float> crnr = {};
+
                 // NE vertex
                 if (this->dataCoords == nullptr) {
                     if (this->hg->has_n1(hi) && this->hg->has_n0(hi)) {
@@ -324,7 +327,11 @@ export namespace mplot
                         datum = datumC;
                     }
                     // Have to rotate after subtracting the center.
-                    sm::vec<float> crnr = lt * sm::vec<float>{ sr, vne, 0 };
+                    if constexpr (A == sm::hexalign::point_up) {
+                        crnr = lt * sm::vec<float>{ sr, dne, 0 };
+                    } else {
+                        crnr = lt * sm::vec<float>{ dne, sr, 0 };
+                    }
                     vtx_1 = crnr + sm::vec<float>{ _x, _y, datum };
                 } else {
                     // Similar logic, but for the coordinate, not just the data value
@@ -357,7 +364,11 @@ export namespace mplot
                     } else {
                         datum = datumC;
                     }
-                    sm::vec<float> crnr = lt * sm::vec<float>{ sr, -vne, 0 };
+                    if constexpr (A == sm::hexalign::point_up) {
+                        crnr = lt * sm::vec<float>{ sr, -dne, 0 };
+                    } else {
+                        crnr = lt * sm::vec<float>{ lr, 0, 0 };
+                    }
                     vtx_2 = crnr + sm::vec<float>{ _x, _y, datum };
                 } else {
                     if (this->hg->has_n0(hi) && this->hg->has_n5(hi)) {
@@ -388,7 +399,11 @@ export namespace mplot
                     } else {
                         datum = datumC;
                     }
-                    sm::vec<float> crnr = lt * sm::vec<float>{ 0, -lr, 0 };
+                    if constexpr (A == sm::hexalign::point_up) {
+                        crnr = lt * sm::vec<float>{ 0, -lr, 0 };
+                    } else {
+                        crnr = lt * sm::vec<float>{ dne, -sr, 0 };
+                    }
                     vtx_tmp = crnr + sm::vec<float>{ _x, _y, datum };
                 } else {
                     if (this->hg->has_n5(hi) && this->hg->has_n4(hi)) {
@@ -418,7 +433,11 @@ export namespace mplot
                     } else {
                         datum = datumC;
                     }
-                    sm::vec<float> crnr = lt * sm::vec<float>{ -sr, -vne, 0 };
+                    if constexpr (A == sm::hexalign::point_up) {
+                        crnr = lt * sm::vec<float>{ -sr, -dne, 0 };
+                    } else {
+                        crnr = lt * sm::vec<float>{ -dne, -sr, 0 };
+                    }
                     vtx_tmp = crnr + sm::vec<float>{ _x, _y, datum };
                 } else {
                     if (this->hg->has_n3(hi) && this->hg->has_n4(hi)) {
@@ -448,7 +467,11 @@ export namespace mplot
                     } else {
                         datum = datumC;
                     }
-                    sm::vec<float> crnr = lt * sm::vec<float>{ -sr, vne, 0 };
+                    if constexpr (A == sm::hexalign::point_up) {
+                        crnr = lt * sm::vec<float>{ -sr, dne, 0 };
+                    } else {
+                        crnr = lt * sm::vec<float>{ -lr, 0, 0 };
+                    }
                     vtx_tmp = crnr + sm::vec<float>{ _x, _y, datum };
                 } else {
                     if (this->hg->has_n2(hi) && this->hg->has_n3(hi)) {
@@ -478,7 +501,11 @@ export namespace mplot
                     } else {
                         datum = datumC;
                     }
-                    sm::vec<float> crnr = lt * sm::vec<float>{ 0, lr, 0 };
+                    if constexpr (A == sm::hexalign::point_up) {
+                        crnr = lt * sm::vec<float>{ 0, lr, 0 };
+                    } else {
+                        crnr = lt * sm::vec<float>{ -dne, sr, 0 };
+                    }
                     vtx_tmp = crnr + sm::vec<float>{ _x, _y, datum };
                 } else {
                     if (this->hg->has_n2(hi) && this->hg->has_n1(hi)) {
@@ -582,7 +609,7 @@ export namespace mplot
         void computeZerogridIndices()
         {
             float sr = this->hg->get_sr();
-            float vne = this->hg->get_v_to_ne();
+            float dne = this->hg->get_d_to_ne();
             float lr = this->hg->get_lr();
             uint32_t nhex = this->hg->num();
 
@@ -600,17 +627,17 @@ export namespace mplot
                 // Use the centre position as the first location for finding the normal vector
                 vtx_0 = sm::vec<float>{static_cast<float>(this->hg->d_x[hi]), static_cast<float>(this->hg->d_y[hi]), datum};
                 // NE vertex
-                this->vertex_push (this->hg->d_x[hi]+sr, this->hg->d_y[hi]+vne, datum, this->vertexPositions);
-                vtx_1 = sm::vec<float>{static_cast<float>(this->hg->d_x[hi])+sr, static_cast<float>(this->hg->d_y[hi])+vne, datum};
+                this->vertex_push (this->hg->d_x[hi]+sr, this->hg->d_y[hi]+dne, datum, this->vertexPositions);
+                vtx_1 = sm::vec<float>{static_cast<float>(this->hg->d_x[hi])+sr, static_cast<float>(this->hg->d_y[hi])+dne, datum};
                 // SE vertex
-                this->vertex_push (this->hg->d_x[hi]+sr, this->hg->d_y[hi]-vne, datum, this->vertexPositions);
-                vtx_2 = sm::vec<float>{static_cast<float>(this->hg->d_x[hi])+sr, static_cast<float>(this->hg->d_y[hi])-vne, datum};
+                this->vertex_push (this->hg->d_x[hi]+sr, this->hg->d_y[hi]-dne, datum, this->vertexPositions);
+                vtx_2 = sm::vec<float>{static_cast<float>(this->hg->d_x[hi])+sr, static_cast<float>(this->hg->d_y[hi])-dne, datum};
                 // S
                 this->vertex_push (this->hg->d_x[hi], this->hg->d_y[hi]-lr, datum, this->vertexPositions);
                 // SW
-                this->vertex_push (this->hg->d_x[hi]-sr, this->hg->d_y[hi]-vne, datum, this->vertexPositions);
+                this->vertex_push (this->hg->d_x[hi]-sr, this->hg->d_y[hi]-dne, datum, this->vertexPositions);
                 // NW
-                this->vertex_push (this->hg->d_x[hi]-sr, this->hg->d_y[hi]+vne, datum, this->vertexPositions);
+                this->vertex_push (this->hg->d_x[hi]-sr, this->hg->d_y[hi]+dne, datum, this->vertexPositions);
                 // N
                 this->vertex_push (this->hg->d_x[hi], this->hg->d_y[hi]+lr, datum, this->vertexPositions);
 

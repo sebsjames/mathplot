@@ -125,7 +125,7 @@ int main()
         for (unsigned int ri = 0; ri < hg.num(); ++ri) {
             data[ri] = 0.05f + 0.15f*std::sin(10.0f*hg.d_x[ri]) * std::sin(1.8f*hg.d_y[ri]) ; // Range 0->1
         }
-        auto hgv = std::make_unique<mplot::HexGridVisual<float, mplot::gl::version_4_1>>(&hg, sm::vec<float>{-2.0f, -0.5f, 0.0f});
+        auto hgv = std::make_unique<mplot::HexGridVisual<float, sm::hexalign::point_up, mplot::gl::version_4_1>>(&hg, sm::vec<float>{-2.0f, -0.5f, 0.0f});
         hgv->set_parent (v.get_id());
         hgv->setScalarData (&data);
         hgv->cm.setType (mplot::ColourMapType::Inferno);

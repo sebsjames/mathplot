@@ -18,7 +18,8 @@ int main()
 {
     mplot::Visual v(1600, 1000, "Demo of sm::hexgrid::resample_image");
 
-    sm::hexgrid hg(0.01f, 3.0f, 0.0f);
+    // Demonstating the creating of a hexgrid with hexagons aligned with a 'flat' up (i.e. an edge at the top)
+    sm::hexgrid<float, sm::hexalign::flat_up> hg(0.01f, 3.0f, 0.0f);
     hg.set_circular_boundary (1.2f);
 
     // Load an image with the help of mplot::loadpng().
@@ -35,7 +36,7 @@ int main()
     sm::vvec<float> hex_image_data = sm::algo::hexgrid::resample_image (hg, image_data, dims[1], image_scale, image_offset);
 
     // Now visualise with a HexGridVisual
-    auto hgv = std::make_unique<mplot::HexGridVisual<float>>(&hg, sm::vec<float>({0,0,0}));
+    auto hgv = std::make_unique<mplot::HexGridVisual<float, sm::hexalign::flat_up>>(&hg, sm::vec<float>({0,0,0}));
     hgv->set_parent (v.get_id());
 
     // Set the image data as the scalar data for the HexGridVisual

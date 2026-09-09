@@ -1,5 +1,5 @@
 /*
- * An example mplot::Visual scene, containing a HexGrid.
+ * An example mplot::Visual scene, containing hexgrids.
  */
 
 #include <iostream>
@@ -55,13 +55,17 @@ int main()
         data2[ri] = 0.05f + 0.05f * std::sin (20.0f * hg2.d_x[ri]) * std::sin (10.0f * hg2.d_y[ri]) ; // Range 0->1
     }
 
+    // sm::HexVisMode::HexInterp to see the hexagons or sm::HexVisMode::Triangles for a smoother surface plot
+    const mplot::HexVisMode visMode = mplot::HexVisMode::HexInterp;
+
     // Add a HexGridVisual to display the HexGrid within the sm::Visual scene
     sm::vec<float, 3> offset = { 0.0f, -0.05f, 0.0f };
     auto hgv1 = std::make_unique<mplot::HexGridVisual<float, sm::hexalign::point_up, mplot::gl::version_4_1>>(&hg1, offset);
     hgv1->set_parent (v.get_id());
     hgv1->cm.setType (mplot::ColourMapType::Ice);
     hgv1->setScalarData (&data1);
-    hgv1->hexVisMode = mplot::HexVisMode::HexInterp; // Or sm::HexVisMode::Triangles for a smoother surface plot
+    hgv1->hexVisMode = visMode;
+    hgv1->addLabel ("hexalign::point_up", sm::vec<>{ 0.0f, -hg1.width()/1.8f }, mplot::TextFeatures(0.02f));
     hgv1->finalize();
     v.addVisualModel (hgv1);
 
@@ -70,7 +74,8 @@ int main()
     hgv2->set_parent (v.get_id());
     hgv2->cm.setType (mplot::ColourMapType::Ice);
     hgv2->setScalarData (&data2);
-    hgv2->hexVisMode = mplot::HexVisMode::HexInterp;
+    hgv2->hexVisMode = visMode;
+    hgv2->addLabel ("hexalign::flat_up", sm::vec<>{ 0.0f, -hg1.width()/1.8f }, mplot::TextFeatures(0.02f));
     hgv2->finalize();
 
     if (v.checkContext() == true) {

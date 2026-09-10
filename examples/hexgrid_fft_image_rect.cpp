@@ -24,11 +24,12 @@ int main()
 {
     mplot::Visual v(1600, 1000, "Hexagonal FFT");
 
-    sm::hexgrid hg(0.01f, 4.0f, 0.0f);
+    sm::hexgrid<float, sm::hexalign::point_up> hg(0.01f, 4.0f, 0.0f);
     hg.set_rectangular_boundary (2.0f, 2.0f);
 
-    sm::hexgrid hgf(0.01f, 8.0f, 0.0f);
-    hgf.set_rectangular_boundary (4.0f, 4.0f);
+    // Need flat_up for the frequency space
+    //sm::hexgrid<float, sm::hexalign::flat_up> hgf(0.01f, 8.0f, 0.0f);
+    //hgf.set_rectangular_boundary (4.0f, 4.0f);
 
     // Load a rectangular image with the help of mplot::loadpng().
     std::string fn = "../examples/bike256.png";
@@ -46,7 +47,7 @@ int main()
     sm::vvec<float> hex_image_data = sm::algo::hexgrid::resample_image (hg, image_data, dims[0], image_scale, image_offset);
     std::cout << "resample complete" << std::endl;
 
-    auto hgv = std::make_unique<mplot::HexGridVisual<float>>(&hg, sm::vec<float>({-6,1.25,0}));
+    auto hgv = std::make_unique<mplot::HexGridVisual<float, sm::hexalign::point_up>>(&hg, sm::vec<float>({-6,1.25,0}));
     hgv->set_parent (v.get_id());
     hgv->setScalarData (&hex_image_data);
     hgv->cm.setType (mplot::ColourMapType::GreyscaleInv);
@@ -56,7 +57,7 @@ int main()
     v.addVisualModel (hgv);
 
     // Transform with FFT
-    sm::hexfft::spectrum<float> fft_data = sm::hexfft::fft (hg, hex_image_data, hgf);
+    sm::hexfft::spectrum<float> fft_data = sm::hexfft::fft (hg, hex_image_data);
     sm::vvec<float> fft_r (fft_data.hex_data.size());
     sm::vvec<float> fft_i (fft_data.hex_data.size());
     for (std::uint32_t i = 0; i < fft_r.size(); ++i) {
@@ -110,7 +111,7 @@ int main()
     gv->finalize();
     v.addVisualModel (gv);
 
-    gv = std::make_unique<mplot::GridVisual<float>>(&grid, sm::vec<float>{-4.5f, 2.5f - hshift1});
+    gv = std::make_unique<mplot::GridVisual<float>>(&grid, sm::vec<float>{-4.5f, 2.0f - hshift1});
     gv->set_parent (v.get_id());
     gv->gridVisMode = mplot::GridVisMode::RectInterp;
     gv->setScalarData (&d1);
@@ -120,22 +121,21 @@ int main()
     gv->finalize();
     v.addVisualModel (gv);
 
-    gv = std::make_unique<mplot::GridVisual<float>>(&grid, sm::vec<float>{-1.5f, 0.0f - hshift1});
+    // FFT
+    gv = std::make_unique<mplot::GridVisual<float>>(&grid, sm::vec<float>{-2.0f, 0.0f - hshift1});
     gv->set_parent (v.get_id());
     gv->gridVisMode = mplot::GridVisMode::RectInterp;
     gv->setScalarData (&X0);
-    //gv->colourScale.compute_scaling (-900, 1200);
     gv->zScale.set_params (0, 0);
     gv->cm.setType (mplot::ColourMapType::GreyscaleInv);
     gv->addLabel ("X_asa.first (odd)", sm::vec<float>({0,-0.2,0}), mplot::TextFeatures(0.05f));
     gv->finalize();
     v.addVisualModel (gv);
 
-    gv = std::make_unique<mplot::GridVisual<float>>(&grid, sm::vec<float>{-1.5f, 2.5f - hshift1});
+    gv = std::make_unique<mplot::GridVisual<float>>(&grid, sm::vec<float>{-2.0f, 2.0f - hshift1});
     gv->set_parent (v.get_id());
     gv->gridVisMode = mplot::GridVisMode::RectInterp;
     gv->setScalarData (&X1);
-    //gv->colourScale.compute_scaling (-900, 1200);
     gv->zScale.set_params (0, 0);
     gv->cm.setType (mplot::ColourMapType::GreyscaleInv);
     gv->addLabel ("X_asa.second (even)", sm::vec<float>({0,-0.2,0}), mplot::TextFeatures(0.05f));
@@ -143,26 +143,29 @@ int main()
     v.addVisualModel (gv);
 
     // Real part
-    hgv = std::make_unique<mplot::HexGridVisual<float>>(&hgf, sm::vec<float>{4.5f});
-    hgv->set_parent (v.get_id());
-    hgv->setScalarData (&fft_r);
-    hgv->colourScale.compute_scaling (-900, 1200);
-    hgv->cm.setType (mplot::ColourMapType::GreyscaleInv);
-    hgv->zScale.set_params (0, 0);
-    hgv->addLabel ("Combined FFT, real", sm::vec<float>({0,-1.2,0}), mplot::TextFeatures(0.05f));
-    hgv->finalize();
-    v.addVisualModel (hgv);
+    auto fhgv = std::make_unique<mplot::HexGridVisual<float, sm::fft::hgf_align>>(fft_data.hgf.get(), sm::vec<float>{2.5f, 1.0f});
+    fhgv->set_parent (v.get_id());
+    fhgv->zoom = (fft_data.Uscale);
+    fhgv->setScalarData (&fft_r);
+    fhgv->colourScale.compute_scaling (-900, 1200);
+    fhgv->cm.setType (mplot::ColourMapType::GreyscaleInv);
+    fhgv->zScale.set_params (0, 0);
+    fhgv->addLabel ("Combined FFT, real", sm::vec<float>({0,-1.2,0}), mplot::TextFeatures(0.05f));
+    fhgv->finalize();
+    v.addVisualModel (fhgv);
 
+#if 0
     // Imaginary part
-    hgv = std::make_unique<mplot::HexGridVisual<float>>(&hgf, sm::vec<float>{4.5f, 5.0f});
-    hgv->set_parent (v.get_id());
-    hgv->setScalarData (&fft_i);
-    hgv->colourScale.compute_scaling (-900, 1200);
-    hgv->cm.setType (mplot::ColourMapType::GreyscaleInv);
-    hgv->zScale.set_params (0, 0);
-    hgv->addLabel ("Combined FFT, imaginary", sm::vec<float>({0,-1.2,0}), mplot::TextFeatures(0.05f));
-    hgv->finalize();
-    v.addVisualModel (hgv);
+    fhgv = std::make_unique<mplot::HexGridVisual<float, sm::fft::hgf_align>>(fft_data.hgf.get(), sm::vec<float>{4.5f, 5.0f});
+    fhgv->set_parent (v.get_id());
+    fhgv->setScalarData (&fft_i);
+    fhgv->colourScale.compute_scaling (-900, 1200);
+    fhgv->cm.setType (mplot::ColourMapType::GreyscaleInv);
+    fhgv->zScale.set_params (0, 0);
+    fhgv->addLabel ("Combined FFT, imaginary", sm::vec<float>({0,-1.2,0}), mplot::TextFeatures(0.05f));
+    fhgv->finalize();
+    v.addVisualModel (fhgv);
+#endif
 
 #if 0
     // Reconstruct with inverse FFT
@@ -181,9 +184,7 @@ int main()
     hgv->addLabel ("Reconstructed from fft_data.hex_data", sm::vec<float>({-0.75,-1.2,0}), mplot::TextFeatures(0.05f));
     hgv->finalize();
     v.addVisualModel (hgv);
-#endif
 
-#if 0
     // Reconstruct with inverse FFT 2
     sm::vvec<std::complex<float>> reconstructed2 = sm::hexfft::ifft (hg, fft_data);
     sm::vvec<float> ifft_r2 (reconstructed2.size());
@@ -200,9 +201,7 @@ int main()
     hgv->addLabel ("Reconstructed from fft_data(.data)", sm::vec<float>({-0.75,-1.2,0}), mplot::TextFeatures(0.05f));
     hgv->finalize();
     v.addVisualModel (hgv);
-#endif
 
-#if 0
     // Diff
     sm::vvec<float> di1 = (ifft_r - hex_image_data).abs();
     hgv = std::make_unique<mplot::HexGridVisual<float>>(&hg, sm::vec<float>{7.5f, 0.0f});

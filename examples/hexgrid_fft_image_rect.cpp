@@ -179,16 +179,75 @@ int main()
     v.addVisualModel (fhgv);
 #endif
 
-#if 0
+#if 1
     // Reconstruct with inverse FFT
-    sm::vvec<std::complex<float>> reconstructed = sm::hexfft::ifft (hg, fft_data.hex_data);
+    sm::vvec<std::complex<float>> reconstructed = sm::hexfft::ifft<float> (hg, fft_data);
     sm::vvec<float> ifft_r (reconstructed.size());
     for (std::uint32_t i = 0; i < ifft_r.size(); ++i) {
         ifft_r[i] = std::real(reconstructed[i]);
     }
 
+    d0.zero();
+    d1.zero();
+    X0.zero();
+    X1.zero();
+
+    std::cout << "fft_data.d_asa.first.size(): "<< fft_data.d_asa.first.size() << std::endl;
+    std::cout << "fft_data.d_asa.second.size(): "<< fft_data.d_asa.second.size() << std::endl;
+    std::cout << "fft_data.X_asa.first.size(): "<< fft_data.X_asa.first.size() << std::endl;
+    std::cout << "fft_data.X_asa.second.size(): "<< fft_data.X_asa.second.size() << std::endl;
+    // Re-extract data to view
+    if (d0.size() == fft_data.d_asa.first.size()) {
+        for (std::uint32_t i = 0; i < d0.size(); ++i) {
+            d0[i] = std::real (fft_data.d_asa.first[i]);
+            d1[i] = std::real (fft_data.d_asa.second[i]);
+            X0[i] = std::real (fft_data.X_asa.first[i]);
+            X1[i] = std::real (fft_data.X_asa.second[i]);
+        }
+    }
+    // FFT
+    gv = std::make_unique<mplot::GridVisual<float>>(&grid, sm::vec<float>{7.0f, 0.0f - hshift1});
+    gv->set_parent (v.get_id());
+    gv->gridVisMode = mplot::GridVisMode::RectInterp;
+    gv->setScalarData (&X0);
+    gv->zScale.set_params (0, 0);
+    gv->cm.setType (mplot::ColourMapType::GreyscaleInv);
+    gv->addLabel ("X_asa.first (odd)", sm::vec<float>({0,-0.2,0}), mplot::TextFeatures(0.05f));
+    gv->finalize();
+    v.addVisualModel (gv);
+
+    gv = std::make_unique<mplot::GridVisual<float>>(&grid, sm::vec<float>{7.0f, 2.0f - hshift1});
+    gv->set_parent (v.get_id());
+    gv->gridVisMode = mplot::GridVisMode::RectInterp;
+    gv->setScalarData (&X1);
+    gv->zScale.set_params (0, 0);
+    gv->cm.setType (mplot::ColourMapType::GreyscaleInv);
+    gv->addLabel ("X_asa.second (even)", sm::vec<float>({0,-0.2,0}), mplot::TextFeatures(0.05f));
+    gv->finalize();
+    v.addVisualModel (gv);
+
+    gv = std::make_unique<mplot::GridVisual<float>>(&grid, sm::vec<float>{9.5f, 0.0f - hshift1});
+    gv->set_parent (v.get_id());
+    gv->gridVisMode = mplot::GridVisMode::RectInterp;
+    gv->setScalarData (&d0);
+    gv->zScale.set_params (0, 0);
+    gv->cm.setType (mplot::ColourMapType::GreyscaleInv);
+    gv->addLabel ("d_asa.first (odd input rows)", sm::vec<float>({0,-0.2,0}), mplot::TextFeatures(0.05f));
+    gv->finalize();
+    v.addVisualModel (gv);
+
+    gv = std::make_unique<mplot::GridVisual<float>>(&grid, sm::vec<float>{9.5f, 2.0f - hshift1});
+    gv->set_parent (v.get_id());
+    gv->gridVisMode = mplot::GridVisMode::RectInterp;
+    gv->setScalarData (&d1);
+    gv->zScale.set_params (0, 0);
+    gv->cm.setType (mplot::ColourMapType::GreyscaleInv);
+    gv->addLabel ("d_asa.second (even)", sm::vec<float>({0,-0.2,0}), mplot::TextFeatures(0.05f));
+    gv->finalize();
+    v.addVisualModel (gv);
+
     // Reconstructed
-    hgv = std::make_unique<mplot::HexGridVisual<float>>(&hg, sm::vec<float>{5.0f});
+    hgv = std::make_unique<mplot::HexGridVisual<float>>(&hg, sm::vec<float>{13.5f});
     hgv->set_parent (v.get_id());
     hgv->setScalarData (&ifft_r);
     hgv->cm.setType (mplot::ColourMapType::GreyscaleInv);
@@ -197,46 +256,6 @@ int main()
     hgv->finalize();
     v.addVisualModel (hgv);
 
-    // Reconstruct with inverse FFT 2
-    sm::vvec<std::complex<float>> reconstructed2 = sm::hexfft::ifft (hg, fft_data);
-    sm::vvec<float> ifft_r2 (reconstructed2.size());
-    for (std::uint32_t i = 0; i < ifft_r2.size(); ++i) {
-        ifft_r2[i] = std::real(reconstructed2[i]);
-    }
-
-    // Reconstructed
-    hgv = std::make_unique<mplot::HexGridVisual<float>>(&hg, sm::vec<float>{5.0f, 2.5f});
-    hgv->set_parent (v.get_id());
-    hgv->setScalarData (&ifft_r2);
-    hgv->cm.setType (mplot::ColourMapType::GreyscaleInv);
-    hgv->zScale.set_params (0, 0);
-    hgv->addLabel ("Reconstructed from fft_data(.data)", sm::vec<float>({-0.75,-1.2,0}), mplot::TextFeatures(0.05f));
-    hgv->finalize();
-    v.addVisualModel (hgv);
-
-    // Diff
-    sm::vvec<float> di1 = (ifft_r - hex_image_data).abs();
-    hgv = std::make_unique<mplot::HexGridVisual<float>>(&hg, sm::vec<float>{7.5f, 0.0f});
-    hgv->set_parent (v.get_id());
-    hgv->setScalarData (&di1);
-    hgv->cm.setType (mplot::ColourMapType::GreyscaleInv);
-    hgv->zScale.set_params (0, 0);
-    hgv->addLabel ("Diff of fft_data.hex_data reconstr", sm::vec<float>({-0.75,-1.2,0}), mplot::TextFeatures(0.05f));
-    hgv->finalize();
-    v.addVisualModel (hgv);
-    std::cout << "Mean diff for fft_data.hex_data reconstr: " << di1.abs().mean() << std::endl;
-
-    // Diff 2
-    sm::vvec<float> di2 = (ifft_r2 - hex_image_data).abs();
-    hgv = std::make_unique<mplot::HexGridVisual<float>>(&hg, sm::vec<float>{7.5f, 2.5f});
-    hgv->set_parent (v.get_id());
-    hgv->setScalarData (&di2);
-    hgv->cm.setType (mplot::ColourMapType::GreyscaleInv);
-    hgv->zScale.set_params (0, 0);
-    hgv->addLabel ("Diff of fft_data.(data) reconstr", sm::vec<float>({-0.75,-1.2,0}), mplot::TextFeatures(0.05f));
-    hgv->finalize();
-    v.addVisualModel (hgv);
-    std::cout << "Mean diff for fft_data.(data) reconstr: " << di2.abs().mean() << std::endl;
 #endif
 
     v.keepOpen();

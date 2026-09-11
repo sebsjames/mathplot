@@ -58,6 +58,9 @@ int main()
 
     // Transform with FFT
     sm::hexfft::spectrum<float> fft_data = sm::hexfft::fft (hg, hex_image_data);
+
+    std::cout << "fft_data m = " << fft_data.m << ", and n = " << fft_data.n << std::endl;
+
     sm::vvec<float> fft_r (fft_data.hex_data.size());
     sm::vvec<float> fft_i (fft_data.hex_data.size());
     for (std::uint32_t i = 0; i < fft_r.size(); ++i) {
@@ -69,16 +72,16 @@ int main()
     constexpr sm::vec<float, 2> grid_spacing = {0.01f, 0.01f};
     sm::grid<std::uint32_t, float> grid(fft_data.m, fft_data.n, grid_spacing);
 
-    sm::vvec<float> d0 (fft_data.d_asa.first.data.size());
-    sm::vvec<float> d1 (fft_data.d_asa.first.data.size());
-    sm::vvec<float> X0 (fft_data.X_asa.first.data.size());
-    sm::vvec<float> X1 (fft_data.X_asa.first.data.size());
+    sm::vvec<float> d0 (fft_data.d_asa.first.size());
+    sm::vvec<float> d1 (fft_data.d_asa.first.size());
+    sm::vvec<float> X0 (fft_data.X_asa.first.size());
+    sm::vvec<float> X1 (fft_data.X_asa.first.size());
 
     for (std::uint32_t i = 0; i < d0.size(); ++i) {
-        d0[i] = std::real (fft_data.d_asa.first.data[i]);
-        d1[i] = std::real (fft_data.d_asa.second.data[i]);
-        X0[i] = std::real (fft_data.X_asa.first.data[i]);
-        X1[i] = std::real (fft_data.X_asa.second.data[i]);
+        d0[i] = std::real (fft_data.d_asa.first[i]);
+        d1[i] = std::real (fft_data.d_asa.second[i]);
+        X0[i] = std::real (fft_data.X_asa.first[i]);
+        X1[i] = std::real (fft_data.X_asa.second[i]);
     }
 
     std::cout << "X0 mean/sd/range: " << X0.mean() << ", " << X0.std() << ", " << X0.range() << std::endl;
@@ -90,11 +93,17 @@ int main()
     for (std::uint32_t i = fft_data.n - 1; i != std::numeric_limits<std::uint32_t>::max(); --i) {
         for (std::uint32_t k = 0; k < fft_data.m; ++k) { // col
             float val = std::round (d1[i * fft_data.m + k] * 255.0f);
-            if (val < 0.0f || val > 255.0f) { throw std::runtime_error ("uhoh"); }
-            d1_rgb[j++] = static_cast<std::uint8_t>(val);
-            d1_rgb[j++] = static_cast<std::uint8_t>(val);
-            d1_rgb[j++] = static_cast<std::uint8_t>(val);
-            d1_rgb[j++] = 255u;
+            if (val < 0.0f || val > 255.0f) {
+                d1_rgb[j++] = static_cast<std::uint8_t>(0u);
+                d1_rgb[j++] = static_cast<std::uint8_t>(0u);
+                d1_rgb[j++] = static_cast<std::uint8_t>(0u);
+                d1_rgb[j++] = 255u;
+            } else {
+                d1_rgb[j++] = static_cast<std::uint8_t>(val);
+                d1_rgb[j++] = static_cast<std::uint8_t>(val);
+                d1_rgb[j++] = static_cast<std::uint8_t>(val);
+                d1_rgb[j++] = 255u;
+            }
         }
     }
     mplot::png_encode ("../examples/bike256_d1.png", d1_rgb.data(), fft_data.m, fft_data.n);

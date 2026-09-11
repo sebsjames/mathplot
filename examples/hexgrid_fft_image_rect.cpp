@@ -25,6 +25,7 @@ int main()
     mplot::Visual v(1600, 1000, "Hexagonal FFT");
 
     sm::hexgrid<float, sm::hexalign::point_up> hg(0.01f, 4.0f, 0.0f);
+    //hg.set_even_rectangular_boundary (2.0f, 2.0f);
     hg.set_rectangular_boundary (2.0f, 2.0f);
 
     // Need flat_up for the frequency space
@@ -179,7 +180,7 @@ int main()
     v.addVisualModel (fhgv);
 #endif
 
-#if 1
+#if 0
     // Reconstruct with inverse FFT
     sm::vvec<std::complex<float>> reconstructed = sm::hexfft::ifft<float> (hg, fft_data);
     sm::vvec<float> ifft_r (reconstructed.size());
@@ -206,7 +207,7 @@ int main()
         }
     }
     // FFT
-    gv = std::make_unique<mplot::GridVisual<float>>(&grid, sm::vec<float>{7.0f, 0.0f - hshift1});
+    gv = std::make_unique<mplot::GridVisual<float>>(&grid, sm::vec<float>{4.0f, 0.0f - hshift1});
     gv->set_parent (v.get_id());
     gv->gridVisMode = mplot::GridVisMode::RectInterp;
     gv->setScalarData (&X0);
@@ -216,7 +217,7 @@ int main()
     gv->finalize();
     v.addVisualModel (gv);
 
-    gv = std::make_unique<mplot::GridVisual<float>>(&grid, sm::vec<float>{7.0f, 2.0f - hshift1});
+    gv = std::make_unique<mplot::GridVisual<float>>(&grid, sm::vec<float>{4.0f, 2.0f - hshift1});
     gv->set_parent (v.get_id());
     gv->gridVisMode = mplot::GridVisMode::RectInterp;
     gv->setScalarData (&X1);
@@ -226,7 +227,7 @@ int main()
     gv->finalize();
     v.addVisualModel (gv);
 
-    gv = std::make_unique<mplot::GridVisual<float>>(&grid, sm::vec<float>{9.5f, 0.0f - hshift1});
+    gv = std::make_unique<mplot::GridVisual<float>>(&grid, sm::vec<float>{7.0f, 0.0f - hshift1});
     gv->set_parent (v.get_id());
     gv->gridVisMode = mplot::GridVisMode::RectInterp;
     gv->setScalarData (&d0);
@@ -236,7 +237,7 @@ int main()
     gv->finalize();
     v.addVisualModel (gv);
 
-    gv = std::make_unique<mplot::GridVisual<float>>(&grid, sm::vec<float>{9.5f, 2.0f - hshift1});
+    gv = std::make_unique<mplot::GridVisual<float>>(&grid, sm::vec<float>{7.0f, 2.0f - hshift1});
     gv->set_parent (v.get_id());
     gv->gridVisMode = mplot::GridVisMode::RectInterp;
     gv->setScalarData (&d1);

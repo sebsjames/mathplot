@@ -103,6 +103,9 @@ target_link_libraries(hexgrid mathplot_examples)
 add_executable(hexgrid_for_fft hexgrid_for_fft.cpp)
 target_link_libraries(hexgrid_for_fft mathplot_examples)
 
+add_executable(hexgrid_for_fft2 hexgrid_for_fft2.cpp)
+target_link_libraries(hexgrid_for_fft2 mathplot_examples)
+
 add_executable(model_crawler model_crawler.cpp)
 target_link_libraries(model_crawler mathplot_examples)
 

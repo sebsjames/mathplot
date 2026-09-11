@@ -59,7 +59,7 @@ int main()
     // Transform with FFT
     sm::hexfft::spectrum<float> fft_data = sm::hexfft::fft (hg, hex_image_data);
 
-    std::cout << "fft_data m = " << fft_data.m << ", and n = " << fft_data.n << std::endl;
+    std::cout << "fft_data cols = " << fft_data.cols << ", and rows = " << fft_data.rows << std::endl;
 
     sm::vvec<float> fft_r (fft_data.hex_data.size());
     sm::vvec<float> fft_i (fft_data.hex_data.size());
@@ -70,7 +70,10 @@ int main()
 
     // rows/cols:
     constexpr sm::vec<float, 2> grid_spacing = {0.01f, 0.01f};
-    sm::grid<std::uint32_t, float> grid(fft_data.m, fft_data.n, grid_spacing);
+    constexpr sm::vec<float, 2> null_offset = {0.0f, 0.0f};
+    sm::grid<std::uint32_t, float> grid(fft_data.cols, fft_data.rows, grid_spacing, null_offset,
+                                        sm::griddomainwrap::none,
+                                        sm::gridorder::bottomleft_to_topright_colmaj);
 
     sm::vvec<float> d0 (fft_data.d_asa.first.size());
     sm::vvec<float> d1 (fft_data.d_asa.first.size());
@@ -88,11 +91,11 @@ int main()
     std::cout << "X1 mean/sd/range: " << X1.mean() << ", " << X1.std() << ", " << X1.range() << std::endl;
 
     // Write out png of d1 for comparative image.
-    sm::vvec<std::uint8_t> d1_rgb (fft_data.m * fft_data.n * 4);
+    sm::vvec<std::uint8_t> d1_rgb (fft_data.cols * fft_data.rows * 4);
     std::uint32_t j = 0;
-    for (std::uint32_t i = fft_data.n - 1; i != std::numeric_limits<std::uint32_t>::max(); --i) {
-        for (std::uint32_t k = 0; k < fft_data.m; ++k) { // col
-            float val = std::round (d1[i * fft_data.m + k] * 255.0f);
+    for (std::uint32_t i = fft_data.rows - 1; i != std::numeric_limits<std::uint32_t>::max(); --i) {
+        for (std::uint32_t k = 0; k < fft_data.cols; ++k) { // col
+            float val = std::round (d1[i * fft_data.cols + k] * 255.0f);
             if (val < 0.0f || val > 255.0f) {
                 d1_rgb[j++] = static_cast<std::uint8_t>(0u);
                 d1_rgb[j++] = static_cast<std::uint8_t>(0u);
@@ -106,7 +109,7 @@ int main()
             }
         }
     }
-    mplot::png_encode ("../examples/bike256_d1.png", d1_rgb.data(), fft_data.m, fft_data.n);
+    mplot::png_encode ("../examples/bike256_d1.png", d1_rgb.data(), fft_data.cols, fft_data.rows);
 
     float hshift1 = 0.75f;
     // Grid 1 ds.first
@@ -152,7 +155,7 @@ int main()
     v.addVisualModel (gv);
 
     // Real part
-    auto fhgv = std::make_unique<mplot::HexGridVisual<float, sm::fft::hgf_align>>(fft_data.hgf.get(), sm::vec<float>{2.5f, 1.0f});
+    auto fhgv = std::make_unique<mplot::HexGridVisual<float, sm::hexalign::flat_up>>(fft_data.hgf.get(), sm::vec<float>{2.5f, 1.0f});
     fhgv->set_parent (v.get_id());
     fhgv->zoom = (fft_data.Uscale);
     fhgv->setScalarData (&fft_r);
@@ -165,7 +168,7 @@ int main()
 
 #if 0
     // Imaginary part
-    fhgv = std::make_unique<mplot::HexGridVisual<float, sm::fft::hgf_align>>(fft_data.hgf.get(), sm::vec<float>{4.5f, 5.0f});
+    fhgv = std::make_unique<mplot::HexGridVisual<float, sm::hexalign::flat_up>>(fft_data.hgf.get(), sm::vec<float>{4.5f, 5.0f});
     fhgv->set_parent (v.get_id());
     fhgv->setScalarData (&fft_i);
     fhgv->colourScale.compute_scaling (-900, 1200);

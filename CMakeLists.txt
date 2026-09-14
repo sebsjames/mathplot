@@ -10,7 +10,9 @@ project(mathplot LANGUAGES CXX C)
 message(STATUS "Install prefix: ${CMAKE_INSTALL_PREFIX}")
 message(STATUS "  (This can be changed with `cmake -DCMAKE_INSTALL_PREFIX=/some/place`")
 
-set(CMAKE_CXX_STANDARD 20)
+# The use of C++20 modules mandates us to use compilers that are
+# recent enough to support C++23. C++23 will allow future use of import std;
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # For future import std; support

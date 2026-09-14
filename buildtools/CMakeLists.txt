@@ -9,8 +9,6 @@ target_sources(tools_lib PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT_SOURCE_
   FILES ${PROJECT_SOURCE_DIR}/mplot/tools.cppm
 )
 
-# Permit #include <mplot/header.h>
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR})
 if(NOT WIN32)
   add_executable(process_colourtables process_colourtables.cpp)
   target_link_libraries(process_colourtables tools_lib)

@@ -30,12 +30,12 @@ export namespace mplot
 
     //! The template argument T is the type of the data which this HexGridVisual
     //! will visualize and the type for the hexgrid.
-    template <class T, int32_t glver = mplot::gl::version_4_1>
+    template <class T, sm::hexalign A = sm::hexalign::point_up, int32_t glver = mplot::gl::version_4_1>
     class HexGridVisual : public VisualDataModel<T,glver>
     {
     public:
         //! Simplest constructor. Use this in all new code!
-        HexGridVisual(const sm::hexgrid<T>* _hg, const sm::vec<float> _offset)
+        HexGridVisual(const sm::hexgrid<T, A>* _hg, const sm::vec<float> _offset)
         {
             this->viewmatrix.translate (_offset);
             this->zScale.set_params (1, 0);
@@ -181,20 +181,20 @@ export namespace mplot
             if (update == false) {
                 std::size_t ind_sz = 0;
                 for (uint32_t hi = 0; hi < nhex; ++hi) {
-                    if (this->hg->has_nne(hi) && this->hg->has_ne(hi)) {
+                    if (this->hg->has_n1(hi) && this->hg->has_n0(hi)) {
                         //std::cout << "1st triangle " << hi << "->" << NNE(hi) << "->" << NE(hi) << std::endl;
                         this->indices.resize (ind_sz + 3);
                         this->indices[ind_sz++] = hi;
-                        this->indices[ind_sz++] = this->hg->nne(hi);
-                        this->indices[ind_sz++] = this->hg->ne(hi);
+                        this->indices[ind_sz++] = this->hg->n1(hi);
+                        this->indices[ind_sz++] = this->hg->n0(hi);
                     }
 
-                    if (this->hg->has_nw(hi) && this->hg->has_nsw(hi)) {
+                    if (this->hg->has_n3(hi) && this->hg->has_n4(hi)) {
                         //std::cout << "2nd triangle " << hi << "->" << NW(hi) << "->" << NSW(hi) << std::endl;
                         this->indices.resize (ind_sz + 3);
                         this->indices[ind_sz++] = hi;
-                        this->indices[ind_sz++] = this->hg->nw(hi);
-                        this->indices[ind_sz++] = this->hg->nsw(hi);
+                        this->indices[ind_sz++] = this->hg->n3(hi);
+                        this->indices[ind_sz++] = this->hg->n4(hi);
                     }
                 }
                 this->idx = nhex;
@@ -222,7 +222,7 @@ export namespace mplot
             // Here's a complication. In a transformed grid, we can't rely on these. Should be able
             // to *compute* them though.
             float sr = this->hg->get_sr();
-            float vne = this->hg->get_v_to_ne();
+            float dne = this->hg->get_d_to_ne();
             float lr = this->hg->get_lr();
 
             uint32_t nhex = this->hg->num();
@@ -234,25 +234,25 @@ export namespace mplot
             float _y = 0.0f;
             // These Ts are all floats, right?
             float datumC = 0.0f;   // datum at the centre
-            float datumNE = 0.0f;  // datum at the hex to the east.
-            float datumNNE = 0.0f; // etc
-            float datumNNW = 0.0f;
-            float datumNW = 0.0f;
-            float datumNSW = 0.0f;
-            float datumNSE = 0.0f;
+            float datumN0 = 0.0f;  // datum at the hex to the east (point_up) or north-east (flat_up)
+            float datumN1 = 0.0f;  // etc
+            float datumN2 = 0.0f;
+            float datumN3 = 0.0f;
+            float datumN4 = 0.0f;
+            float datumN5 = 0.0f;
 
             float datum = 0.0f;
             float third = 0.3333333f;
             float half = 0.5f;
             sm::vec<float> vtx_0, vtx_1, vtx_2, /* vtx_3, vtx_4, vtx_5, vtx_6, */ vtx_tmp;
 
-            sm::vec<float> coordC = { 0.0f, 0.0f, 0.0f };
-            sm::vec<float> coordNE = coordC;
-            sm::vec<float> coordNNE = coordC;
-            sm::vec<float> coordNNW = coordC;
-            sm::vec<float> coordNW = coordC;
-            sm::vec<float> coordNSW = coordC;
-            sm::vec<float> coordNSE = coordC;
+            sm::vec<float> coordC = {};
+            sm::vec<float> coordN0 = {};
+            sm::vec<float> coordN1 = {};
+            sm::vec<float> coordN2 = {};
+            sm::vec<float> coordN3 = {};
+            sm::vec<float> coordN4 = {};
+            sm::vec<float> coordN5 = {};
 
             for (uint32_t hi = 0; hi < nhex; ++hi) {
 
@@ -260,13 +260,13 @@ export namespace mplot
                     _x = this->hg->d_x[hi];
                     _y = this->hg->d_y[hi];
                     // Use the linear scaled copy of the data, dcopy.
-                    datumC   = this->dcopy[hi]; // '_z'
-                    datumNE  = this->hg->has_ne(hi)  ? this->dcopy[this->hg->ne(hi)]  : datumC; // datum Neighbour East
-                    datumNNE = this->hg->has_nne(hi) ? this->dcopy[this->hg->nne(hi)] : datumC; // datum Neighbour North East
-                    datumNNW = this->hg->has_nnw(hi) ? this->dcopy[this->hg->nnw(hi)] : datumC; // etc
-                    datumNW  = this->hg->has_nw(hi)  ? this->dcopy[this->hg->nw(hi)]  : datumC;
-                    datumNSW = this->hg->has_nsw(hi) ? this->dcopy[this->hg->nsw(hi)] : datumC;
-                    datumNSE = this->hg->has_nse(hi) ? this->dcopy[this->hg->nse(hi)] : datumC;
+                    datumC  = this->dcopy[hi]; // '_z'
+                    datumN0 = this->hg->has_n0(hi) ? this->dcopy[this->hg->n0(hi)] : datumC; // datum Neighbour East
+                    datumN1 = this->hg->has_n1(hi) ? this->dcopy[this->hg->n1(hi)] : datumC; // datum Neighbour North East
+                    datumN2 = this->hg->has_n2(hi) ? this->dcopy[this->hg->n2(hi)] : datumC; // etc
+                    datumN3 = this->hg->has_n3(hi) ? this->dcopy[this->hg->n3(hi)] : datumC;
+                    datumN4 = this->hg->has_n4(hi) ? this->dcopy[this->hg->n4(hi)] : datumC;
+                    datumN5 = this->hg->has_n5(hi) ? this->dcopy[this->hg->n5(hi)] : datumC;
                 } else {
                     // Get coordinates from dataCoords
                     _x = (*this->dataCoords)[hi][0];
@@ -274,19 +274,19 @@ export namespace mplot
                     datumC = (*this->dataCoords)[hi][2];
                     coordC = (*this->dataCoords)[hi];
 
-                    coordNE  = this->hg->has_ne(hi)  ? (*this->dataCoords)[this->hg->ne(hi)]  : (*this->dataCoords)[hi]; // datum Neighbour East
-                    coordNNE = this->hg->has_nne(hi) ? (*this->dataCoords)[this->hg->nne(hi)] : (*this->dataCoords)[hi]; // datum Neighbour North East
-                    coordNNW = this->hg->has_nnw(hi) ? (*this->dataCoords)[this->hg->nnw(hi)] : (*this->dataCoords)[hi]; // etc
-                    coordNW  = this->hg->has_nw(hi)  ? (*this->dataCoords)[this->hg->nw(hi)]  : (*this->dataCoords)[hi];
-                    coordNSW = this->hg->has_nsw(hi) ? (*this->dataCoords)[this->hg->nsw(hi)] : (*this->dataCoords)[hi];
-                    coordNSE = this->hg->has_nse(hi) ? (*this->dataCoords)[this->hg->nse(hi)] : (*this->dataCoords)[hi];
+                    coordN0 = this->hg->has_n0(hi) ? (*this->dataCoords)[this->hg->n0(hi)] : (*this->dataCoords)[hi]; // datum Neighbour East
+                    coordN1 = this->hg->has_n1(hi) ? (*this->dataCoords)[this->hg->n1(hi)] : (*this->dataCoords)[hi]; // datum Neighbour North East
+                    coordN2 = this->hg->has_n2(hi) ? (*this->dataCoords)[this->hg->n2(hi)] : (*this->dataCoords)[hi]; // etc
+                    coordN3 = this->hg->has_n3(hi) ? (*this->dataCoords)[this->hg->n3(hi)] : (*this->dataCoords)[hi];
+                    coordN4 = this->hg->has_n4(hi) ? (*this->dataCoords)[this->hg->n4(hi)] : (*this->dataCoords)[hi];
+                    coordN5 = this->hg->has_n5(hi) ? (*this->dataCoords)[this->hg->n5(hi)] : (*this->dataCoords)[hi];
 
-                    datumNE = coordNE[2];
-                    datumNNE = coordNNE[2];
-                    datumNNW = coordNNW[2];
-                    datumNW = coordNW[2];
-                    datumNSW = coordNSW[2];
-                    datumNSE = coordNSE[2];
+                    datumN0 = coordN0[2];
+                    datumN1 = coordN1[2];
+                    datumN2 = coordN2[2];
+                    datumN3 = coordN3[2];
+                    datumN4 = coordN4[2];
+                    datumN5 = coordN5[2];
                 }
 
                 // Use a single colour for each hex, even though hex z positions are
@@ -298,7 +298,7 @@ export namespace mplot
                 if (this->showcentre && _x == 0.0f && _y == 0.0f) {
                     this->markHex (hi);
                 }
-                std::array<float, 3> blkclr = {0,0,0};
+                std::array<float, 3> blkclr = {};
 
                 // First push the 7 positions of the triangle vertices, starting with the centre
 
@@ -309,33 +309,40 @@ export namespace mplot
                 // The rotation from the transformation in the hexgrid (if any)
                 sm::mat<float, 3> lt = this->hg->tfm.linear().template as<float>();
 
+                // A hexagon corner/vertex position
+                sm::vec<float> crnr = {};
+
                 // NE vertex
                 if (this->dataCoords == nullptr) {
-                    if (this->hg->has_nne(hi) && this->hg->has_ne(hi)) {
+                    if (this->hg->has_n1(hi) && this->hg->has_n0(hi)) {
                         // Compute mean of this->data[hi] and NE and E hexes
-                        datum = third * (datumC + datumNNE + datumNE);
-                    } else if (this->hg->has_nne(hi) || this->hg->has_ne(hi)) {
-                        if (this->hg->has_nne(hi)) {
-                            datum = half * (datumC + datumNNE);
+                        datum = third * (datumC + datumN1 + datumN0);
+                    } else if (this->hg->has_n1(hi) || this->hg->has_n0(hi)) {
+                        if (this->hg->has_n1(hi)) {
+                            datum = half * (datumC + datumN1);
                         } else {
-                            datum = half * (datumC + datumNE);
+                            datum = half * (datumC + datumN0);
                         }
                     } else {
                         datum = datumC;
                     }
                     // Have to rotate after subtracting the center.
-                    sm::vec<float> crnr = lt * sm::vec<float>{ sr, vne, 0 };
+                    if constexpr (A == sm::hexalign::point_up) {
+                        crnr = lt * sm::vec<float>{ sr, dne, 0 };
+                    } else {
+                        crnr = lt * sm::vec<float>{ dne, sr, 0 };
+                    }
                     vtx_1 = crnr + sm::vec<float>{ _x, _y, datum };
                 } else {
                     // Similar logic, but for the coordinate, not just the data value
-                    if (this->hg->has_nne(hi) && this->hg->has_ne(hi)) {
+                    if (this->hg->has_n1(hi) && this->hg->has_n0(hi)) {
                         // Compute mean of coordC and NE and E hexes
-                        vtx_1 = third * (coordC + coordNNE + coordNE);
-                    } else if (this->hg->has_nne(hi) || this->hg->has_ne(hi)) {
-                        if (this->hg->has_nne(hi)) {
-                            vtx_1 = half * (coordC + coordNNE);
+                        vtx_1 = third * (coordC + coordN1 + coordN0);
+                    } else if (this->hg->has_n1(hi) || this->hg->has_n0(hi)) {
+                        if (this->hg->has_n1(hi)) {
+                            vtx_1 = half * (coordC + coordN1);
                         } else {
-                            vtx_1 = half * (coordC + coordNE);
+                            vtx_1 = half * (coordC + coordN0);
                         }
                     } else {
                         vtx_1 = coordC;
@@ -346,27 +353,31 @@ export namespace mplot
 
                 // SE vertex
                 if (this->dataCoords == nullptr) {
-                    if (this->hg->has_ne(hi) && this->hg->has_nse(hi)) {
-                        datum = third * (datumC + datumNE + datumNSE);
-                    } else if (this->hg->has_ne(hi) || this->hg->has_nse(hi)) {
-                        if (this->hg->has_ne(hi)) {
-                            datum = half * (datumC + datumNE);
+                    if (this->hg->has_n0(hi) && this->hg->has_n5(hi)) {
+                        datum = third * (datumC + datumN0 + datumN5);
+                    } else if (this->hg->has_n0(hi) || this->hg->has_n5(hi)) {
+                        if (this->hg->has_n0(hi)) {
+                            datum = half * (datumC + datumN0);
                         } else {
-                            datum = half * (datumC + datumNSE);
+                            datum = half * (datumC + datumN5);
                         }
                     } else {
                         datum = datumC;
                     }
-                    sm::vec<float> crnr = lt * sm::vec<float>{ sr, -vne, 0 };
+                    if constexpr (A == sm::hexalign::point_up) {
+                        crnr = lt * sm::vec<float>{ sr, -dne, 0 };
+                    } else {
+                        crnr = lt * sm::vec<float>{ lr, 0, 0 };
+                    }
                     vtx_2 = crnr + sm::vec<float>{ _x, _y, datum };
                 } else {
-                    if (this->hg->has_ne(hi) && this->hg->has_nse(hi)) {
-                        vtx_2 = third * (coordC + coordNE + coordNSE);
-                    } else if (this->hg->has_ne(hi) || this->hg->has_nse(hi)) {
-                        if (this->hg->has_ne(hi)) {
-                            vtx_2 = half * (coordC + coordNE);
+                    if (this->hg->has_n0(hi) && this->hg->has_n5(hi)) {
+                        vtx_2 = third * (coordC + coordN0 + coordN5);
+                    } else if (this->hg->has_n0(hi) || this->hg->has_n5(hi)) {
+                        if (this->hg->has_n0(hi)) {
+                            vtx_2 = half * (coordC + coordN0);
                         } else {
-                            vtx_2 = half * (coordC + coordNSE);
+                            vtx_2 = half * (coordC + coordN5);
                         }
                     } else {
                         vtx_2 = coordC;
@@ -377,27 +388,31 @@ export namespace mplot
 
                 // S
                 if (this->dataCoords == nullptr) {
-                    if (this->hg->has_nse(hi) && this->hg->has_nsw(hi)) {
-                        datum = third * (datumC + datumNSE + datumNSW);
-                    } else if (this->hg->has_nse(hi) || this->hg->has_nsw(hi)) {
-                        if (this->hg->has_nse(hi)) {
-                            datum = half * (datumC + datumNSE);
+                    if (this->hg->has_n5(hi) && this->hg->has_n4(hi)) {
+                        datum = third * (datumC + datumN5 + datumN4);
+                    } else if (this->hg->has_n5(hi) || this->hg->has_n4(hi)) {
+                        if (this->hg->has_n5(hi)) {
+                            datum = half * (datumC + datumN5);
                         } else {
-                            datum = half * (datumC + datumNSW);
+                            datum = half * (datumC + datumN4);
                         }
                     } else {
                         datum = datumC;
                     }
-                    sm::vec<float> crnr = lt * sm::vec<float>{ 0, -lr, 0 };
+                    if constexpr (A == sm::hexalign::point_up) {
+                        crnr = lt * sm::vec<float>{ 0, -lr, 0 };
+                    } else {
+                        crnr = lt * sm::vec<float>{ dne, -sr, 0 };
+                    }
                     vtx_tmp = crnr + sm::vec<float>{ _x, _y, datum };
                 } else {
-                    if (this->hg->has_nse(hi) && this->hg->has_nsw(hi)) {
-                        vtx_tmp = third * (coordC + coordNSE + coordNSW);
-                    } else if (this->hg->has_nse(hi) || this->hg->has_nsw(hi)) {
-                        if (this->hg->has_nse(hi)) {
-                            vtx_tmp = half * (coordC + coordNSE);
+                    if (this->hg->has_n5(hi) && this->hg->has_n4(hi)) {
+                        vtx_tmp = third * (coordC + coordN5 + coordN4);
+                    } else if (this->hg->has_n5(hi) || this->hg->has_n4(hi)) {
+                        if (this->hg->has_n5(hi)) {
+                            vtx_tmp = half * (coordC + coordN5);
                         } else {
-                            vtx_tmp = half * (coordC + coordNSW);
+                            vtx_tmp = half * (coordC + coordN4);
                         }
                     } else {
                         vtx_tmp = coordC;
@@ -407,27 +422,31 @@ export namespace mplot
 
                 // SW
                 if (this->dataCoords == nullptr) {
-                    if (this->hg->has_nw(hi) && this->hg->has_nsw(hi)) {
-                        datum = third * (datumC + datumNW + datumNSW);
-                    } else if (this->hg->has_nw(hi) || this->hg->has_nsw(hi)) {
-                        if (this->hg->has_nw(hi)) {
-                            datum = half * (datumC + datumNW);
+                    if (this->hg->has_n3(hi) && this->hg->has_n4(hi)) {
+                        datum = third * (datumC + datumN3 + datumN4);
+                    } else if (this->hg->has_n3(hi) || this->hg->has_n4(hi)) {
+                        if (this->hg->has_n3(hi)) {
+                            datum = half * (datumC + datumN3);
                         } else {
-                            datum = half * (datumC + datumNSW);
+                            datum = half * (datumC + datumN4);
                         }
                     } else {
                         datum = datumC;
                     }
-                    sm::vec<float> crnr = lt * sm::vec<float>{ -sr, -vne, 0 };
+                    if constexpr (A == sm::hexalign::point_up) {
+                        crnr = lt * sm::vec<float>{ -sr, -dne, 0 };
+                    } else {
+                        crnr = lt * sm::vec<float>{ -dne, -sr, 0 };
+                    }
                     vtx_tmp = crnr + sm::vec<float>{ _x, _y, datum };
                 } else {
-                    if (this->hg->has_nw(hi) && this->hg->has_nsw(hi)) {
-                        vtx_tmp = third * (coordC + coordNW + coordNSW);
-                    } else if (this->hg->has_nw(hi) || this->hg->has_nsw(hi)) {
-                        if (this->hg->has_nw(hi)) {
-                            vtx_tmp = half * (coordC + coordNW);
+                    if (this->hg->has_n3(hi) && this->hg->has_n4(hi)) {
+                        vtx_tmp = third * (coordC + coordN3 + coordN4);
+                    } else if (this->hg->has_n3(hi) || this->hg->has_n4(hi)) {
+                        if (this->hg->has_n3(hi)) {
+                            vtx_tmp = half * (coordC + coordN3);
                         } else {
-                            vtx_tmp = half * (coordC + coordNSW);
+                            vtx_tmp = half * (coordC + coordN4);
                         }
                     } else {
                         vtx_tmp = coordC;
@@ -437,27 +456,31 @@ export namespace mplot
 
                 // NW
                 if (this->dataCoords == nullptr) {
-                    if (this->hg->has_nnw(hi) && this->hg->has_nw(hi)) {
-                        datum = third * (datumC + datumNNW + datumNW);
-                    } else if (this->hg->has_nnw(hi) || this->hg->has_nw(hi)) {
-                        if (this->hg->has_nnw(hi)) {
-                            datum = half * (datumC + datumNNW);
+                    if (this->hg->has_n2(hi) && this->hg->has_n3(hi)) {
+                        datum = third * (datumC + datumN2 + datumN3);
+                    } else if (this->hg->has_n2(hi) || this->hg->has_n3(hi)) {
+                        if (this->hg->has_n2(hi)) {
+                            datum = half * (datumC + datumN2);
                         } else {
-                            datum = half * (datumC + datumNW);
+                            datum = half * (datumC + datumN3);
                         }
                     } else {
                         datum = datumC;
                     }
-                    sm::vec<float> crnr = lt * sm::vec<float>{ -sr, vne, 0 };
+                    if constexpr (A == sm::hexalign::point_up) {
+                        crnr = lt * sm::vec<float>{ -sr, dne, 0 };
+                    } else {
+                        crnr = lt * sm::vec<float>{ -lr, 0, 0 };
+                    }
                     vtx_tmp = crnr + sm::vec<float>{ _x, _y, datum };
                 } else {
-                    if (this->hg->has_nnw(hi) && this->hg->has_nw(hi)) {
-                        vtx_tmp = third * (coordC + coordNNW + coordNW);
-                    } else if (this->hg->has_nnw(hi) || this->hg->has_nw(hi)) {
-                        if (this->hg->has_nnw(hi)) {
-                            vtx_tmp = half * (coordC + coordNNW);
+                    if (this->hg->has_n2(hi) && this->hg->has_n3(hi)) {
+                        vtx_tmp = third * (coordC + coordN2 + coordN3);
+                    } else if (this->hg->has_n2(hi) || this->hg->has_n3(hi)) {
+                        if (this->hg->has_n2(hi)) {
+                            vtx_tmp = half * (coordC + coordN2);
                         } else {
-                            vtx_tmp = half * (coordC + coordNW);
+                            vtx_tmp = half * (coordC + coordN3);
                         }
                     } else {
                         vtx_tmp = coordC;
@@ -467,27 +490,31 @@ export namespace mplot
 
                 // N
                 if (this->dataCoords == nullptr) {
-                    if (this->hg->has_nnw(hi) && this->hg->has_nne(hi)) {
-                        datum = third * (datumC + datumNNW + datumNNE);
-                    } else if (this->hg->has_nnw(hi) || this->hg->has_nne(hi)) {
-                        if (this->hg->has_nnw(hi)) {
-                            datum = half * (datumC + datumNNW);
+                    if (this->hg->has_n2(hi) && this->hg->has_n1(hi)) {
+                        datum = third * (datumC + datumN2 + datumN1);
+                    } else if (this->hg->has_n2(hi) || this->hg->has_n1(hi)) {
+                        if (this->hg->has_n2(hi)) {
+                            datum = half * (datumC + datumN2);
                         } else {
-                            datum = half * (datumC + datumNNE);
+                            datum = half * (datumC + datumN1);
                         }
                     } else {
                         datum = datumC;
                     }
-                    sm::vec<float> crnr = lt * sm::vec<float>{ 0, lr, 0 };
+                    if constexpr (A == sm::hexalign::point_up) {
+                        crnr = lt * sm::vec<float>{ 0, lr, 0 };
+                    } else {
+                        crnr = lt * sm::vec<float>{ -dne, sr, 0 };
+                    }
                     vtx_tmp = crnr + sm::vec<float>{ _x, _y, datum };
                 } else {
-                    if (this->hg->has_nnw(hi) && this->hg->has_nne(hi)) {
-                        vtx_tmp = third * (coordC + coordNNW + coordNNE);
-                    } else if (this->hg->has_nnw(hi) || this->hg->has_nne(hi)) {
-                        if (this->hg->has_nnw(hi)) {
-                            vtx_tmp = half * (coordC + coordNNW);
+                    if (this->hg->has_n2(hi) && this->hg->has_n1(hi)) {
+                        vtx_tmp = third * (coordC + coordN2 + coordN1);
+                    } else if (this->hg->has_n2(hi) || this->hg->has_n1(hi)) {
+                        if (this->hg->has_n2(hi)) {
+                            vtx_tmp = half * (coordC + coordN2);
                         } else {
-                            vtx_tmp = half * (coordC + coordNNE);
+                            vtx_tmp = half * (coordC + coordN1);
                         }
                     } else {
                         vtx_tmp = coordC;
@@ -582,7 +609,7 @@ export namespace mplot
         void computeZerogridIndices()
         {
             float sr = this->hg->get_sr();
-            float vne = this->hg->get_v_to_ne();
+            float dne = this->hg->get_d_to_ne();
             float lr = this->hg->get_lr();
             uint32_t nhex = this->hg->num();
 
@@ -600,17 +627,17 @@ export namespace mplot
                 // Use the centre position as the first location for finding the normal vector
                 vtx_0 = sm::vec<float>{static_cast<float>(this->hg->d_x[hi]), static_cast<float>(this->hg->d_y[hi]), datum};
                 // NE vertex
-                this->vertex_push (this->hg->d_x[hi]+sr, this->hg->d_y[hi]+vne, datum, this->vertexPositions);
-                vtx_1 = sm::vec<float>{static_cast<float>(this->hg->d_x[hi])+sr, static_cast<float>(this->hg->d_y[hi])+vne, datum};
+                this->vertex_push (this->hg->d_x[hi]+sr, this->hg->d_y[hi]+dne, datum, this->vertexPositions);
+                vtx_1 = sm::vec<float>{static_cast<float>(this->hg->d_x[hi])+sr, static_cast<float>(this->hg->d_y[hi])+dne, datum};
                 // SE vertex
-                this->vertex_push (this->hg->d_x[hi]+sr, this->hg->d_y[hi]-vne, datum, this->vertexPositions);
-                vtx_2 = sm::vec<float>{static_cast<float>(this->hg->d_x[hi])+sr, static_cast<float>(this->hg->d_y[hi])-vne, datum};
+                this->vertex_push (this->hg->d_x[hi]+sr, this->hg->d_y[hi]-dne, datum, this->vertexPositions);
+                vtx_2 = sm::vec<float>{static_cast<float>(this->hg->d_x[hi])+sr, static_cast<float>(this->hg->d_y[hi])-dne, datum};
                 // S
                 this->vertex_push (this->hg->d_x[hi], this->hg->d_y[hi]-lr, datum, this->vertexPositions);
                 // SW
-                this->vertex_push (this->hg->d_x[hi]-sr, this->hg->d_y[hi]-vne, datum, this->vertexPositions);
+                this->vertex_push (this->hg->d_x[hi]-sr, this->hg->d_y[hi]-dne, datum, this->vertexPositions);
                 // NW
-                this->vertex_push (this->hg->d_x[hi]-sr, this->hg->d_y[hi]+vne, datum, this->vertexPositions);
+                this->vertex_push (this->hg->d_x[hi]-sr, this->hg->d_y[hi]+dne, datum, this->vertexPositions);
                 // N
                 this->vertex_push (this->hg->d_x[hi], this->hg->d_y[hi]+lr, datum, this->vertexPositions);
 
@@ -676,7 +703,7 @@ export namespace mplot
     protected:
         //! The hexgrid to visualize. This is not expected to change (update methods may
         //! assume the hexgrid has remained unaltered)
-        const sm::hexgrid<T>* hg;
+        const sm::hexgrid<T, A>* hg;
     };
 
 } // namespace mplot

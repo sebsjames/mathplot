@@ -9,6 +9,7 @@ set(MATHPLOT_EXAMPLES_MODULES
   ${PROJECT_SOURCE_DIR}/maths/sm/config.cppm
   ${PROJECT_SOURCE_DIR}/maths/sm/bootstrap.cppm
   ${PROJECT_SOURCE_DIR}/maths/sm/rungekutta4.cppm
+  ${SM_HEXFFT_MODULES}
 )
 list(REMOVE_DUPLICATES MATHPLOT_EXAMPLES_MODULES)
 add_library(mathplot_examples STATIC)
@@ -98,6 +99,12 @@ target_link_libraries(showcase mathplot_examples)
 
 add_executable(hexgrid hexgrid.cpp)
 target_link_libraries(hexgrid mathplot_examples)
+
+add_executable(hexgrid_for_fft hexgrid_for_fft.cpp)
+target_link_libraries(hexgrid_for_fft mathplot_examples)
+
+add_executable(hexgrid_for_fft2 hexgrid_for_fft2.cpp)
+target_link_libraries(hexgrid_for_fft2 mathplot_examples)
 
 add_executable(model_crawler model_crawler.cpp)
 target_link_libraries(model_crawler mathplot_examples)
@@ -339,6 +346,15 @@ else()
   target_link_libraries(hexgrid_image mathplot_examples)
 endif()
 
+if(0) # Disabled until hexgrid_fft_image_rect works
+add_executable(hexgrid_fft_image hexgrid_fft_image.cpp)
+if(OpenMP_CXX_FOUND)
+  target_link_libraries(hexgrid_fft_image OpenMP::OpenMP_CXX mathplot_examples)
+else()
+  target_link_libraries(hexgrid_fft_image mathplot_examples)
+endif()
+endif()
+
 add_executable(hexgrid_image_mask hexgrid_image_mask.cpp)
 if(OpenMP_CXX_FOUND)
   target_link_libraries(hexgrid_image_mask OpenMP::OpenMP_CXX mathplot_examples)
@@ -351,6 +367,13 @@ if(OpenMP_CXX_FOUND)
   target_link_libraries(hexgrid_image_rect OpenMP::OpenMP_CXX mathplot_examples)
 else()
   target_link_libraries(hexgrid_image_rect mathplot_examples)
+endif()
+
+add_executable(hexgrid_fft_image_rect hexgrid_fft_image_rect.cpp)
+if(OpenMP_CXX_FOUND)
+  target_link_libraries(hexgrid_fft_image_rect OpenMP::OpenMP_CXX mathplot_examples)
+else()
+  target_link_libraries(hexgrid_fft_image_rect mathplot_examples)
 endif()
 
 add_executable(hexgrid_image_onsphere hexgrid_image_onsphere.cpp)

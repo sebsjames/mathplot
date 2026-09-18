@@ -35,12 +35,12 @@ int main()
 
     // Create a HexGrid to show in the scene. Hexes outside the circular boundary will
     // all be discarded.
-    sm::hexgrid<float, sm::hexalign::point_up> hg1(0.01f, 0.5f, 0.0f);
+    sm::hexgrid<float, sm::hexalign::point_up> hg1(0.01f, 0.2f, 0.0f);
     //hg1.set_circular_boundary (0.1f);
     hg1.set_boundary_on_outer_edge();
     std::cout << "Number of pixels in point_up grid:" << hg1.num() << std::endl;
 
-    sm::hexgrid<float, sm::hexalign::flat_up> hg2(0.01f, 0.5f, 0.0f);
+    sm::hexgrid<float, sm::hexalign::flat_up> hg2(0.01f, 0.2f, 0.0f);
     //hg2.set_circular_boundary (0.1f);
     hg2.set_boundary_on_outer_edge();
     std::cout << "Number of pixels in flat_up grid:" << hg2.num() << std::endl;
@@ -65,7 +65,8 @@ int main()
     hgv1->cm.setType (mplot::ColourMapType::Ice);
     hgv1->setScalarData (&data1);
     hgv1->hexVisMode = visMode;
-    hgv1->addLabel ("hexalign::point_up", sm::vec<>{ 0.0f, -hg1.width()/1.8f }, mplot::TextFeatures(0.02f));
+    hgv1->zScale.null_scaling();
+    hgv1->addLabel ("hexalign::point_up", sm::vec<>{ -hg1.width()/2.1f, -hg1.width()/1.6f }, mplot::TextFeatures(0.02f));
     hgv1->finalize();
     v.addVisualModel (hgv1);
 
@@ -75,7 +76,8 @@ int main()
     hgv2->cm.setType (mplot::ColourMapType::Ice);
     hgv2->setScalarData (&data2);
     hgv2->hexVisMode = visMode;
-    hgv2->addLabel ("hexalign::flat_up", sm::vec<>{ 0.0f, -hg1.width()/1.8f }, mplot::TextFeatures(0.02f));
+    hgv2->zScale.null_scaling();
+    hgv2->addLabel ("hexalign::flat_up", sm::vec<>{ -hg1.width()/2.6f, -hg1.width()/1.6f }, mplot::TextFeatures(0.02f));
     hgv2->finalize();
 
     if (v.checkContext() == true) {

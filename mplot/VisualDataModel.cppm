@@ -267,6 +267,9 @@ export namespace mplot
             } else if (this->complexData != nullptr) {
                 if (this->complexHandling == mplot::complex_number_handling::as_colour_vector_real_imaginary
                     || this->complexHandling == mplot::complex_number_handling::as_colour_vector_magnitude_phase) {
+
+                    // No need to worry about scaling colourScale here, as dcolour/dcolour2 are autoscaled later.
+
                     this->dcolour2.resize (this->datasize);
                     this->dcolour3.resize (this->datasize); // though we won't use this
                     sm::vvec<float> veclens(this->dcopy);
@@ -286,12 +289,54 @@ export namespace mplot
                     this->zScale.transform (veclens, this->dcopy);
 
                 } else if (this->complexHandling == mplot::complex_number_handling::as_colour_phase_magnitude_z) {
+
+                    // As we call transform_one, we have to first loop through and 'manually
+                    // autoscale' if scaling was not already set by the client code.
+                    if (this->zScale.ready() == false || this->colourScale.ready() == false) {
+                        auto inrange = sm::interval<T>::search_initialized();
+                        auto col_inrange = sm::interval<T>::search_initialized();
+                        for (std::uint32_t i = 0; i < this->datasize; ++i) {
+                            inrange.update (std::abs ((*this->complexData)[i]));
+                            col_inrange.update (std::arg ((*this->complexData)[i]));
+                        }
+                        if (this->zScale.ready() == false) {
+                            this->zScale.compute_scaling (inrange);
+                        }
+                        if (this->colourScale.ready() == false) {
+                            this->colourScale.compute_scaling (col_inrange);
+                        }
+                    }
+
                     for (std::uint32_t i = 0; i < this->datasize; ++i) {
                         this->dcopy[i] = this->zScale.transform_one (std::abs ((*this->complexData)[i]));
                         if (std::isnan(this->dcopy[i])) { this->dcopy[i] = this->zScale.transform_one(0.0f); }
                         this->dcolour[i] = this->colourScale.transform_one (std::arg ((*this->complexData)[i]));
                     }
                 } else {
+
+                    // As we call transform_one, we have to first loop through and 'manually
+                    // autoscale' if scaling was not already set by the client code.
+                    if (this->zScale.ready() == false || this->colourScale.ready() == false) {
+                        auto inrange = sm::interval<T>::search_initialized();
+                        for (std::uint32_t i = 0; i < this->datasize; ++i) {
+                            if (this->complexHandling == mplot::complex_number_handling::as_real_scalar) {
+                                inrange.update (std::real ((*this->complexData)[i]));
+                            } else if (this->complexHandling == mplot::complex_number_handling::as_imaginary_scalar) {
+                                inrange.update (std::imag ((*this->complexData)[i]));
+                            } else if (this->complexHandling == mplot::complex_number_handling::as_magnitude_scalar) {
+                                inrange.update (std::abs ((*this->complexData)[i]));
+                            } else if (this->complexHandling == mplot::complex_number_handling::as_phase_scalar) {
+                                inrange.update (std::arg ((*this->complexData)[i]));
+                            } // do nothing
+                        }
+                        if (this->colourScale.ready() == false) {
+                            this->colourScale.compute_scaling (inrange);
+                        }
+                        if (this->zScale.ready() == false) {
+                            this->zScale.compute_scaling (inrange);
+                        }
+                    }
+
                     for (std::uint32_t i = 0; i < this->datasize; ++i) {
                         T _in = T{0};
                         if (this->complexHandling == mplot::complex_number_handling::as_real_scalar) {

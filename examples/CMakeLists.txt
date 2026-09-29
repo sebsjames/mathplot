@@ -29,8 +29,10 @@ target_link_libraries(rod_with_normals mathplot_examples)
 add_executable(ellipsoid ellipsoid.cpp)
 target_link_libraries(ellipsoid mathplot_examples)
 
+if(NOT APPLE) # geodesic.cpp compiles on Apple with homebrew clang-22 with language standard c++20, but not language standard c++-23. Not sure why not.
 add_executable(geodesic geodesic.cpp)
 target_link_libraries(geodesic mathplot_examples)
+endif()
 
 add_executable(vectorvis vectorvis.cpp)
 target_link_libraries(vectorvis mathplot_examples)

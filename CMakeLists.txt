@@ -118,21 +118,7 @@ include_directories(${GLFW3_INCLUDE_DIR})
 find_package(Freetype REQUIRED)
 include_directories(${FREETYPE_INCLUDE_DIRS})
 
-# Include the maths subdirectory (sebsjames/maths is git-submoduled)
-# If the subdirectory is not available, try to include maths from system
-file(GLOB bundled_maths ${PROJECT_SOURCE_DIR}/maths/*)
-if(bundled_maths)
-  message(STATUS "Using bundled maths")
-  include_directories(${PROJECT_SOURCE_DIR}/maths)
-else()
-  message(STATUS "Using maths from vcpkg")
-  find_path(MATHS_INCLUDE_DIRS "sm/algo" REQUIRED)
-  include_directories(${MATHS_INCLUDE_DIRS})
-endif()
-
-# Use packaged nlohmann json
-# find_package(nlohmann_json REQUIRED)
-# Now nlohmann is submoduled to get an up-to-date version (for C++ modules)
+# nlohmann is submoduled to get an up-to-date version (for C++ modules). This is used compiling json module.
 include_directories("${PROJECT_SOURCE_DIR}/json/include")
 
 # If Qt5 is present, then some optional Qt examples will be compiled
@@ -165,7 +151,11 @@ endif() # else we have it in a directory included by default in the path
 
 # Include maths module defs
 include(${PROJECT_SOURCE_DIR}/maths/cmake/module_definitions.cmake)
-setup_module_variables_for_maths (${PROJECT_SOURCE_DIR}/maths ${PROJECT_SOURCE_DIR}/json)
+setup_module_variables_for_maths (${PROJECT_SOURCE_DIR}/maths)
+
+# Some examples use sm::config from sebsjames/maths_config. We don't use anything defined in here.
+include(${PROJECT_SOURCE_DIR}/maths_config/cmake/module_definitions.cmake)
+setup_module_variables_for_maths_config (${PROJECT_SOURCE_DIR}/maths_config ${PROJECT_SOURCE_DIR}/json ${PROJECT_SOURCE_DIR}/maths)
 
 # Include our own module defs
 include(${PROJECT_SOURCE_DIR}/cmake/module_definitions.cmake)

@@ -4,3 +4,6 @@
 [submodule "json"]
 	path = json
 	url = https://github.com/nlohmann/json
+[submodule "maths_config"]
+	path = maths_config
+	url = git@github.com:sebsjames/maths_config

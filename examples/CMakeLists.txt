@@ -6,7 +6,7 @@ set(MATHPLOT_EXAMPLES_MODULES
   ${MPLOT_READCURVES_MODULES}
   ${MPLOT_ALL_VISUALMODEL_MODULES}
   ${PROJECT_SOURCE_DIR}/mplot/compoundray/Visual.cppm
-  ${PROJECT_SOURCE_DIR}/maths/sm/config.cppm
+  ${SM_CONFIG_MODULES}
   ${PROJECT_SOURCE_DIR}/maths/sm/bootstrap.cppm
   ${PROJECT_SOURCE_DIR}/maths/sm/rungekutta4.cppm
   ${SM_HEXFFT_MODULES}
@@ -182,8 +182,7 @@ if(HDF5_FOUND) # anneal.cppm uses HDF5
     ${MPLOT_MATHS_HEXGRID_MODULES}
     ${PROJECT_SOURCE_DIR}/maths/sm/anneal.cppm
     ${PROJECT_SOURCE_DIR}/maths/sm/hdfdata.cppm
-    ${PROJECT_SOURCE_DIR}/json/src/modules/json.cppm
-    ${PROJECT_SOURCE_DIR}/maths/sm/config.cppm
+    ${SM_CONFIG_MODULES}
   )
   target_link_libraries(anneal_asa_novis ${HDF5_LIBRARIES})
 
@@ -302,8 +301,7 @@ target_link_libraries(healpix mathplot_examples)
 add_executable(jsonconfig jsonconfig.cpp)
 target_sources(jsonconfig PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT_SOURCE_DIR}
   FILES ${MPLOT_MATHS_CORE_MODULES}
-  ${PROJECT_SOURCE_DIR}/json/src/modules/json.cppm
-  ${PROJECT_SOURCE_DIR}/maths/sm/config.cppm
+  ${SM_CONFIG_MODULES}
 )
 target_link_libraries(jsonconfig)
 

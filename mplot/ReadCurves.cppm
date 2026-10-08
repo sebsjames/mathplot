@@ -567,7 +567,7 @@ export namespace mplot
          */
         sm::bezcurvepath<float> parseD (const std::string& d)
         {
-            sm::bezcurvepath<float> curves;
+            sm::bezcurvepath<float> curves = {};
 
             // As we parse through the path, we have to keep track of the
             // current coordinate position, as curves are specified from the
@@ -581,9 +581,9 @@ export namespace mplot
             // The last Bezier control points, c2, especially may be required
             // in a shortcut Bezier command (s or S), hence declaring these
             // outside the scope of the while loop.
-            sm::vec<float, 2> c1; // Control point 1
-            sm::vec<float, 2> c2; // Control point 2
-            sm::vec<float, 2> f;  // Final point of curve
+            sm::vec<float, 2> c1 = {}; // Control point 1
+            sm::vec<float, 2> c2 = {}; // Control point 2
+            sm::vec<float, 2> f = {};  // Final point of curve
 
             // A list of SVG command characters
             const char* svgCmds = "mMcCsSqQtTzZlLhHvV";

@@ -370,20 +370,17 @@ export namespace mplot
                 circ_id = _attr->value();
                 bool gotx = false;
                 bool goty = false;
-                float cx = 0.0f;
-                float cy = 0.0f;
+                sm::vec<float, 2> cxcy = {};
                 // Now, get the x and y attributes of the circle, cx and cy
                 if ((_attr = circ_node->first_attribute ("cx"))) {
                     gotx = true;
-                    cx = std::atof (_attr->value());
+                    cxcy[0] = std::stof (_attr->value());
                 }
                 if ((_attr = circ_node->first_attribute ("cy"))) {
                     goty = true;
-                    cy = std::atof (_attr->value());
+                    cxcy[1] = std::stof (_attr->value());
                 }
-                if (gotx && goty) {
-                    this->circles[circ_id] = sm::vec<float,2>({cx, cy});
-                }
+                if (gotx && goty) { this->circles[circ_id] = cxcy; }
             } // else failed to get circ_id
         }
 
@@ -465,7 +462,7 @@ export namespace mplot
                 mplot::tools::searchReplace ("x", ".", mm);
                 mplot::tools::searchReplace ("_", "", mm);
                 mplot::tools::searchReplace ("m", "", mm);
-                float mmf = std::atof (mm.c_str());
+                float mmf = std::stof (mm);
                 // dl is the length of the scale bar line
                 float dl = 0.0f;
                 dl = this->linePath.get_end_to_end();
@@ -872,14 +869,8 @@ export namespace mplot
 
             // Now do something with x1,y1,x2,y2: Create a bezcurve object then add this
             // to this->linePath
-            const sm::vec<float, 2> p1 = {
-                static_cast<float>(std::atof (x1.c_str())),
-                static_cast<float>(std::atof (y1.c_str()))
-            };
-            const sm::vec<float, 2> p2 = {
-                static_cast<float>(std::atof (x2.c_str())),
-                static_cast<float>(std::atof (y2.c_str()))
-            };
+            const sm::vec<float, 2> p1 = { std::stof (x1), std::stof (y1) };
+            const sm::vec<float, 2> p2 = { std::stof (x2), std::stof (y2) };
             sm::bezcurve<float, 3> linecurve (sm::vvec<sm::vec<float, 2>>{p1, p2});
             this->linePath.reset();
             this->linePath.initial_coordinate = p1;

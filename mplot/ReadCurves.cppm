@@ -96,8 +96,8 @@ export namespace mplot
 
             char* textpos = this->data_;
             std::string line("");
-            std::size_t llen = 0U;   // line length (chars)
-            std::size_t curpos = 0U;
+            std::size_t llen = 0u;   // line length (chars)
+            std::size_t curpos = 0u;
             while (getline (f, line)) {
                 // Restore the newline
                 line += "\n";
@@ -114,11 +114,11 @@ export namespace mplot
             // Note: text is already null terminated as we used calloc.
         }
         //! The path from which to read data.
-        std::string filepath;
+        std::string filepath = {};
         //! The character data.
-        char* data_;
+        char* data_ = nullptr;
         //! The size in bytes of the character data @data_
-        std::size_t sz;
+        std::size_t sz = 0u;
     };
 
     /*!
@@ -180,7 +180,7 @@ export namespace mplot
          */
         sm::bezcurvepath<float> getEnclosedRegion (const std::string& structName) const
         {
-            sm::bezcurvepath<float> nullrtn;
+            sm::bezcurvepath<float> nullrtn = {};
             typename std::list<sm::bezcurvepath<float>>::const_iterator i = this->enclosedRegions.begin();
             while (i != this->enclosedRegions.end()) {
                 if (i->name == structName) {
@@ -273,7 +273,7 @@ export namespace mplot
                  path_node = path_node->next_sibling("path")) {
                 // Un-enclosed paths will need to use their id attribute
                 std::string p_id(""); // unenclosed path id
-                rapidxml::xml_attribute<>* path_id_attr;
+                rapidxml::xml_attribute<>* path_id_attr = nullptr;
                 if ((path_id_attr = path_node->first_attribute ("id"))) {
                     p_id = path_id_attr->value();
                     this->readPath (path_node, p_id);
@@ -299,7 +299,7 @@ export namespace mplot
             // Within each <g>: Read the id attribute, then search out <path>
             // elements and read those.
             std::string g_id("");
-            rapidxml::xml_attribute<>* id_attr;
+            rapidxml::xml_attribute<>* id_attr = nullptr;
             if ((id_attr = g_node->first_attribute ("id"))) {
                 g_id = id_attr->value();
             } // else failed to get g_id
@@ -315,7 +315,7 @@ export namespace mplot
                     // format. If so, use this to override the id from the <g>
                     // element
                     std::string p_id("");
-                    rapidxml::xml_attribute<>* path_id_attr;
+                    rapidxml::xml_attribute<>* path_id_attr = nullptr;
                     // Check path id attribute...
                     if ((path_id_attr = path_node->first_attribute ("id"))) {
                         p_id = path_id_attr->value();
@@ -365,13 +365,13 @@ export namespace mplot
         {
             // Within each <circle>: Read the id attribute
             std::string circ_id("");
-            rapidxml::xml_attribute<>* _attr;
+            rapidxml::xml_attribute<>* _attr = nullptr;
             if ((_attr = circ_node->first_attribute ("id"))) {
                 circ_id = _attr->value();
                 bool gotx = false;
                 bool goty = false;
-                float cx = 0.0;
-                float cy = 0.0;
+                float cx = 0.0f;
+                float cy = 0.0f;
                 // Now, get the x and y attributes of the circle, cx and cy
                 if ((_attr = circ_node->first_attribute ("cx"))) {
                     gotx = true;
@@ -384,7 +384,6 @@ export namespace mplot
                 if (gotx && goty) {
                     this->circles[circ_id] = sm::vec<float,2>({cx, cy});
                 }
-
             } // else failed to get circ_id
         }
 
@@ -424,7 +423,7 @@ export namespace mplot
         void readPath (rapidxml::xml_node<>* path_node, const std::string& layerName)
         {
             std::string d("");
-            rapidxml::xml_attribute<>* d_attr;
+            rapidxml::xml_attribute<>* d_attr = nullptr;
             if ((d_attr = path_node->first_attribute ("d"))) {
                 d = d_attr->value();
             } // else failed to get d
@@ -873,12 +872,14 @@ export namespace mplot
 
             // Now do something with x1,y1,x2,y2: Create a bezcurve object then add this
             // to this->linePath
-            sm::vec<float, 2> p1;
-            p1[0] = static_cast<float>(std::atof (x1.c_str()));
-            p1[1] = static_cast<float>(std::atof (y1.c_str()));
-            sm::vec<float, 2> p2;
-            p2[0] = static_cast<float>(std::atof (x2.c_str()));
-            p2[1] = static_cast<float>(std::atof (y2.c_str()));
+            const sm::vec<float, 2> p1 = {
+                static_cast<float>(std::atof (x1.c_str())),
+                static_cast<float>(std::atof (y1.c_str()))
+            };
+            const sm::vec<float, 2> p2 = {
+                static_cast<float>(std::atof (x2.c_str())),
+                static_cast<float>(std::atof (y2.c_str()))
+            };
             sm::bezcurve<float, 3> linecurve (sm::vvec<sm::vec<float, 2>>{p1, p2});
             this->linePath.reset();
             this->linePath.initial_coordinate = p1;

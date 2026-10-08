@@ -15,8 +15,8 @@ export module mplot.version;
 export namespace mplot
 {
     //! A version definition for the whole of mathplot
-    constexpr std::uint32_t version_major = 1;
-    constexpr std::uint32_t version_minor = 0;
+    constexpr std::uint32_t version_major = 2;
+    constexpr std::uint32_t version_minor = 1;
     //! Returns a string for the version of the mathplot library
     std::string version_string()
     {

@@ -21,6 +21,7 @@ void draw (mplot::Visual<>& v, sm::vec<> offset);
 int main()
 {
     mplot::Visual<> v(1600, 1000, "mplot::HexGridVisual transforms");
+    v.rotateAboutNearest (true);
     draw<sm::hexalign::point_up> (v, sm::vec<>{});
     draw<sm::hexalign::flat_up> (v, sm::vec<>{ 0.0f, -0.3f, 0.0f });
     v.keepOpen();
@@ -47,7 +48,7 @@ void draw_one (mplot::Visual<>& v, sm::hexgrid<float, halign>& hg,
 
     auto vvm = std::make_unique<mplot::VectorVisual<float, 3>>(offset);
     vvm->set_parent (v.get_id());
-    vvm->thevec = hg.dirn_r();
+    vvm->thevec = hg.dirn_r().plus_one_dim(0.0f);
     vvm->vgoes = mplot::VectorGoes::FromOrigin;
     vvm->thickness = hg.d / 10;
     vvm->fixed_colour = true;
@@ -57,7 +58,7 @@ void draw_one (mplot::Visual<>& v, sm::hexgrid<float, halign>& hg,
 
     vvm = std::make_unique<mplot::VectorVisual<float, 3>>(offset);
     vvm->set_parent (v.get_id());
-    vvm->thevec = hg.dirn_g();
+    vvm->thevec = hg.dirn_g().plus_one_dim(0.0f);;
     vvm->vgoes = mplot::VectorGoes::FromOrigin;
     vvm->thickness = hg.d / 10;
     vvm->fixed_colour = true;
@@ -67,7 +68,7 @@ void draw_one (mplot::Visual<>& v, sm::hexgrid<float, halign>& hg,
 
     vvm = std::make_unique<mplot::VectorVisual<float, 3>>(offset);
     vvm->set_parent (v.get_id());
-    vvm->thevec = hg.dirn_b();
+    vvm->thevec = hg.dirn_b().plus_one_dim(0.0f);;
     vvm->vgoes = mplot::VectorGoes::FromOrigin;
     vvm->thickness = hg.d / 10;
     vvm->fixed_colour = true;
@@ -100,12 +101,17 @@ void draw (mplot::Visual<mplot::gl::version_4_1>& v, sm::vec<> offset)
     // Draw original grid
     draw_one (v, hg1, &data1, offset, "Original grid");
 
-    // A rotational transform
-    sm::mat<float, 4> rotn;
+    // A rotational transform as 4x4
+    //sm::mat<float, 4> rotn;
+    //rotn.rotate (sm::vec<>::uz(), sm::mathconst<float>::pi_over_2);
+    // or 3x3
+    sm::mat<float, 3> rotn;
     rotn.rotate (sm::vec<>::uz(), sm::mathconst<float>::pi_over_2);
 
-    // A reflection
-    sm::mat<float, 4> mirror = sm::mat<float, 4>::reflection (sm::vec<>{}, sm::vec<>::ux());
+    // A reflection as a 4x4
+    // sm::mat<float, 4> mirror = sm::mat<float, 4>::reflection (sm::vec<>{}, sm::vec<>::ux());
+    // or as a 3x3
+    sm::mat<float, 3> mirror = sm::mat<float, 3>::reflection (sm::vec<>::ux());
 
     sm::hexgrid<float, halign> hg1_mirror = hg1;
     hg1_mirror.transform (mirror);
@@ -126,4 +132,11 @@ void draw (mplot::Visual<mplot::gl::version_4_1>& v, sm::vec<> offset)
     hg1_rot_mirr.transform (rotn * mirror);
     offset[0] += 0.3f;
     draw_one (v, hg1_rot_mirr, &data1, offset, "Mirr then rotn");
+
+    sm::hexgrid<float, halign> hg1_3d = hg1;
+    rotn.set_identity();
+    rotn.rotate (sm::vec<>::uy(), sm::mathconst<float>::pi_over_4);
+    hg1_3d.transform (rotn);
+    offset[0] += 0.3f;
+    draw_one (v, hg1_3d, &data1, offset, "3D rotns act up");
 }

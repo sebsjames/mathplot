@@ -406,7 +406,7 @@ export namespace mplot
                 this->vertex_push (this->zoom * vtx_0, this->vertexPositions);
 
                 // The rotation from the transformation in the hexgrid (if any)
-                sm::mat<float, 3> lt = this->hg->tfm.linear().template as<float>();
+                sm::mat<float, 3> lt (this->hg->tfm.template as<float>());
 
                 // A hexagon corner/vertex position
                 sm::vec<float> crnr = {};

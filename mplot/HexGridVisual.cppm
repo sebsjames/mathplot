@@ -57,6 +57,11 @@ export namespace mplot
             this->tfm = (sm::mat<float, 3>::identity() * factor) * this->tfm;
         }
 
+        void reflect_lr()
+        {
+            this->tfm = sm::mat<float, 3>::reflection(sm::vec<float>::ux()) * this->tfm;
+        }
+
         //! scalar 'zoom' has been replaced with a transform matrix to allow zoom, but also flip or rotate
         sm::mat<float, 3> tfm;
 

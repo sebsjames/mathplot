@@ -77,6 +77,9 @@ int main()
     hgv2->setScalarData (&data2);
     hgv2->hexVisMode = visMode;
     hgv2->zScale.null_scaling();
+    // You can transform the view of the hexgrid in HexGridVisual (transforms may also be applied to the underlying hexgrid)
+    // This applies a scaling first, and then a reflection.
+    //hgv2->tfm = sm::mat<float, 3>::reflection (sm::vec<float>::ux()) * sm::mat<float, 3>::identity() * 0.5f;
     hgv2->addLabel ("hexalign::flat_up", sm::vec<>{ -hg1.width()/2.6f, -hg1.width()/1.6f }, mplot::TextFeatures(0.02f));
     hgv2->finalize();
 

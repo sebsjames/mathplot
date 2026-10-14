@@ -173,7 +173,7 @@ int main()
     // Real part of hexgrid FFT
     auto fhgv = std::make_unique<mplot::HexGridVisual<float, sm::hexalign::flat_up>>(hfft.hgf.get(), sm::vec<float>{3.0f, 0.0f});
     fhgv->set_parent (v.get_id());
-    fhgv->zoom = (hfft.Uscale);
+    fhgv->set_zoom (hfft.Uscale);
     fhgv->zScale.null_scaling();
     fhgv->setScalarData (&fft_r);
     fhgv->cm.setType (mplot::ColourMapType::GreyscaleInv);

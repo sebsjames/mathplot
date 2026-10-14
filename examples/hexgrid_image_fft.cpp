@@ -104,7 +104,7 @@ int main (int argc, char** argv)
     // Show the real part of FFT on a hexgrid
     auto fhgv = std::make_unique<mplot::HexGridVisual<float, sm::hexalign::flat_up>>(hfft.hgf.get(), o + sm::vec<float>{ hgw, fhgw * 0.6f });
     fhgv->set_parent (v.get_id());
-    fhgv->zoom = myUscale;
+    fhgv->set_zoom (myUscale);
     fhgv->setScalarData (&fft_r);
     fhgv->colourScale.compute_scaling (-1200, 1200);
     fhgv->cm.setType (mplot::ColourMapType::CET_D13);
@@ -116,7 +116,7 @@ int main (int argc, char** argv)
     // Show the imaginary part of FFT on a hexgrid
     fhgv = std::make_unique<mplot::HexGridVisual<float, sm::hexalign::flat_up>>(hfft.hgf.get(), o + sm::vec<float>{ hgw, -fhgw * 0.6f });
     fhgv->set_parent (v.get_id());
-    fhgv->zoom = myUscale;
+    fhgv->set_zoom (myUscale);
     fhgv->setScalarData (&fft_i);
     fhgv->colourScale.compute_scaling (-1200, 1200);
     fhgv->cm.setType (mplot::ColourMapType::CET_D13);
@@ -173,7 +173,7 @@ int main (int argc, char** argv)
     // real
     fhgv = std::make_unique<mplot::HexGridVisual<float, sm::hexalign::flat_up>>(hfft.hgf.get(), o + sm::vec<float>{ hgw, -hgw * 1.5f + fhgw * 0.6f });
     fhgv->set_parent (v.get_id());
-    fhgv->zoom = myUscale;
+    fhgv->set_zoom (myUscale);
     fhgv->setScalarData (&fft_r);
     fhgv->colourScale.compute_scaling (-1200, 1200);
     fhgv->cm.setType (mplot::ColourMapType::CET_D13);
@@ -184,7 +184,7 @@ int main (int argc, char** argv)
     // imag
     fhgv = std::make_unique<mplot::HexGridVisual<float, sm::hexalign::flat_up>>(hfft.hgf.get(), o + sm::vec<float>{ hgw, -hgw * 1.5f - fhgw * 0.6f });
     fhgv->set_parent (v.get_id());
-    fhgv->zoom = myUscale;
+    fhgv->set_zoom (myUscale);
     fhgv->setScalarData (&fft_i);
     fhgv->colourScale.compute_scaling (-1200, 1200);
     fhgv->cm.setType (mplot::ColourMapType::CET_D13);
@@ -206,7 +206,7 @@ int main (int argc, char** argv)
     // real
     fhgv = std::make_unique<mplot::HexGridVisual<float, sm::hexalign::flat_up>>(hfft.hgf.get(), o + sm::vec<float>{ hgw, -hgw * 3.0f + fhgw * 0.6f });
     fhgv->set_parent (v.get_id());
-    fhgv->zoom = myUscale;
+    fhgv->set_zoom (myUscale);
     fhgv->setScalarData (&fft_r);
     fhgv->colourScale.compute_scaling (-1200, 1200);
     fhgv->cm.setType (mplot::ColourMapType::CET_D13);
@@ -217,7 +217,7 @@ int main (int argc, char** argv)
     // image
     fhgv = std::make_unique<mplot::HexGridVisual<float, sm::hexalign::flat_up>>(hfft.hgf.get(), o + sm::vec<float>{ hgw, -hgw * 3.0f - fhgw * 0.6f });
     fhgv->set_parent (v.get_id());
-    fhgv->zoom = myUscale;
+    fhgv->set_zoom (myUscale);
     fhgv->setScalarData (&fft_i);
     fhgv->colourScale.compute_scaling (-1200, 1200);
     fhgv->cm.setType (mplot::ColourMapType::CET_D13);

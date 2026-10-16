@@ -335,17 +335,51 @@ export namespace mplot
         // Draw carefully around the boundary with tubes or lines or quads
         void computeHexgridBoundary()
         {
-            std::array<float, 3> blkclr = {};
+            constexpr std::array<float, 3> clr = {};
+            constexpr std::array<float, 3> clr0 = {.1f,.1f,.1f};
             sm::mat<float, 3> lt (this->hg->tfm.template as<float>());
+            //std::cout << "lt:\n" << lt << std::endl;
+
             for (auto hptr : this->hg->bhexen) {
                 std::uint32_t hi = hptr->vi;
+                // Look at each possible neighbour direction and see if we need a tube
                 for (std::uint32_t i = 0; i < 6; ++i) {
                     if (this->hg->has_neighbour (hi, i) == false) {
-                        // Draw in line from vtx 5 to 0, 0 to 1, 1 to 2, etc
+                        // There's no neighbour, so we need a tube. The logic is made complex by the
+                        // need to angle the ends of the tubes correctly depending on the shape of
+                        // the boundary
                         std::uint32_t i0 = (i + 5u) % 6u;
                         sm::vec<float, 3> c0 = lt * hptr->get_vertex_coord (i0).template as<float>().plus_one_dim (0.0f);
                         sm::vec<float, 3> c = lt * hptr->get_vertex_coord (i).template as<float>().plus_one_dim (0.0f);
-                        this->computeTube (c0, c, blkclr, blkclr, this->hg->d / 12.0f);
+
+                        sm::vec<float, 3> u0 = {}; // tube end normal for c0
+                        sm::vec<float, 3> u = {}; // tube end normal for c
+                        sm::vec<float> v = {};
+
+                        std::uint32_t di = 0u; // direction to corner neighbour
+                        std::uint32_t vi = 0u; // vector to cross with uz depends on if corner neighbour exists or not
+
+                        di = (i + 5u) % 6u;
+                        if (this->hg->has_neighbour (hi, di) == false) {
+                            vi = (i + 5u) % 6u;
+                        } else {
+                            vi = i;
+                        }
+                        v = hptr->get_vertex (vi).plus_one_dim();
+                        v.renormalize();
+                        u0 = lt * v.cross (sm::vec<float>::uz());
+
+                        di = (i + 1u) % 6u;
+                        if (this->hg->has_neighbour (hi, di) == false) {
+                            vi = i;
+                        } else {
+                            vi = (i + 5u) % 6u;
+                        }
+                        v = hptr->get_vertex (vi).plus_one_dim();
+                        v.renormalize();
+                        u = lt * v.cross (-sm::vec<float>::uz());
+
+                        this->computeOpenFlaredTube (c0, c, u0, u, clr0, clr, this->hg->d / 12.0f, this->hg->d / 12.0f);
                     }
                 }
             }

@@ -18,10 +18,12 @@ int main()
 {
     // Contructor args are width, height, title
     mplot::Visual<mplot::gl::version_4_1> v(1600, 1000, "mplot::HexGridVisual");
+    v.fov = 15;
+    //v.rotateAboutNearest (true);
 
     sm::hexgrid<float, sm::hexalign::point_up> hg1(0.01f, 0.205f, 0.0f);
-    //hg1.set_circular_boundary (0.1f);
-    hg1.set_boundary_on_outer_edge();
+    hg1.set_circular_boundary (0.1f);
+    //hg1.set_boundary_on_outer_edge();
 
     // Make some dummy data (a sine wave) to make an interesting surface
     std::vector<float> data1(hg1.num(), 0.0f);

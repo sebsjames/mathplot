@@ -321,11 +321,34 @@ export namespace mplot
             if (this->showhexes == true) {
                 this->computeHexes();
             }
+            // Boundary
+            if (this->showboundary == true) {
+                this->computeHexgridBoundary();
+            }
             // Optionally show a Flat surface for the zero plane
             if (this->zerogrid == true) {
                 this->computeZerogridIndices();
             }
             // End trial grid
+        }
+
+        // Draw carefully around the boundary with tubes or lines or quads
+        void computeHexgridBoundary()
+        {
+            std::array<float, 3> blkclr = {};
+            sm::mat<float, 3> lt (this->hg->tfm.template as<float>());
+            for (auto hptr : this->hg->bhexen) {
+                std::uint32_t hi = hptr->vi;
+                for (std::uint32_t i = 0; i < 6; ++i) {
+                    if (this->hg->has_neighbour (hi, i) == false) {
+                        // Draw in line from vtx 5 to 0, 0 to 1, 1 to 2, etc
+                        std::uint32_t i0 = (i + 5u) % 6u;
+                        sm::vec<float, 3> c0 = lt * hptr->get_vertex_coord (i0).template as<float>().plus_one_dim (0.0f);
+                        sm::vec<float, 3> c = lt * hptr->get_vertex_coord (i).template as<float>().plus_one_dim (0.0f);
+                        this->computeTube (c0, c, blkclr, blkclr, this->hg->d / 12.0f);
+                    }
+                }
+            }
         }
 
         // Compute vertices for the patchwork quilt of hexes
@@ -407,9 +430,11 @@ export namespace mplot
                 // Use a single colour for each hex, even though hex z positions are
                 // interpolated. Do the _colour_ scaling:
                 std::array<float, 3> clr = this->setColour (hi);
+#if 0 // Now going to draw carefully around the boundary
                 if (this->showboundary && (this->hg->vhexen[hi])->boundary_hex() == true) {
                     this->markHex (hi);
                 }
+#endif
                 if (this->showcentre && _x == 0.0f && _y == 0.0f) {
                     this->markHex (hi);
                 }

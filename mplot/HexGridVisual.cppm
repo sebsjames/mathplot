@@ -365,7 +365,7 @@ export namespace mplot
                         } else {
                             vi = i;
                         }
-                        v = hptr->get_vertex (vi).plus_one_dim();
+                        v = hptr->get_vertex (vi).template as<float>().plus_one_dim();
                         v.renormalize();
                         u0 = lt * v.cross (sm::vec<float>::uz());
 
@@ -375,7 +375,7 @@ export namespace mplot
                         } else {
                             vi = (i + 5u) % 6u;
                         }
-                        v = hptr->get_vertex (vi).plus_one_dim();
+                        v = hptr->get_vertex (vi).template as<float>().plus_one_dim();
                         v.renormalize();
                         u = lt * v.cross (-sm::vec<float>::uz());
 

@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include <string>
 #include <memory>
+#include <cstdint>
 
 import sm.vec;
 import sm.quaternion;

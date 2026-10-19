@@ -5,11 +5,11 @@ layout: page
 nav_order: 0
 permalink: /tutorials/quick/
 ---
-# Quick-start to run a morphologica example
+# Quick-start to run a mathplot example
 
-This page is going to show you how to build and run one of the morphologica 2D graph examples.
+This page is going to show you how to build and run one of the mathplot 2D graph examples.
 
-Quick-start assumption: You're using a Debian flavour of Linux. If you're using another type of Linux, then I hope you can figure out the packages you'll need from the list below and how to install them. In all other ways, the process will be the same. If you're using a Mac, see [README.build.mac](https://github.com/ABRG-Models/morphologica/tree/main/README.build.mac.md) for help getting dependencies in place. It's [README.build.windows](https://github.com/ABRG-Models/morphologica/tree/main/README.build.windows.md) for Windows users (vcpkg is used to obtain dependencies).
+Quick-start assumption: You're using a Debian flavour of Linux. If you're using another type of Linux, then I hope you can figure out the packages you'll need from the list below and how to install them. In all other ways, the process will be the same. If you're using a Mac, see [README.build.mac](https://github.com/sebsjames/mathplot/tree/main/README.build.mac.md) for help getting dependencies in place. It's [README.build.windows](https://github.com/sebsjames/mathplot/tree/main/README.build.windows.md) for Windows users (vcpkg is used to obtain dependencies).
 
 ## Install dependencies
 This command will install dependencies for building graph1.cpp and (almost) all the other examples (assuming a Debian-like OS)
@@ -21,13 +21,13 @@ sudo apt install build-essential cmake git wget  \
                  libglfw3-dev libfreetype-dev libarmadillo-dev libhdf5-dev
 ```
 ## Clone the code
-Get your copy of the morphologica code from Github.
+Get your copy of the mathplot code from Github.
 ```bash
-git clone git@github.com:ABRG-Models/morphologica
+git clone git@github.com:sebsjames/mathplot
 ```
 ## Prepare the build
 ```bash
-cd morphologica
+cd mathplot
 mkdir build         # Create a build directory
 cd build
 ```
@@ -47,20 +47,20 @@ gedit ../examples/graph1.cpp
 The program graph1.cpp is:
 ```c++
 // Visualize a graph. Minimal example showing how a default graph appears
-#include <morph/Visual.h>
-#include <morph/GraphVisual.h>
-#include <morph/vvec.h>
+#include <memory>
+import mplot.visual;
+import mplot.graphvisual; // exports sm.vvec and sm.vec
 
 int main()
 {
-    // Set up a morph::Visual 'scene environment'.
-    morph::Visual v(1024, 768, "Made with morph::GraphVisual");
+    // Set up a mplot::Visual 'scene environment'.
+    mplot::Visual v(1024, 768, "Made with mplot::GraphVisual");
     // Create a GraphVisual object (obtaining a unique_ptr to the object) with a spatial offset within the scene of 0,0,0
-    auto gv = std::make_unique<morph::GraphVisual<double>> (morph::vec<float>({0,0,0}));
+    auto gv = std::make_unique<mplot::GraphVisual<double>> (sm::vec<float>({0,0,0}));
     // This mandatory line of boilerplate code sets the parent pointer in GraphVisual and binds some functions
-    v.bindmodel (gv);
+    gv->set_parent (v.get_id());
     // Data for the x axis. A vvec is like std::vector, but with built-in maths methods
-    morph::vvec<double> x;
+    sm::vvec<double> x;
     // This works like numpy's linspace() (the 3 args are "start", "end" and "num"):
     x.linspace (-0.5, 0.8, 14);
     // Set a graph up of y = x^3
@@ -74,10 +74,11 @@ int main()
     // Because v owns the unique_ptr to the GraphVisual, its memory will be deallocated when v goes out of scope.
     return 0;
 }
+
 ```
 The program generates a clean looking graph...
 
-![Screenshot of graph1.cpp output showing a cubic function](https://github.com/ABRG-Models/morphologica/blob/main/examples/screenshots/graph1.png?raw=true)
+![Screenshot of graph1.cpp output showing a cubic function](https://github.com/sebsjames/mathplot/blob/main/examples/screenshots/graph1.png?raw=true)
 
 ...and the code compares favourably (in terms of amount of boilerplate code) with the equivalent Python, graph1.py:
 ```python

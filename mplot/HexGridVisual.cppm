@@ -310,6 +310,9 @@ export namespace mplot
                     }
                 }
                 this->idx = nhex;
+
+                // Boundary can be drawn on non-update
+                if (this->showboundary == true) { this->computeHexgridBoundary(); }
             }
         }
 

@@ -7,7 +7,7 @@ layout: page
 nav_order: 16
 ---
 ```c++
-#include <mplot/HexGridVisual.h>
+import mplot.hexgridvisual;
 ```
 
 # Hexagonal Grids

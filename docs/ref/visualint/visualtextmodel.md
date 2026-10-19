@@ -7,6 +7,6 @@ layout: page
 nav_order: 2
 ---
 ```c++
-#include <mplot/VisualTextModel.h>
+import mplot.visualtextmodel;
 ```
 mplot::VisualTextModel is an analogue to mplot::VisualModel which is specialised for drawing text.

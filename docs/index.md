@@ -8,7 +8,7 @@ nav_order: 1
 # Welcome to mathplot
 
 This is a documentation and reference website for
-mathplot, a library of header-only C++ code for data visualization  ([source code on Github](https://github.com/sebsjames/mathplot)).
+mathplot, a library of C++ modules for data visualization  ([source code on Github](https://github.com/sebsjames/mathplot)).
 
 ## Reference
 

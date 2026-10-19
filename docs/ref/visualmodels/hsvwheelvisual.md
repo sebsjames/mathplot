@@ -7,7 +7,7 @@ layout: page
 nav_order: 24
 ---
 ```c++
-#include <mplot/HsvwheelVisual.h>
+import mplot.hsvwheelvisual;
 ```
 
 # HSV Wheel

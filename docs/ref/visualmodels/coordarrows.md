@@ -7,7 +7,7 @@ layout: page
 nav_order: 22
 ---
 ```c++
-#include <mplot/CoordArrows.h>
+import mplot.coordarrows;
 ```
 
 # Coordinate axes

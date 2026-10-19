@@ -7,7 +7,7 @@ layout: page
 nav_order: 12
 ---
 ```c++
-#include <mplot/ColourBarVisual.h>
+import mplot.colourbarvisual;
 ```
 
 # Colour bars

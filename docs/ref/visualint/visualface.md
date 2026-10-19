@@ -7,7 +7,7 @@ layout: page
 nav_order: 4
 ---
 ```c++
-#include <mplot/VisualFace.h>
+import mplot.visualface;
 ```
 # Font faces in mathplot
 

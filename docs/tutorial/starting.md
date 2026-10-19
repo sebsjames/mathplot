@@ -5,6 +5,14 @@ layout: page
 nav_order: 1
 permalink: /tutorials/newproject
 ---
+# Old tutorial!
+
+Apologies, this tutorial is out of date!
+
+However, there is an up to date example project to help you get started:
+
+Head over to the template repository [mathplot_template](https://github.com/sebsjames/mathplot_template).
+
 # Building your code with morphologica
 
 This page will walk you through the process of setting up a new project to build morphologica code so that you can try the example code in the tutorials.

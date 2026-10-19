@@ -10,7 +10,7 @@ nav_order: 2
 {: .no_toc}
 
 ```c++
-#include <mplot/VisualModel.h>
+import mplot.visualmodel;
 ```
 **Table of Contents**
 
@@ -156,6 +156,8 @@ vertexColors. Where you are using only colour to indicate changing
 values, this can be a very efficient way of updating your
 visualization.
 
+More recently, I've been making `reinitColours` methods, that change only the colours of a model. This means constructing the model with the dynamic elements first and any (more complex) non-dynamic elements later. Then, it is simple to update the colours. At the end of reinitColours(), reinit_colour_buffer() is called.
+
 # The VisualModel coordinate frame
 
 When you add vertices to a VisualModel, you do so in the model's own
@@ -274,10 +276,10 @@ The function `VisualModel::setSizeScale(float)` sets up a transformation matrix 
 
 ## Two dimensional models
 
-OpenGL is fundamentally three dimensional. However, some models, such as a `GraphVisual` are only really useful as two dimensional figures. It's possible to prevent a model from being rotatable within the scene, even when other models *can* rotate. Use the Boolean `VisualModel::twodimensional` attribute to indicate which.
+OpenGL is fundamentally three dimensional. However, some models, such as a `GraphVisual` are only really useful as two dimensional figures. It's possible to prevent a model from being rotatable within the scene, even when other models *can* rotate. Use the method `VisualModel::twodimensional` to set this flag.
 
 ```c++
-cube_vm_ptr->twodimensional = false; // This cube won't rotate
+cube_vm_ptr->twodimensional (false); // This cube won't rotate
 ```
 
 You can change this attribute at any time, it will be used on each call to `render()`. In some derived classes, such as  `GraphVisual`,  `twodimensional` is set to true by default.

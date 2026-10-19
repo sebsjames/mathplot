@@ -6,7 +6,7 @@ parent: Welcome
 nav_order: 1
 ---
 # What is it?
-mathplot is a library of **header-only C++** code for **data visualization**.
+mathplot is a library of **modules-native C++** code for **data visualization**.
 
 mathplot provides **data visualization** for simulations of dynamical systems, agent-based models or, in fact, any program written in C++.
 
@@ -20,7 +20,7 @@ It helps with:
 
 You can also use its sibling, [sebsjames/maths](https://github.com/sebsjames/maths) which gives you the `sm` namespace and:
 
-* **Convenient maths**. Several of the maths headers provide easy ways to do some of the mathematical basics you're going to use regularly. Random number generators, vector maths, simple matrices, ranges, scaling and templated mathematical constants. You don't *have* to use them, but they're available.
+* **Convenient maths**. Several of the sebsjames/maths modules provide easy ways to do some of the mathematical basics you're going to use regularly. Random number generators, vector maths, simple matrices, ranges, scaling and templated mathematical constants. You don't *have* to use them, but they're available.
 
 There is also:
 

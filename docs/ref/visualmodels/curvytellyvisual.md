@@ -7,7 +7,7 @@ layout: page
 nav_order: 14
 ---
 ```c++
-#include <mplot/CurvyTellyVisual.h>
+import mplot.curvytellyvisual;
 ```
 
 # CurvyTellyVisual: A curved grid

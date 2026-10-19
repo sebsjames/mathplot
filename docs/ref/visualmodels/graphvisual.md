@@ -10,7 +10,7 @@ nav_order: 10
 {: .no_toc}
 
 ```c++
-#include <mplot/GraphVisual.h>
+import mplot.graphvisual;
 ```
 
 **Table of contents**
@@ -30,7 +30,7 @@ int main() {
 
     // 5 lines of C++ code to create a 2D Graph
     auto gv = std::make_unique<mplot::GraphVisual<double>> (sm::vec<float>{0,0,0});
-    v.bindmodel (gv);
+    gv->set_parent (v.get_id());
     gv->setdata (x, x.pow(3));
     gv->finalize();
     v.addVisualModel (gv);
@@ -38,7 +38,7 @@ int main() {
     v.keepOpen();
 }
 ```
-As usual, we create the `VisualModel` with a call to `std::make_unique<>`, and then call the boilerplate `bindmodel` function to wire up some callbacks.
+As usual, we create the `VisualModel` with a call to `std::make_unique<>`, and then call the boilerplate `set_parent` function to wire up some callbacks.
 
 In this example, there's just one line setting up the `GraphVisual`: `gv->setdata (x, x.pow(3));`.
 This passes data into the GraphVisual instance.

@@ -7,7 +7,7 @@ layout: page
 nav_order: 20
 ---
 ```c++
-#include <mplot/QuiverVisual.h>
+import mplot.quivervisual;
 ```
 
 # Quiver plots

@@ -339,6 +339,7 @@ export namespace mplot
             constexpr std::array<float, 3> clr0 = {.1f,.1f,.1f};
             sm::mat<float, 3> lt (this->hg->tfm.template as<float>());
             //std::cout << "lt:\n" << lt << std::endl;
+            lt = this->tfm * lt; // Also apply our own tfm
 
             for (auto hptr : this->hg->bhexen) {
                 std::uint32_t hi = hptr->vi;

@@ -7,7 +7,7 @@ layout: page
 nav_order: 8
 ---
 ```c++
-#include <mplot/ColourMap.h>
+import mplot.colourmap;
 ```
 # Introduction
 
@@ -55,7 +55,7 @@ grid. These are coloured with the 'plasma' colour map:
 
 The full list of available maps is found in the enumerated class
 `mplot::ColourMapType`, found in
-[ColourMap.h](https://github.com/sebsjames/mathplot/blob/main/mplot/ColourMap.h):
+[ColourMap.cppm](https://github.com/sebsjames/mathplot/blob/main/mplot/ColourMap.cppm):
 
 ```c++
 enum class ColourMapType // in mplot namespace
@@ -111,7 +111,7 @@ type of the data values. `T` may be any floating point or integer
 type.
 
 ```c++
-template <typename T>
+template <typename T = float> requires std::is_arithmetic_v<T>
 class ColourMap
 { /* ... */ }
 ```

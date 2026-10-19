@@ -1,5 +1,5 @@
 ---
-title: VisualCommon.h
+title: VisualCommon
 parent: Internal classes
 grand_parent: Reference
 permalink: /ref/visualint/visualcommon
@@ -7,9 +7,9 @@ layout: page
 nav_order: 3
 ---
 ```c++
-#include <mplot/VisualCommon.h>
+import mplot.visualcommon;
 ```
-This header contains a couple of structs used across the `Visual` and `VisualModel` classes. These are enclosed within a `mplot::visgl` namespace to indicate that they are related to OpenGL graphics and related to `mplot::Visual`.
+This module contains a couple of structs used across the `Visual` and `VisualModel` classes. These are enclosed within a `mplot::visgl` namespace to indicate that they are related to OpenGL graphics and related to `mplot::Visual`.
 
 ## Shader program struct: `visgl::visual_shaderprogs`
 

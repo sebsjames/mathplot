@@ -7,7 +7,7 @@ layout: page
 nav_order: 18
 ---
 ```c++
-#include <mplot/TxtVisual.h>
+import mplot.txtvisual;
 ```
 
 # A `VisualModel` for text

@@ -7,7 +7,7 @@ layout: page
 nav_order: 7
 ---
 ```c++
-#include <mplot/VisualGlfw.h>
+import mplot.visualglfw;
 ```
 
 `VisualGlfw` is a singleton class that manages start up and shutdown

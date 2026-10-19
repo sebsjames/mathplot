@@ -7,7 +7,7 @@ layout: page
 nav_order: 14
 ---
 ```c++
-#include <mplot/unicode.h>
+import mplot.unicode;
 ```
 
 # Unicode text handling

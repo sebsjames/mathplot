@@ -10,7 +10,7 @@ nav_order: 0
 {: .no_toc}
 
 ```c++
-#include <mplot/Visual.h>
+import mplot.visual;
 ```
 
 **Table of contents**
@@ -50,7 +50,7 @@ mplot::Visual v(1024, 768, "Window title here");
 
 // You then create some kind of mplot::VisualModel (GraphVisual derives from VisualModel):
 auto gv = std::make_unique<mplot::GraphVisual<double>> (sm::vec<float>({0,0,0}));
-v.bindmodel (gv);                                       // bindmodel is boilerplate
+gv->set_parent (v.get_id());                            // set_parent is boilerplate
 sm::vvec<double> x = {0,.1,.2,.3,.4,.5,.6,.7,.8,.9};    // x axis data
 gv->setdata (x, x.pow(3));                              // Graph y = x^3
 gv->finalize();                                         // 'completes' the VisualModel
@@ -142,7 +142,7 @@ To guarantee the ownership of the model will reside in the `mplot::Visual` insta
 // Create a GraphVisual. gv will be of type std::unique_ptr<mplot::GraphVisual<double>>
 auto gv = std::make_unique<mplot::GraphVisual<double>> (sm::vec<float>({0,0,0}));
 // Bind the new model to the Visual instance
-v.bindmodel (gv);
+gv->set_parent (v.get_id());
 // Do some GraphVisual-specific setup:
 gv->setdata (x, x.pow(3));
 // Call VisualModel::finalize(), which populates the OpenGL vertex/index buffers
@@ -153,7 +153,7 @@ mplot::GraphVisual<double>* gv_pointer = v.addVisualModel (gv);
 ```
 Here we've created a GraphVisual, set it up and added it to the scene.
 
-The call `v.bindmodel (gv)` is necessary to set some callbacks in the GraphVisual. Essentially it sets the Visual object `v` as the 'parent' for the `GraphVisual` and sets callbacks that give the GraphVisual access to the OpenGL shader programs. You'll write a line like this as boilerplate for every `VisualModel` that you create and add.
+The call `gv->set_parent (v.get_id())` is necessary to set some callbacks in the GraphVisual. Essentially it sets the Visual object `v` as the 'parent' for the `GraphVisual` and sets callbacks that give the GraphVisual access to the OpenGL shader programs. You'll write a line like this as boilerplate for every `VisualModel` that you create and add.
 
 After any specific setup (here it was `gv->setdata (x, x.pow(3))`), you then call `VisualModel::finalize()`. This actually builds the model out of triangles and populates the OpenGL buffers. If you don't call `finalize()`, the model won't render at all.
 
@@ -383,7 +383,7 @@ In this program, we set up a `Visual` then add a `GraphVisual`:
 
 ```c++
 auto gv = std::make_unique<mplot::GraphVisual<float>> (sm::vec<float>({0,0,0}));
-v.bindmodel (gv);
+gv->set_parent (v.get_id())
 gv->setsize (1.33, 1); // etc; other setup calls are hidden in this example
 gv->finalize();
 auto gv_pointer = v.addVisualModel (gv);
@@ -612,11 +612,9 @@ Note that the OpenGL version integer is also used as a template parameter in the
 
 How you include OpenGL headers and link to OpenGL driver code can be complex, and can differ between Linux, Apple and Windows platforms.
 
-In mathplot we use GLAD for the GL headers (the headers are mplot/glad/gl.h for the single context schemme and mplot/glad/gl_mx.h for the multicontext-safe scheme).
+In mathplot we use GLAD for the GL headers and compile this into a small, local libglad library.
 
 GLAD ensures that all the OpenGL functions are correctly loaded from the OpenGL driver.
-
-It is also possible to include GL externally, but in this case  you should use `mplot::VisualNoMX` instead of `mplot::Visual`.
 
 Linking should be determined by the CMake system.
 

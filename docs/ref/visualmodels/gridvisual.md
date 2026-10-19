@@ -7,7 +7,7 @@ layout: page
 nav_order: 12
 ---
 ```c++
-#include <mplot/GridVisual.h>
+import mplot.gridvisual;
 ```
 
 # Visualizing an `sm::grid`

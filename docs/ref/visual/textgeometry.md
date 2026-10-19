@@ -7,7 +7,7 @@ layout: page
 nav_order: 12
 ---
 ```c++
-#include <mplot/TextGeometry.h>
+import mplot.textgeometry;
 ```
 
 # How long is that string?
@@ -42,7 +42,7 @@ struct TextGeometry
 };
 ```
 
-An example of its use can be found in [`ConfigVisual.h`](https://github.com/sebsjames/mathplot/blob/main/mplot/ConfigVisual.h), where text
+An example of its use can be found in [`ConfigVisual.cppm`](https://github.com/sebsjames/mathplot/blob/main/mplot/ConfigVisual.cppm), where text
 information is shown line by line:
 
 ```c++

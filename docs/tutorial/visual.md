@@ -43,10 +43,11 @@ compile and run it with:
 
 ```bash
 cd mathplot
+# git submodule init and git submodule update if you haven't already
 mkdir build
 cd build
-cmake ..
-make helloworld
+CC=clang-20 CXX=clang++-20 cmake .. -GNinja
+ninja helloworld
 ./examples/helloworld
 ```
 It's an empty Visual scene with a text label and nothing

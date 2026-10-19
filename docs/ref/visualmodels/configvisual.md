@@ -7,9 +7,9 @@ layout: page
 nav_order: 12
 ---
 ```c++
-#include <mplot/ConfigVisual.h>
+import mplot.configvisual;
 ```
 
 # Displaying `Config` text
 
-`mplot::ConfigVisual` is a class for drawing some text config information, drawn from a [`sm::config`](https://sebsjames.github.io/maths/ref/config) object.
+`mplot::ConfigVisual` is a class for drawing some text config information, drawn from a [`sm::config`](https://sebsjames.github.io/maths/ref/config) object from [sebsjames/maths_config](https://github.com/sebsjames/maths_config).

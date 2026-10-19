@@ -7,7 +7,7 @@ layout: page
 nav_order: 4
 ---
 ```c++
-#include <mplot/VisualDataModel.h>
+import mplot.visualdatamodel;
 ```
 
 # Introduction
@@ -16,7 +16,7 @@ nav_order: 4
 
 The idea behind `VisualDataModel` was to make a uniform interface to containers of 3D coordinates and containers for scalar or vector data values to display at those coordinates. The data is referred to by member pointers and then there are [`sm::scale`](https://sebsjames.github.io/maths/ref/scale) objects and a [`mplot::ColourMap`](/ref/visual/colourmap)  that are common across all visualizations.
 
-The VisualModels [`ScatterVisual`](https://github.com/sebsjames/mathplot/blob/main/mplot/ScatterVisual.h), [`QuiverVisual`](https://github.com/sebsjames/mathplot/blob/main/mplot/QuiverVisual.h) [`HexGridVisual`](https://github.com/sebsjames/mathplot/blob/main/mplot/HexGridVisual.h) and [`GridVisual`](https://github.com/sebsjames/mathplot/blob/main/mplot/GridVisual.h) are all derived from `mplot::VisualDataModel`. If you are building a class to visualize 3D scalar or vector fields, you may wish to derive from `VisualDataModel` rather than direct from `mplot::VisualModel`.
+The VisualModels [`ScatterVisual`](https://github.com/sebsjames/mathplot/blob/main/mplot/ScatterVisual.h), [`QuiverVisual`](https://github.com/sebsjames/mathplot/blob/main/mplot/QuiverVisual.h) [`HexGridVisual`](https://github.com/sebsjames/mathplot/blob/main/mplot/HexGridVisual.h) and [`GridVisual`](https://github.com/sebsjames/mathplot/blob/main/mplot/GridVisual.h) are all derived from `mplot::VisualDataModel`. If you are building a class to visualize 3D scalar or vector fields, you may wish to derive from `VisualDataModel` rather than directly from `mplot::VisualModel`.
 
 # Declaration
 

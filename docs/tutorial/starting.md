@@ -5,9 +5,13 @@ layout: page
 nav_order: 1
 permalink: /tutorials/newproject
 ---
-# Old tutorial
+# Old tutorial!
 
 Apologies, this tutorial is out of date!
+
+However, there is an up to date example project to help you get started:
+
+Head over to the template repository [mathplot_template](https://github.com/sebsjames/mathplot_template).
 
 # Building your code with morphologica
 

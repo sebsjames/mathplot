@@ -7,7 +7,7 @@ layout: page
 nav_order: 10
 ---
 ```c++
-#include <mplot/TextFeatures.h>
+import mplot.textfeatures;
 ```
 
 # `TextFeatures` for a mathplot label

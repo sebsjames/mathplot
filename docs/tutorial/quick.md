@@ -15,10 +15,9 @@ Quick-start assumption: You're using a Debian flavour of Linux. If you're using 
 This command will install dependencies for building graph1.cpp and (almost) all the other examples (assuming a Debian-like OS)
 
 ```bash
-sudo apt install build-essential cmake git wget  \
-                 nlohmann-json3-dev librapidxml-dev \
-                 freeglut3-dev libglu1-mesa-dev libxmu-dev libxi-dev \
-                 libglfw3-dev libfreetype-dev libarmadillo-dev libhdf5-dev
+sudo apt install build-essential cmake git ninja-build \
+                 librapidxml-dev freeglut3-dev libglu1-mesa-dev libxmu-dev \
+                 libxi-dev libglfw3-dev libfreetype-dev libhdf5-dev
 ```
 ## Clone the code
 Get your copy of the mathplot code from Github.
@@ -28,16 +27,18 @@ git clone git@github.com:sebsjames/mathplot
 ## Prepare the build
 ```bash
 cd mathplot
-mkdir build         # Create a build directory
+git submodule init    # Initialize and update the submodules (json, maths and maths_config)
+git submodule update
+mkdir build           # Create a build directory
 cd build
 ```
 ## Do the build
 You first run cmake to generate makefiles, then make will execute the compiler calls.
 ```bash
-cmake ..            # Call cmake to generate the makefiles
-make graph1         # Compile a single one of the examples. Add VERBOSE=1 to see the compiler commands.
+CC=clang-20 CXX=clang++-20 cmake .. -GNinja # Call cmake to generate the ninja build files
+ninja graph1                                # Compile a single one of the examples
 ```
-(There are lots of other examples---Try ```make graph2``` or ```make convolve```.)
+(There are lots of other examples---Try ```ninja graph2``` or ```ninja convolve```.)
 ## Run the program
 ```bash
 ./examples/graph1   # Run the program. You should see a graph of a cubic function.

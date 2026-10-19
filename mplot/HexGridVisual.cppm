@@ -468,11 +468,6 @@ export namespace mplot
                 // Use a single colour for each hex, even though hex z positions are
                 // interpolated. Do the _colour_ scaling:
                 std::array<float, 3> clr = this->setColour (hi);
-#if 0 // Now going to draw carefully around the boundary
-                if (this->showboundary && (this->hg->vhexen[hi])->boundary_hex() == true) {
-                    this->markHex (hi);
-                }
-#endif
                 if (this->showcentre && _x == 0.0f && _y == 0.0f) {
                     this->markHex (hi);
                 }

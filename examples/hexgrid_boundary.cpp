@@ -42,9 +42,29 @@ int main()
     hgv1->setScalarData (&data1);
     hgv1->hexVisMode = visMode;
     hgv1->zScale.null_scaling();
-    hgv1->addLabel ("hexalign::point_up", sm::vec<>{ -hg1.width()/2.1f, -hg1.width()/1.6f }, mplot::TextFeatures(0.02f));
+    hgv1->addLabel ("Boundary of hexalign::point_up", sm::vec<>{ -hg1.width()/2.1f, -hg1.width()/1.6f }, mplot::TextFeatures(0.02f));
     hgv1->finalize();
     v.addVisualModel (hgv1);
+
+    sm::hexgrid<float, sm::hexalign::point_up> hg2(0.01f, 0.205f, 0.0f);
+    hg2.set_circular_boundary (0.1f);
+
+    sm::mat<float, 2> rotn;
+    rotn.rotate (sm::mathconst<float>::pi_over_4);
+
+    hg2.transform (rotn);
+
+    offset[0] += 0.3f;
+    auto hgv2 = std::make_unique<mplot::HexGridVisual<float, sm::hexalign::point_up, mplot::gl::version_4_1>>(&hg2, offset);
+    hgv2->set_parent (v.get_id());
+    hgv2->cm.setType (mplot::ColourMapType::Plasma);
+    hgv2->showboundary = true;
+    hgv2->setScalarData (&data1);
+    hgv2->hexVisMode = visMode;
+    hgv2->zScale.null_scaling();
+    hgv2->addLabel ("Boundary of transformed hexgrid", sm::vec<>{ -hg2.width()/2.1f, -hg2.width()/1.6f }, mplot::TextFeatures(0.02f));
+    hgv2->finalize();
+    v.addVisualModel (hgv2);
 
     v.keepOpen();
 

@@ -9,6 +9,7 @@
 #include <iostream>
 #include <string>
 #include <complex>
+#include <cstdint>
 
 import sm.vec;
 import sm.vvec;

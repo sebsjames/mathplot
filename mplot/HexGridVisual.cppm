@@ -52,19 +52,6 @@ export namespace mplot
         //! something, so that it is visible.
         void markHex (std::uint32_t hi) { this->markedHexes.insert(hi); }
 
-        void set_zoom (const float factor)
-        {
-            this->tfm = (sm::mat<float, 3>::identity() * factor) * this->tfm;
-        }
-
-        void reflect_lr()
-        {
-            this->tfm = sm::mat<float, 3>::reflection(sm::vec<float>::ux()) * this->tfm;
-        }
-
-        //! scalar 'zoom' has been replaced with a transform matrix to allow zoom, but also flip or rotate
-        sm::mat<float, 3> tfm;
-
         //! Show a set of hexes at the zero?
         bool zerogrid = false;
 
@@ -257,7 +244,7 @@ export namespace mplot
                 // mapping of the 2D hexgrid onto a 3D manifold.
                 if (this->dataCoords == nullptr) {
                     sm::vec<T, 3> crd = { this->hg->d_x[hi], this->hg->d_y[hi], this->dcopy[hi] };
-                    sm::vec<float, 3> p = this->tfm * crd.template as<float>();
+                    sm::vec<float, 3> p = crd.template as<float>();
                     if (update == false) {
                         this->vertexPositions[hi * 3] = p[0];
                         this->vertexPositions[hi * 3 + 1] = p[1];
@@ -265,7 +252,7 @@ export namespace mplot
                     this->vertexPositions[hi * 3 + 2] = p[2];
 
                 } else { // Otherwise use the positions directly in the hexgrid:
-                    sm::vec<float, 3> p = this->tfm * (*this->dataCoords)[hi]; // sm::vec<float, 3>{ (*this->dataCoords)[hi][0], (*this->dataCoords)[hi][1], (*this->dataCoords)[hi][2] };
+                    const sm::vec<float, 3> p = (*this->dataCoords)[hi];
                     if (update == false) {
                         this->vertexPositions[hi * 3] = p[0];
                         this->vertexPositions[hi * 3 + 1] = p[1];
@@ -310,6 +297,9 @@ export namespace mplot
                     }
                 }
                 this->idx = nhex;
+
+                // Boundary can be drawn on non-update
+                if (this->showboundary == true) { this->computeHexgridBoundary(); }
             }
         }
 
@@ -321,11 +311,68 @@ export namespace mplot
             if (this->showhexes == true) {
                 this->computeHexes();
             }
+            // Boundary
+            if (this->showboundary == true) {
+                this->computeHexgridBoundary();
+            }
             // Optionally show a Flat surface for the zero plane
             if (this->zerogrid == true) {
                 this->computeZerogridIndices();
             }
             // End trial grid
+        }
+
+        // Draw carefully around the boundary with tubes or lines or quads
+        void computeHexgridBoundary()
+        {
+            constexpr std::array<float, 3> clr = {};
+            constexpr std::array<float, 3> clr0 = {.1f,.1f,.1f};
+            sm::mat<float, 3> lt (this->hg->tfm.template as<float>());
+            //std::cout << "lt:\n" << lt << std::endl;
+
+            for (auto hptr : this->hg->bhexen) {
+                std::uint32_t hi = hptr->vi;
+                // Look at each possible neighbour direction and see if we need a tube
+                for (std::uint32_t i = 0; i < 6; ++i) {
+                    if (this->hg->has_neighbour (hi, i) == false) {
+                        // There's no neighbour, so we need a tube. The logic is made complex by the
+                        // need to angle the ends of the tubes correctly depending on the shape of
+                        // the boundary
+                        std::uint32_t i0 = (i + 5u) % 6u;
+                        sm::vec<float, 3> c0 = lt * hptr->get_vertex_coord (i0).template as<float>().plus_one_dim (0.0f);
+                        sm::vec<float, 3> c = lt * hptr->get_vertex_coord (i).template as<float>().plus_one_dim (0.0f);
+
+                        sm::vec<float, 3> u0 = {}; // tube end normal for c0
+                        sm::vec<float, 3> u = {}; // tube end normal for c
+                        sm::vec<float> v = {};
+
+                        std::uint32_t di = 0u; // direction to corner neighbour
+                        std::uint32_t vi = 0u; // vector to cross with uz depends on if corner neighbour exists or not
+
+                        di = (i + 5u) % 6u;
+                        if (this->hg->has_neighbour (hi, di) == false) {
+                            vi = (i + 5u) % 6u;
+                        } else {
+                            vi = i;
+                        }
+                        v = hptr->get_vertex (vi).template as<float>().plus_one_dim();
+                        v.renormalize();
+                        u0 = lt * v.cross (sm::vec<float>::uz());
+
+                        di = (i + 1u) % 6u;
+                        if (this->hg->has_neighbour (hi, di) == false) {
+                            vi = i;
+                        } else {
+                            vi = (i + 5u) % 6u;
+                        }
+                        v = hptr->get_vertex (vi).template as<float>().plus_one_dim();
+                        v.renormalize();
+                        u = lt * v.cross (-sm::vec<float>::uz());
+
+                        this->computeOpenFlaredTube (c0, c, u0, u, clr0, clr, this->hg->d / 12.0f, this->hg->d / 12.0f);
+                    }
+                }
+            }
         }
 
         // Compute vertices for the patchwork quilt of hexes
@@ -407,9 +454,6 @@ export namespace mplot
                 // Use a single colour for each hex, even though hex z positions are
                 // interpolated. Do the _colour_ scaling:
                 std::array<float, 3> clr = this->setColour (hi);
-                if (this->showboundary && (this->hg->vhexen[hi])->boundary_hex() == true) {
-                    this->markHex (hi);
-                }
                 if (this->showcentre && _x == 0.0f && _y == 0.0f) {
                     this->markHex (hi);
                 }
@@ -419,7 +463,7 @@ export namespace mplot
 
                 // Use the centre position as the first location for finding the normal vector
                 vtx_0 = this->dataCoords == nullptr ? sm::vec<float>{ _x, _y, datumC } : coordC;
-                this->vertex_push ((this->tfm * vtx_0), this->vertexPositions);
+                this->vertex_push (vtx_0, this->vertexPositions);
 
                 // A hexagon corner/vertex position
                 sm::vec<float> crnr = {};
@@ -460,7 +504,7 @@ export namespace mplot
                         vtx_1 = coordC;
                     }
                 }
-                this->vertex_push (this->tfm * vtx_1, this->vertexPositions);
+                this->vertex_push (vtx_1, this->vertexPositions);
 
 
                 // SE vertex
@@ -495,7 +539,7 @@ export namespace mplot
                         vtx_2 = coordC;
                     }
                 }
-                this->vertex_push (this->tfm * vtx_2, this->vertexPositions);
+                this->vertex_push (vtx_2, this->vertexPositions);
 
 
                 // S
@@ -530,7 +574,7 @@ export namespace mplot
                         vtx_tmp = coordC;
                     }
                 }
-                this->vertex_push (this->tfm * vtx_tmp, this->vertexPositions);
+                this->vertex_push (vtx_tmp, this->vertexPositions);
 
                 // SW
                 if (this->dataCoords == nullptr) {
@@ -564,7 +608,7 @@ export namespace mplot
                         vtx_tmp = coordC;
                     }
                 }
-                this->vertex_push (this->tfm * vtx_tmp, this->vertexPositions);
+                this->vertex_push (vtx_tmp, this->vertexPositions);
 
                 // NW
                 if (this->dataCoords == nullptr) {
@@ -598,7 +642,7 @@ export namespace mplot
                         vtx_tmp = coordC;
                     }
                 }
-                this->vertex_push (this->tfm * vtx_tmp, this->vertexPositions);
+                this->vertex_push (vtx_tmp, this->vertexPositions);
 
                 // N
                 if (this->dataCoords == nullptr) {
@@ -632,7 +676,7 @@ export namespace mplot
                         vtx_tmp = coordC;
                     }
                 }
-                this->vertex_push (this->tfm * vtx_tmp, this->vertexPositions);
+                this->vertex_push (vtx_tmp, this->vertexPositions);
 
                 // From vtx_0,1,2 compute normal. This sets the correct normal, but note
                 // that there is only one 'layer' of vertices; the back of the

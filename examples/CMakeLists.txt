@@ -103,6 +103,9 @@ target_link_libraries(hexgrid mathplot_examples)
 add_executable(hexgrid_transforms hexgrid_transforms.cpp)
 target_link_libraries(hexgrid_transforms mathplot_examples)
 
+add_executable(hexgrid_boundary hexgrid_boundary.cpp)
+target_link_libraries(hexgrid_boundary mathplot_examples)
+
 add_executable(hexgrid_fft hexgrid_fft.cpp)
 target_link_libraries(hexgrid_fft mathplot_examples)
 

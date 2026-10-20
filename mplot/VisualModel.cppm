@@ -836,7 +836,28 @@ export namespace mplot
         void postmultViewMatrix (const sm::mat<float, 4>& m) { this->viewmatrix = this->viewmatrix * m; }
         void premultViewMatrix (const sm::mat<float, 4>& m) { this->viewmatrix = m * this->viewmatrix; }
 
+        //! Scale the viewmatrix (this allows you to 'zoom' your model)
         void scaleViewMatrix (const float by) { this->viewmatrix.scale (by); }
+
+        //! An alias for scaleViewMatrix
+        void set_zoom (const float factor) { this->viewmatrix.scale (factor); }
+
+        //! Reflect your model left to right (across the y-z plane through the origin)
+        void reflect_x()
+        {
+            this->postmultViewMatrix (sm::mat<float, 4>::reflection (sm::vec<float, 3>{}, sm::vec<float, 3>::ux()));
+        }
+
+        //! Reflect your model up/down (across the x-z plane through the origin)
+        void reflect_y()
+        {
+            this->postmultViewMatrix (sm::mat<float, 4>::reflection (sm::vec<float, 3>{}, sm::vec<float, 3>::uy()));
+        }
+
+        void reflect_z()
+        {
+            this->postmultViewMatrix (sm::mat<float, 4>::reflection (sm::vec<float, 3>{}, sm::vec<float, 3>::uz()));
+        }
 
         //! When setting the scene matrix, also have to set the text's scene matrices.
         void setSceneMatrix (const sm::mat<float, 4>& sv)

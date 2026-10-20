@@ -52,19 +52,6 @@ export namespace mplot
         //! something, so that it is visible.
         void markHex (std::uint32_t hi) { this->markedHexes.insert(hi); }
 
-        void set_zoom (const float factor)
-        {
-            this->tfm = (sm::mat<float, 3>::identity() * factor) * this->tfm;
-        }
-
-        void reflect_lr()
-        {
-            this->tfm = sm::mat<float, 3>::reflection(sm::vec<float>::ux()) * this->tfm;
-        }
-
-        //! scalar 'zoom' has been replaced with a transform matrix to allow zoom, but also flip or rotate
-        sm::mat<float, 3> tfm;
-
         //! Show a set of hexes at the zero?
         bool zerogrid = false;
 
@@ -257,7 +244,7 @@ export namespace mplot
                 // mapping of the 2D hexgrid onto a 3D manifold.
                 if (this->dataCoords == nullptr) {
                     sm::vec<T, 3> crd = { this->hg->d_x[hi], this->hg->d_y[hi], this->dcopy[hi] };
-                    sm::vec<float, 3> p = this->tfm * crd.template as<float>();
+                    sm::vec<float, 3> p = crd.template as<float>();
                     if (update == false) {
                         this->vertexPositions[hi * 3] = p[0];
                         this->vertexPositions[hi * 3 + 1] = p[1];
@@ -265,7 +252,7 @@ export namespace mplot
                     this->vertexPositions[hi * 3 + 2] = p[2];
 
                 } else { // Otherwise use the positions directly in the hexgrid:
-                    sm::vec<float, 3> p = this->tfm * (*this->dataCoords)[hi]; // sm::vec<float, 3>{ (*this->dataCoords)[hi][0], (*this->dataCoords)[hi][1], (*this->dataCoords)[hi][2] };
+                    const sm::vec<float, 3> p = (*this->dataCoords)[hi];
                     if (update == false) {
                         this->vertexPositions[hi * 3] = p[0];
                         this->vertexPositions[hi * 3 + 1] = p[1];
@@ -342,7 +329,6 @@ export namespace mplot
             constexpr std::array<float, 3> clr0 = {.1f,.1f,.1f};
             sm::mat<float, 3> lt (this->hg->tfm.template as<float>());
             //std::cout << "lt:\n" << lt << std::endl;
-            lt = this->tfm * lt; // Also apply our own tfm
 
             for (auto hptr : this->hg->bhexen) {
                 std::uint32_t hi = hptr->vi;
@@ -477,7 +463,7 @@ export namespace mplot
 
                 // Use the centre position as the first location for finding the normal vector
                 vtx_0 = this->dataCoords == nullptr ? sm::vec<float>{ _x, _y, datumC } : coordC;
-                this->vertex_push ((this->tfm * vtx_0), this->vertexPositions);
+                this->vertex_push (vtx_0, this->vertexPositions);
 
                 // A hexagon corner/vertex position
                 sm::vec<float> crnr = {};
@@ -518,7 +504,7 @@ export namespace mplot
                         vtx_1 = coordC;
                     }
                 }
-                this->vertex_push (this->tfm * vtx_1, this->vertexPositions);
+                this->vertex_push (vtx_1, this->vertexPositions);
 
 
                 // SE vertex
@@ -553,7 +539,7 @@ export namespace mplot
                         vtx_2 = coordC;
                     }
                 }
-                this->vertex_push (this->tfm * vtx_2, this->vertexPositions);
+                this->vertex_push (vtx_2, this->vertexPositions);
 
 
                 // S
@@ -588,7 +574,7 @@ export namespace mplot
                         vtx_tmp = coordC;
                     }
                 }
-                this->vertex_push (this->tfm * vtx_tmp, this->vertexPositions);
+                this->vertex_push (vtx_tmp, this->vertexPositions);
 
                 // SW
                 if (this->dataCoords == nullptr) {
@@ -622,7 +608,7 @@ export namespace mplot
                         vtx_tmp = coordC;
                     }
                 }
-                this->vertex_push (this->tfm * vtx_tmp, this->vertexPositions);
+                this->vertex_push (vtx_tmp, this->vertexPositions);
 
                 // NW
                 if (this->dataCoords == nullptr) {
@@ -656,7 +642,7 @@ export namespace mplot
                         vtx_tmp = coordC;
                     }
                 }
-                this->vertex_push (this->tfm * vtx_tmp, this->vertexPositions);
+                this->vertex_push (vtx_tmp, this->vertexPositions);
 
                 // N
                 if (this->dataCoords == nullptr) {
@@ -690,7 +676,7 @@ export namespace mplot
                         vtx_tmp = coordC;
                     }
                 }
-                this->vertex_push (this->tfm * vtx_tmp, this->vertexPositions);
+                this->vertex_push (vtx_tmp, this->vertexPositions);
 
                 // From vtx_0,1,2 compute normal. This sets the correct normal, but note
                 // that there is only one 'layer' of vertices; the back of the

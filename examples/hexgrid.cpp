@@ -44,9 +44,9 @@ namespace hexexample
 int main()
 {
     // Contructor args are width, height, title
-    mplot::Visual<mplot::gl::version_4_1> v(1800, 1500, "mplot::HexGridVisual examples");
+    mplot::Visual<mplot::gl::version_4_1> v(1800, 1800, "mplot::HexGridVisual examples");
     // Set inital scene translation
-    v.setSceneTrans (sm::vec<float,3>{ float{-0.627816}, float{0.566485}, float{-5.9089} });
+    v.setSceneTrans (sm::vec<float,3>{ float{-0.635992}, float{0.75472}, float{-6.91652} });
     // You can set a field of view (in degrees)
     v.fov = 15;
     // The coordinate arrows can be shown/hidden
@@ -55,6 +55,7 @@ int main()
     v.backgroundWhite();
     // You can switch on the "lighting shader" which puts diffuse light into the scene
     v.lightingEffects();
+    v.rotateAboutNearest (true);
 
     // Create a HexGrid to show in the scene. Hexes outside the circular boundary will all be
     // discarded.
@@ -187,6 +188,7 @@ int main()
     hgv_pu = std::make_unique<mplot::HexGridVisual<float, sm::hexalign::point_up, mplot::gl::version_4_1>>(&hg1, offset);
     hgv_pu->set_parent (v.get_id());
     hgv_pu->cm.setType (mplot::ColourMapType::Ice);
+    hgv_pu->showboundary = true;
     hgv_pu->setScalarData (&data1);
     hgv_pu->hexVisMode = mplot::HexVisMode::HexInterp;
     hgv_pu->zScale.null_scaling();
@@ -261,6 +263,7 @@ int main()
     hgv_fl = std::make_unique<mplot::HexGridVisual<float, sm::hexalign::flat_up, mplot::gl::version_4_1>>(&hgf1, offset);
     hgv_fl->set_parent (v.get_id());
     hgv_fl->cm.setType (mplot::ColourMapType::CET_L07);
+    hgv_fl->showboundary = true;
     hgv_fl->setScalarData (&dataf1);
     hgv_fl->hexVisMode = mplot::HexVisMode::HexInterp;
     hgv_fl->zScale.null_scaling();
@@ -339,6 +342,61 @@ int main()
     hgv_fl->finalize();
     v.addVisualModel (hgv_fl);
 
+    /*
+     * Row 3
+     */
+    sm::mat<float, 2> rotn;
+    rotn.rotate (sm::mathconst<float>::pi_over_4);
+    hgf1.transform (rotn);
+
+    // Regenerate data/reduced grids
+    hexexample::orthogonal_sines (hgf1, dataf1);
+
+    sm::hexgrid<float, sm::hexalign::flat_up> hgf1rt = sm::algo::hexgrid::reduced_hexgrid (hgf1);
+    // Regenerate data for hgf1rt
+    sm::vvec<float> dataf1rt = {};
+    hexexample::orthogonal_sines (hgf1r, dataf1rt);
+
+    sm::hexgrid<float, sm::hexalign::flat_up> hgf1rrt = sm::algo::hexgrid::reduced_hexgrid (hgf1rt);
+    sm::vvec<float> dataf1rrt = {};
+    hexexample::orthogonal_sines (hgf1rrt, dataf1rrt);
+
+    offset = {0.0f, -3 * rh, 0.0f };
+    hgv_fl = std::make_unique<mplot::HexGridVisual<float, sm::hexalign::flat_up, mplot::gl::version_4_1>>(&hgf1, offset);
+    hgv_fl->set_parent (v.get_id());
+    hgv_fl->cm.setType (mplot::ColourMapType::Ocean);
+    hgv_fl->showboundary = true;
+    hgv_fl->setScalarData (&dataf1);
+    hgv_fl->hexVisMode = mplot::HexVisMode::HexInterp;
+    hgv_fl->zScale.null_scaling();
+    hgv_fl->addLabel ("flat_up, rotated pi/4 (ccw)\n2D (flat)\ncircular boundary\nboundary shown\nColourMapType::Ocean", label_pos, tf);
+    hgv_fl->finalize();
+    v.addVisualModel (hgv_fl);
+
+    offset = {cw, -3 * rh, 0.01f };
+    hgv_fl = std::make_unique<mplot::HexGridVisual<float, sm::hexalign::flat_up, mplot::gl::version_4_1>>(&hgf1rt, offset);
+    hgv_fl->set_parent (v.get_id());
+    hgv_fl->cm.setType (mplot::ColourMapType::Ocean);
+    hgv_fl->showboundary = true;
+    hgv_fl->setScalarData (&dataf1rt);
+    hgv_fl->hexVisMode = mplot::HexVisMode::HexInterp;
+    hgv_fl->zScale.null_scaling();
+    hgv_fl->addLabel ("Grid reduced once\nData regenerated", label_pos, tf);
+    hgv_fl->finalize();
+    v.addVisualModel (hgv_fl);
+
+    offset = {2 * cw, -3 * rh, 0.02f };
+    hgv_fl = std::make_unique<mplot::HexGridVisual<float, sm::hexalign::flat_up, mplot::gl::version_4_1>>(&hgf1rrt, offset);
+    hgv_fl->set_parent (v.get_id());
+    hgv_fl->cm.setType (mplot::ColourMapType::Ocean);
+    hgv_fl->showboundary = true;
+    hgv_fl->setScalarData (&dataf1rrt);
+    hgv_fl->hexVisMode = mplot::HexVisMode::HexInterp;
+    hgv_fl->zScale.null_scaling();
+    hgv_fl->addLabel ("Grid reduced twice", label_pos, tf);
+    hgv_fl->finalize();
+    v.addVisualModel (hgv_fl);
+
     // Lastly, a dynamic HexGridVisual.
 
     // Dynamic hexgrid data is a Bessel function
@@ -356,7 +414,7 @@ int main()
     compute_bessel (k);
 
     // Add a HexGridVisual to display the HexGrid within the mplot::Visual scene
-    offset = {4 * cw, -1 * rh, 0.02f };
+    offset = {4 * cw, -3 * rh, 0.02f };
     auto hgv = std::make_unique<mplot::HexGridVisual<float>>(&hg1, offset);
     hgv->set_parent (v.get_id());
     hgv->setScalarData (&dyn_data);

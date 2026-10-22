@@ -225,7 +225,7 @@ int main()
     hgv_pu->setScalarData (&data1);
     hgv_pu->hexVisMode = mplot::HexVisMode::HexInterp;
     hgv_pu->zScale.null_scaling();
-    hgv_pu->addLabel ("Previous 3 shown layered\nLayers separated in z\nUpper two have setAlpha(0.5)", label_pos, tf);
+    hgv_pu->addLabel ("Previous 3 shown layered\nLayers separated in z\nTop 2 transparent", label_pos, tf);
     hgv_pu->finalize();
     v.addVisualModel (hgv_pu);
 
@@ -339,5 +339,43 @@ int main()
     hgv_fl->finalize();
     v.addVisualModel (hgv_fl);
 
-    v.keepOpen();
+    // Lastly, a dynamic HexGridVisual.
+
+    // Dynamic hexgrid data is a Bessel function
+    std::vector<float> dyn_data(hg1.num(), 0.0f);
+    std::vector<float> r(hg1.num(), 0.0f);
+    float k = 1.0f;
+    auto compute_bessel = [&r, &dyn_data, hg1] (const float k) {
+        for (std::uint32_t hi = 0; hi < hg1.num(); ++hi) {
+            r[hi] = std::sqrt (hg1.d_x[hi] * hg1.d_x[hi] + hg1.d_y[hi] * hg1.d_y[hi]);
+            dyn_data[hi] = std::sin (100.0f * k * r[hi]) / k * r[hi];
+        }
+    };
+
+    // Compute first data state
+    compute_bessel (k);
+
+    // Add a HexGridVisual to display the HexGrid within the mplot::Visual scene
+    offset = {4 * cw, -1 * rh, 0.02f };
+    auto hgv = std::make_unique<mplot::HexGridVisual<float>>(&hg1, offset);
+    hgv->set_parent (v.get_id());
+    hgv->setScalarData (&dyn_data);
+    hgv->showboundary = true;
+    hgv->cm.setType (mplot::ColourMapType::CET_L09);
+    hgv->hexVisMode = mplot::HexVisMode::Triangles;
+    hgv->addLabel ("Dynamic hexgrid\nBessel function\nHexVisMode::Triangles\nColourMapType::CET_L09", label_pos, tf);
+    hgv->finalize();
+    auto hgvp = v.addVisualModel (hgv);
+
+    // Now loop, updating the dynamic hexgrid
+    while (v.readyToFinish() == false) {
+        v.wait (0.08);
+        if (k > 8.0f) { k = 1.0f; }
+        compute_bessel (k);
+        k += 0.1f;
+        if (v.validVisualModel (hgvp) != nullptr) { // Test hgvp is still valid
+            hgvp->updateData (&dyn_data);
+        }
+        v.render();
+    }
 }

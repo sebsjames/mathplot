@@ -36,6 +36,12 @@ export namespace mplot
             this->addLabel (this->text, sm::vec<float>{}, this->tf);
         }
 
+        void update (const std::string& newtext)
+        {
+            this->text = newtext;
+            this->reinit_with_clearTexts();
+        }
+
         std::string text;
         mplot::TextFeatures tf;
     };

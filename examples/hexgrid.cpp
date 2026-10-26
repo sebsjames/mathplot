@@ -135,8 +135,9 @@ int main()
     hgv_fl->showboundary = true;
     hgv_fl->setScalarData (&data2);
     hgv_fl->hexVisMode = mplot::HexVisMode::HexInterp;
+    hgv_fl->hex_size_factor = 0.95f;
     hgv_fl->zScale.null_scaling();
-    hgv_fl->addLabel ("hexalign::flat_up\n2D (value is only colour)\noriginal hex boundary\nboundary indicated in black\nHexVisMode::HexInterp\nColourMapType::Cork",
+    hgv_fl->addLabel ("hexalign::flat_up\n2D (value is only colour)\noriginal hex boundary\nboundary indicated in black\nHexVisMode::HexInterp\nhex_size_factor 0.95\nColourMapType::Cork",
                       label_pos, tf);
     hgv_fl->finalize();
     v.addVisualModel (hgv_fl);
@@ -161,8 +162,9 @@ int main()
     hgv_pu->showboundary = true;
     hgv_pu->setScalarData (&data1);
     hgv_pu->hexVisMode = mplot::HexVisMode::HexInterp;
+    hgv_pu->hex_size_factor = 0.95f;
     hgv_pu->zScale.null_scaling();
-    hgv_pu->addLabel ("hexalign::point_up\n2D\ncircular boundary\nboundary shown\nHexVisMode::HexInterp\nColourMapType::Plasma",
+    hgv_pu->addLabel ("hexalign::point_up\n2D\ncircular boundary\nboundary shown\nHexVisMode::HexInterp\nhex_size_factor 0.95\nColourMapType::Plasma",
                       label_pos, tf);
     hgv_pu->finalize();
     v.addVisualModel (hgv_pu);

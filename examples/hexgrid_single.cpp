@@ -69,9 +69,10 @@ int main()
     hgv_pu->setScalarData (&data1);
     hgv_pu->showboundary = true;
     hgv_pu->hexVisMode = mplot::HexVisMode::HexInterp;
-    hgv_pu->hex_draw_threshold = 0.5f;
+    hgv_pu->hex_size_factor = 0.95f;
+    hgv_pu->hex_draw_threshold = 0.1f;
     hgv_pu->hex_invisible_alpha = 0.5f;
-    hgv_pu->addLabel ("hexalign::point_up\n3D (value is z and colour)\ncircular boundary\nboundary shown\nLower values transparent\nHexVisMode::HexInterp\nColourMapType::CET_L04",
+    hgv_pu->addLabel ("hexalign::point_up\n3D (value is z and colour)\ncircular boundary\nboundary shown\nLower values transparent\nHexVisMode::HexInterp\nhex_size_factor 0.95\nColourMapType::CET_L04",
                       label_pos, tf);
     hgv_pu->finalize();
     v.addVisualModel (hgv_pu);

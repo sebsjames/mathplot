@@ -132,34 +132,38 @@ export namespace mplot
         // colours.
         void reinitColours()
         {
-            constexpr std::array<float, 4> blkclr = {0,0,0};
-
             std::uint32_t nhex = this->hg->num();
 
             this->setupScaling();
 
             if (this->hexVisMode == HexVisMode::Triangles) {
                 // Reinit triangle mesh colours
-                if (this->vertexColors.size() < 3u * nhex) {
+                if (this->vertexColors.size() < this->ncol * nhex) {
                     throw std::runtime_error ("vertexColors is too small to reinitColours");
                 }
                 for (std::uint32_t hi = 0; hi < nhex; ++hi) {
-                    std::array<float, 3> clr = this->setColour (hi);
+
+                    std::array<float, 4> blkclr = {0,0,0,1};
+
+                    // If this hex is below hex_draw_threshold then draw with transparency
+                    if (this->scalarData != nullptr && this->hex_draw_threshold != 0.0f) {
+                        if (std::abs(this->dcolour[hi]) <= this->hex_draw_threshold) {
+                            blkclr[3] = this->hex_invisible_alpha;
+                        }
+                    }
+                    std::array<float, 3> _clr = this->setColour (hi);
+                    std::array<float, 4> clr = { _clr[0], _clr[1], _clr[2], blkclr[3] };
 
                     if (this->markedHexes.count(hi)) {
                         this->vertexColors[hi * this->ncol] = blkclr[0];
                         this->vertexColors[hi * this->ncol + 1] = blkclr[1];
                         this->vertexColors[hi * this->ncol + 2] = blkclr[2];
-                        if (this->ncol == 4) {
-                            this->vertexColors[hi * this->ncol + 3] = 1.0f;
-                        }
+                        if (this->ncol == 4) { this->vertexColors[hi * this->ncol + 3] = blkclr[3]; }
                     } else {
                         this->vertexColors[hi * this->ncol] = clr[0];
                         this->vertexColors[hi * this->ncol + 1] = clr[1];
                         this->vertexColors[hi * this->ncol + 2] = clr[2];
-                        if (this->ncol == 4) {
-                            this->vertexColors[hi * this->ncol + 3] = 1.0f; // or clr[3]
-                        }
+                        if (this->ncol == 4) { this->vertexColors[hi * this->ncol + 3] = clr[3]; }
                     }
                 }
 
@@ -169,16 +173,25 @@ export namespace mplot
                     throw std::runtime_error ("vertexColors is too small to reinitColours");
                 }
                 for (std::uint32_t hi = 0; hi < nhex; ++hi) {
-                    std::array<float, 3> clr = this->setColour (hi);
+
+                    std::array<float, 4> blkclr = {0,0,0,1};
+
+                    // If this hex is below hex_draw_threshold then draw with transparency
+                    if (this->scalarData != nullptr && this->hex_draw_threshold != 0.0f) {
+                        if (std::abs(this->dcolour[hi]) <= this->hex_draw_threshold) {
+                            blkclr[3] = this->hex_invisible_alpha;
+                        }
+                    }
+                    std::array<float, 3> _clr = this->setColour (hi);
+                    std::array<float, 4> clr = { _clr[0], _clr[1], _clr[2], blkclr[3] };
+
                     const std::uint32_t istart = 7u * this->ncol;
                     if (std::isnan(this->dcolour[hi])) {
                         // 7 colour vertices per hex, so 7 * ncol = istart locations in vertexColors
                         this->vertexColors[hi * istart] = clr[0];
                         this->vertexColors[hi * istart + 1] = clr[1];
                         this->vertexColors[hi * istart + 2] = clr[2];
-                        if (this->ncol == 4) {
-                            this->vertexColors[hi * istart + 3] = 1.0f; // or clr[3]
-                        }
+                        if (this->ncol == 4) { this->vertexColors[hi * istart + 3] = clr[3]; }
                         // Could also set the blkclrs but assume they are unchanging
                     } else {
 
@@ -187,7 +200,7 @@ export namespace mplot
                         this->vertexColors[hi * istart + this->ncol * 0] = clr[0];
                         this->vertexColors[hi * istart + this->ncol * 0 + 1] = clr[1];
                         this->vertexColors[hi * istart + this->ncol * 0 + 2] = clr[2];
-                        if (this->ncol == 4) { this->vertexColors[hi * istart + this->ncol * 0 + 3] = 1.0f; }
+                        if (this->ncol == 4) { this->vertexColors[hi * istart + this->ncol * 0 + 3] = clr[3]; }
                         //2
                         if (mhex) {
                             this->vertexColors[hi * istart + this->ncol * 1] = blkclr[0];
@@ -198,13 +211,13 @@ export namespace mplot
                             this->vertexColors[hi * istart + this->ncol * 1 + 1] = clr[1];
                             this->vertexColors[hi * istart + this->ncol * 1 + 2] = clr[2];
                         }
-                        if (this->ncol == 4) { this->vertexColors[hi * istart + this->ncol * 1 + 3] = 1.0f; }
+                        if (this->ncol == 4) { this->vertexColors[hi * istart + this->ncol * 1 + 3] = clr[3]; }
 
                         //3
                         this->vertexColors[hi * istart + this->ncol * 2] = clr[0];
                         this->vertexColors[hi * istart + this->ncol * 2 + 1] = clr[1];
                         this->vertexColors[hi * istart + this->ncol * 2 + 2] = clr[2];
-                        if (this->ncol == 4) { this->vertexColors[hi * istart + this->ncol * 2 + 3] = 1.0f; }
+                        if (this->ncol == 4) { this->vertexColors[hi * istart + this->ncol * 2 + 3] = clr[3]; }
                         //4
                         if (mhex) {
                             this->vertexColors[hi * istart + this->ncol * 3] = blkclr[0];
@@ -215,12 +228,12 @@ export namespace mplot
                             this->vertexColors[hi * istart + this->ncol * 3 + 1] = clr[1];
                             this->vertexColors[hi * istart + this->ncol * 3 + 2] = clr[2];
                         }
-                        if (this->ncol == 4) { this->vertexColors[hi * istart + this->ncol * 3 + 3] = 1.0f; }
+                        if (this->ncol == 4) { this->vertexColors[hi * istart + this->ncol * 3 + 3] = clr[3]; }
                         //5
                         this->vertexColors[hi * istart + this->ncol * 4] = clr[0];
                         this->vertexColors[hi * istart + this->ncol * 4 + 1] = clr[1];
                         this->vertexColors[hi * istart + this->ncol * 4 + 2] = clr[2];
-                        if (this->ncol == 4) { this->vertexColors[hi * istart + this->ncol * 4 + 3] = 1.0f; }
+                        if (this->ncol == 4) { this->vertexColors[hi * istart + this->ncol * 4 + 3] = clr[3]; }
                         //6
                         if (mhex) {
                             this->vertexColors[hi * istart + this->ncol * 5] = blkclr[0];
@@ -231,12 +244,12 @@ export namespace mplot
                             this->vertexColors[hi * istart + this->ncol * 5 + 1] = clr[1];
                             this->vertexColors[hi * istart + this->ncol * 5 + 2] = clr[2];
                         }
-                        if (this->ncol == 4) { this->vertexColors[hi * istart + this->ncol * 5 + 3] = 1.0f; }
+                        if (this->ncol == 4) { this->vertexColors[hi * istart + this->ncol * 5 + 3] = clr[3]; }
                         //7
                         this->vertexColors[hi * istart + this->ncol * 6] = clr[0];
                         this->vertexColors[hi * istart + this->ncol * 6 + 1] = clr[1];
                         this->vertexColors[hi * istart + this->ncol * 6 + 2] = clr[2];
-                        if (this->ncol == 4) { this->vertexColors[hi * istart + this->ncol * 6 + 3] = 1.0f; }
+                        if (this->ncol == 4) { this->vertexColors[hi * istart + this->ncol * 6 + 3] = clr[3]; }
                     }
                 }
             }

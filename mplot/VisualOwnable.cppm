@@ -1870,6 +1870,7 @@ export namespace mplot
                           << "Ctrl-l: Toggle the scene lock\n"
                           << "Ctrl-c: Toggle coordinate arrows\n"
                           << "Ctrl-s: Take a snapshot\n"
+                          << "Ctrl-Shift-s: Output GLSL shaders to stdout\n"
                           << "Ctrl-m: Save 3D models in .gltf format (open in e.g. blender)\n"
                           << "Ctrl-a: Reset default view\n"
                           << "Ctrl-o: Reduce field of view\n"

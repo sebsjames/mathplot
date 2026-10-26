@@ -37,6 +37,7 @@ export namespace mplot
         //! Construct with a hexgrid and the usual model offset
         HexGridVisual(const sm::hexgrid<T, A>* _hg, const sm::vec<float> _offset)
         {
+            this->ncol = 4;
             this->viewmatrix.translate (_offset);
             this->zScale.identity_scaling();
             this->colourScale.do_autoscale = true;
@@ -63,6 +64,17 @@ export namespace mplot
 
         //! Set false to omit the hexes
         bool showhexes = true;
+
+        //! Could make hexes bigger or smaller across the hexgrid (to show one signal on top of another)
+        float hex_size_factor = 1.0f;
+
+        //! Draw hex with full alpha=1 only if |signal| is above this threshold (scalarData
+        //! only). Compared against the dcolour value, which is in range 0->1
+        float hex_draw_threshold = 0.0f;
+
+        //! If you want to just see the below-hex_draw_threshold hexes, set this to a low value like
+        //! 0.1. 0.0 makes those hexes vanish completely.
+        float hex_invisible_alpha = 0.0f;
 
         void initializeVertices() { this->initializeVertices (false); }
         //! Do the computations to initialize the vertices that will represent the
@@ -120,7 +132,7 @@ export namespace mplot
         // colours.
         void reinitColours()
         {
-            constexpr std::array<float, 3> blkclr = {0,0,0};
+            constexpr std::array<float, 4> blkclr = {0,0,0};
 
             std::uint32_t nhex = this->hg->num();
 
@@ -135,13 +147,19 @@ export namespace mplot
                     std::array<float, 3> clr = this->setColour (hi);
 
                     if (this->markedHexes.count(hi)) {
-                        this->vertexColors[hi * 3] = blkclr[0];
-                        this->vertexColors[hi * 3 + 1] = blkclr[1];
-                        this->vertexColors[hi * 3 + 2] = blkclr[2];
+                        this->vertexColors[hi * this->ncol] = blkclr[0];
+                        this->vertexColors[hi * this->ncol + 1] = blkclr[1];
+                        this->vertexColors[hi * this->ncol + 2] = blkclr[2];
+                        if (this->ncol == 4) {
+                            this->vertexColors[hi * this->ncol + 3] = 1.0f;
+                        }
                     } else {
-                        this->vertexColors[hi * 3] = clr[0];
-                        this->vertexColors[hi * 3 + 1] = clr[1];
-                        this->vertexColors[hi * 3 + 2] = clr[2];
+                        this->vertexColors[hi * this->ncol] = clr[0];
+                        this->vertexColors[hi * this->ncol + 1] = clr[1];
+                        this->vertexColors[hi * this->ncol + 2] = clr[2];
+                        if (this->ncol == 4) {
+                            this->vertexColors[hi * this->ncol + 3] = 1.0f; // or clr[3]
+                        }
                     }
                 }
 
@@ -152,61 +170,73 @@ export namespace mplot
                 }
                 for (std::uint32_t hi = 0; hi < nhex; ++hi) {
                     std::array<float, 3> clr = this->setColour (hi);
+                    const std::uint32_t istart = 7u * this->ncol;
                     if (std::isnan(this->dcolour[hi])) {
-                        // 7 colour vertices per hex, so 7 * 3 = 21 locations in vertexColors
-                        this->vertexColors[hi * 21] = clr[0];
-                        this->vertexColors[hi * 21 + 1] = clr[1];
-                        this->vertexColors[hi * 21 + 2] = clr[2];
+                        // 7 colour vertices per hex, so 7 * ncol = istart locations in vertexColors
+                        this->vertexColors[hi * istart] = clr[0];
+                        this->vertexColors[hi * istart + 1] = clr[1];
+                        this->vertexColors[hi * istart + 2] = clr[2];
+                        if (this->ncol == 4) {
+                            this->vertexColors[hi * istart + 3] = 1.0f; // or clr[3]
+                        }
                         // Could also set the blkclrs but assume they are unchanging
                     } else {
 
                         bool mhex = this->markedHexes.count(hi);
 
-                        this->vertexColors[hi * 21 + 3 * 0] = clr[0];
-                        this->vertexColors[hi * 21 + 3 * 0 + 1] = clr[1];
-                        this->vertexColors[hi * 21 + 3 * 0 + 2] = clr[2];
+                        this->vertexColors[hi * istart + this->ncol * 0] = clr[0];
+                        this->vertexColors[hi * istart + this->ncol * 0 + 1] = clr[1];
+                        this->vertexColors[hi * istart + this->ncol * 0 + 2] = clr[2];
+                        if (this->ncol == 4) { this->vertexColors[hi * istart + this->ncol * 0 + 3] = 1.0f; }
                         //2
                         if (mhex) {
-                            this->vertexColors[hi * 21 + 3 * 1] = blkclr[0];
-                            this->vertexColors[hi * 21 + 3 * 1 + 1] = blkclr[1];
-                            this->vertexColors[hi * 21 + 3 * 1 + 2] = clr[2];
+                            this->vertexColors[hi * istart + this->ncol * 1] = blkclr[0];
+                            this->vertexColors[hi * istart + this->ncol * 1 + 1] = blkclr[1];
+                            this->vertexColors[hi * istart + this->ncol * 1 + 2] = clr[2];
                         } else {
-                            this->vertexColors[hi * 21 + 3 * 1] = clr[0];
-                            this->vertexColors[hi * 21 + 3 * 1 + 1] = clr[1];
-                            this->vertexColors[hi * 21 + 3 * 1 + 2] = clr[2];
+                            this->vertexColors[hi * istart + this->ncol * 1] = clr[0];
+                            this->vertexColors[hi * istart + this->ncol * 1 + 1] = clr[1];
+                            this->vertexColors[hi * istart + this->ncol * 1 + 2] = clr[2];
                         }
+                        if (this->ncol == 4) { this->vertexColors[hi * istart + this->ncol * 1 + 3] = 1.0f; }
+
                         //3
-                        this->vertexColors[hi * 21 + 3 * 2] = clr[0];
-                        this->vertexColors[hi * 21 + 3 * 2 + 1] = clr[1];
-                        this->vertexColors[hi * 21 + 3 * 2 + 2] = clr[2];
+                        this->vertexColors[hi * istart + this->ncol * 2] = clr[0];
+                        this->vertexColors[hi * istart + this->ncol * 2 + 1] = clr[1];
+                        this->vertexColors[hi * istart + this->ncol * 2 + 2] = clr[2];
+                        if (this->ncol == 4) { this->vertexColors[hi * istart + this->ncol * 2 + 3] = 1.0f; }
                         //4
                         if (mhex) {
-                            this->vertexColors[hi * 21 + 3 * 3] = blkclr[0];
-                            this->vertexColors[hi * 21 + 3 * 3 + 1] = blkclr[1];
-                            this->vertexColors[hi * 21 + 3 * 3 + 2] = clr[2];
+                            this->vertexColors[hi * istart + this->ncol * 3] = blkclr[0];
+                            this->vertexColors[hi * istart + this->ncol * 3 + 1] = blkclr[1];
+                            this->vertexColors[hi * istart + this->ncol * 3 + 2] = clr[2];
                         } else {
-                            this->vertexColors[hi * 21 + 3 * 3] = clr[0];
-                            this->vertexColors[hi * 21 + 3 * 3 + 1] = clr[1];
-                            this->vertexColors[hi * 21 + 3 * 3 + 2] = clr[2];
+                            this->vertexColors[hi * istart + this->ncol * 3] = clr[0];
+                            this->vertexColors[hi * istart + this->ncol * 3 + 1] = clr[1];
+                            this->vertexColors[hi * istart + this->ncol * 3 + 2] = clr[2];
                         }
+                        if (this->ncol == 4) { this->vertexColors[hi * istart + this->ncol * 3 + 3] = 1.0f; }
                         //5
-                        this->vertexColors[hi * 21 + 3 * 4] = clr[0];
-                        this->vertexColors[hi * 21 + 3 * 4 + 1] = clr[1];
-                        this->vertexColors[hi * 21 + 3 * 4 + 2] = clr[2];
+                        this->vertexColors[hi * istart + this->ncol * 4] = clr[0];
+                        this->vertexColors[hi * istart + this->ncol * 4 + 1] = clr[1];
+                        this->vertexColors[hi * istart + this->ncol * 4 + 2] = clr[2];
+                        if (this->ncol == 4) { this->vertexColors[hi * istart + this->ncol * 4 + 3] = 1.0f; }
                         //6
                         if (mhex) {
-                            this->vertexColors[hi * 21 + 3 * 5] = blkclr[0];
-                            this->vertexColors[hi * 21 + 3 * 5 + 1] = blkclr[1];
-                            this->vertexColors[hi * 21 + 3 * 5 + 2] = clr[2];
+                            this->vertexColors[hi * istart + this->ncol * 5] = blkclr[0];
+                            this->vertexColors[hi * istart + this->ncol * 5 + 1] = blkclr[1];
+                            this->vertexColors[hi * istart + this->ncol * 5 + 2] = clr[2];
                         } else {
-                            this->vertexColors[hi * 21 + 3 * 5] = clr[0];
-                            this->vertexColors[hi * 21 + 3 * 5 + 1] = clr[1];
-                            this->vertexColors[hi * 21 + 3 * 5 + 2] = clr[2];
+                            this->vertexColors[hi * istart + this->ncol * 5] = clr[0];
+                            this->vertexColors[hi * istart + this->ncol * 5 + 1] = clr[1];
+                            this->vertexColors[hi * istart + this->ncol * 5 + 2] = clr[2];
                         }
+                        if (this->ncol == 4) { this->vertexColors[hi * istart + this->ncol * 5 + 3] = 1.0f; }
                         //7
-                        this->vertexColors[hi * 21 + 3 * 6] = clr[0];
-                        this->vertexColors[hi * 21 + 3 * 6 + 1] = clr[1];
-                        this->vertexColors[hi * 21 + 3 * 6 + 2] = clr[2];
+                        this->vertexColors[hi * istart + this->ncol * 6] = clr[0];
+                        this->vertexColors[hi * istart + this->ncol * 6 + 1] = clr[1];
+                        this->vertexColors[hi * istart + this->ncol * 6 + 2] = clr[2];
+                        if (this->ncol == 4) { this->vertexColors[hi * istart + this->ncol * 6 + 3] = 1.0f; }
                     }
                 }
             }
@@ -229,17 +259,27 @@ export namespace mplot
 
             this->setupScaling();
 
-            std::array<float, 3> blkclr = {0,0,0};
+            std::array<float, 4> blkclr = {0,0,0,1};
 
             if (update == false) {
                 this->vertexPositions.resize (3u * nhex);
                 this->vertexNormals.resize (3u * nhex);
-                this->vertexColors.resize (3u * nhex);
+                this->vertexColors.resize (this->ncol * nhex);
                 this->indices.reserve (6u * nhex);
             }
 
             for (std::uint32_t hi = 0; hi < nhex; ++hi) {
-                std::array<float, 3> clr = this->setColour (hi);
+
+                // If this hex is below hex_draw_threshold then draw an invisible hex and move on
+                if (this->scalarData != nullptr && this->hex_draw_threshold != 0.0f) {
+                    if (std::abs(this->dcolour[hi]) <= this->hex_draw_threshold) {
+                        blkclr[3] = this->hex_invisible_alpha; // our hex_alpha
+                    }
+                }
+
+                std::array<float, 3> _clr = this->setColour (hi);
+                std::array<float, 4> clr = { _clr[0], _clr[1], _clr[2], blkclr[3] };
+
                 // If dataCoords has been populated, use these for hex positions, allowing for
                 // mapping of the 2D hexgrid onto a 3D manifold.
                 if (this->dataCoords == nullptr) {
@@ -260,13 +300,15 @@ export namespace mplot
                     this->vertexPositions[hi * 3 + 2] = p[2];
                 }
                 if (this->markedHexes.count(hi)) {
-                    this->vertexColors[hi * 3] = blkclr[0];
-                    this->vertexColors[hi * 3 + 1] = blkclr[1];
-                    this->vertexColors[hi * 3 + 2] = blkclr[2];
+                    this->vertexColors[hi * this->ncol] = blkclr[0];
+                    this->vertexColors[hi * this->ncol + 1] = blkclr[1];
+                    this->vertexColors[hi * this->ncol + 2] = blkclr[2];
+                    if (this->ncol == 4) { this->vertexColors[hi * this->ncol + 3] = blkclr[3]; }
                 } else {
-                    this->vertexColors[hi * 3] = clr[0];
-                    this->vertexColors[hi * 3 + 1] = clr[1];
-                    this->vertexColors[hi * 3 + 2] = clr[2];
+                    this->vertexColors[hi * this->ncol] = clr[0];
+                    this->vertexColors[hi * this->ncol + 1] = clr[1];
+                    this->vertexColors[hi * this->ncol + 2] = clr[2];
+                    if (this->ncol == 4) { this->vertexColors[hi * this->ncol + 3] = clr[3]; }
                 }
                 if (update == false) {
                     this->vertexNormals[hi * 3] = 0.0f;
@@ -326,7 +368,7 @@ export namespace mplot
         void computeHexgridBoundary()
         {
             constexpr std::array<float, 3> clr = {};
-            constexpr std::array<float, 3> clr0 = {.1f,.1f,.1f};
+            constexpr std::array<float, 3> clr0 = { 0.1f, 0.1f, 0.1f };
             sm::mat<float, 3> lt (this->hg->tfm.template as<float>());
             //std::cout << "lt:\n" << lt << std::endl;
 
@@ -416,7 +458,21 @@ export namespace mplot
             // The rotation from the transformation in the hexgrid (if any)
             sm::mat<float, 3> lt (this->hg->tfm.template as<float>());
 
+            // Scale hexes (dataCoords must be nullptr for this to take effect)
+            if (this->hex_size_factor != 1.0f) {
+                sm::mat<float, 3> scaler = sm::mat<float, 3>::identity() * this->hex_size_factor;
+                lt = scaler * lt;
+            }
+
             for (std::uint32_t hi = 0; hi < nhex; ++hi) {
+
+                float hex_alpha = 1.0f;
+                // If this hex is below hex_draw_threshold then draw an invisible hex and move on
+                if (this->scalarData != nullptr && this->hex_draw_threshold != 0.0f) {
+                    if (std::abs(this->dcolour[hi]) <= this->hex_draw_threshold) {
+                        hex_alpha = this->hex_invisible_alpha;
+                    }
+                }
 
                 if (this->dataCoords == nullptr) {
                     _x = this->hg->d_x[hi];
@@ -453,11 +509,12 @@ export namespace mplot
 
                 // Use a single colour for each hex, even though hex z positions are
                 // interpolated. Do the _colour_ scaling:
-                std::array<float, 3> clr = this->setColour (hi);
+                std::array<float, 3> _clr = this->setColour (hi);
+                std::array<float, 4> clr = { _clr[0], _clr[1], _clr[2], hex_alpha };
                 if (this->showcentre && _x == 0.0f && _y == 0.0f) {
                     this->markHex (hi);
                 }
-                std::array<float, 3> blkclr = {};
+                std::array<float, 4> blkclr = { 0.0f, 0.0f, 0.0f, hex_alpha };
 
                 // First push the 7 positions of the triangle vertices, starting with the centre
 
@@ -699,35 +756,35 @@ export namespace mplot
                 // marked, then three of the vertices are given the colour black,
                 // marking the hex out visually.
                 if (std::isnan(this->dcolour[hi])) {
-                    this->vertex_push (clr, this->vertexColors);
-                    this->vertex_push (blkclr, this->vertexColors);
-                    this->vertex_push (blkclr, this->vertexColors);
-                    this->vertex_push (blkclr, this->vertexColors);
-                    this->vertex_push (blkclr, this->vertexColors);
-                    this->vertex_push (blkclr, this->vertexColors);
-                    this->vertex_push (blkclr, this->vertexColors);
+                    this->vertex_push_colour (clr, this->vertexColors);
+                    this->vertex_push_colour (blkclr, this->vertexColors);
+                    this->vertex_push_colour (blkclr, this->vertexColors);
+                    this->vertex_push_colour (blkclr, this->vertexColors);
+                    this->vertex_push_colour (blkclr, this->vertexColors);
+                    this->vertex_push_colour (blkclr, this->vertexColors);
+                    this->vertex_push_colour (blkclr, this->vertexColors);
                 } else {
-                    this->vertex_push (clr, this->vertexColors);
+                    this->vertex_push_colour (clr, this->vertexColors);
                     if (this->markedHexes.count(hi)) {
-                        this->vertex_push (blkclr, this->vertexColors);
+                        this->vertex_push_colour (blkclr, this->vertexColors);
                     } else {
-                        this->vertex_push (clr, this->vertexColors);
+                        this->vertex_push_colour (clr, this->vertexColors);
                     }
 
-                    this->vertex_push (clr, this->vertexColors);
+                    this->vertex_push_colour (clr, this->vertexColors);
 
                     if (this->markedHexes.count(hi)) {
-                        this->vertex_push (blkclr, this->vertexColors);
+                        this->vertex_push_colour (blkclr, this->vertexColors);
                     } else {
-                        this->vertex_push (clr, this->vertexColors);
+                        this->vertex_push_colour (clr, this->vertexColors);
                     }
-                    this->vertex_push (clr, this->vertexColors);
+                    this->vertex_push_colour (clr, this->vertexColors);
                     if (this->markedHexes.count(hi)) {
-                        this->vertex_push (blkclr, this->vertexColors);
+                        this->vertex_push_colour (blkclr, this->vertexColors);
                     } else {
-                        this->vertex_push (clr, this->vertexColors);
+                        this->vertex_push_colour (clr, this->vertexColors);
                     }
-                    this->vertex_push (clr, this->vertexColors);
+                    this->vertex_push_colour (clr, this->vertexColors);
                 }
 
                 // Define indices now to produce the 6 triangles in the hex

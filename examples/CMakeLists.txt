@@ -100,6 +100,9 @@ target_link_libraries(showcase mathplot_examples)
 add_executable(hexgrid hexgrid.cpp)
 target_link_libraries(hexgrid mathplot_examples)
 
+add_executable(hexgrid_single hexgrid_single.cpp)
+target_link_libraries(hexgrid_single mathplot_examples)
+
 add_executable(hexgrid_transforms hexgrid_transforms.cpp)
 target_link_libraries(hexgrid_transforms mathplot_examples)
 

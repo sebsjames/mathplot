@@ -397,6 +397,20 @@ int main()
     hgv_fl->finalize();
     v.addVisualModel (hgv_fl);
 
+    offset = {3 * cw, -3 * rh, 0.02f };
+    hgv_fl = std::make_unique<mplot::HexGridVisual<float, sm::hexalign::flat_up, mplot::gl::version_4_1>>(&hgf1rrt, offset);
+    hgv_fl->set_parent (v.get_id());
+    hgv_fl->cm.setType (mplot::ColourMapType::Ocean);
+    hgv_fl->hex_size_factor = 0.5f;
+    hgv_fl->hex_draw_threshold = 0.2f;
+    hgv_fl->showboundary = true;
+    hgv_fl->setScalarData (&dataf1rrt);
+    hgv_fl->hexVisMode = mplot::HexVisMode::HexInterp;
+    hgv_fl->zScale.null_scaling();
+    hgv_fl->addLabel ("Grid reduced twice\nhex_size_factor = 0.5\nhex_draw_threshold = 0.2\n(only draw high signal hexes)", label_pos, tf);
+    hgv_fl->finalize();
+    v.addVisualModel (hgv_fl);
+
     // Lastly, a dynamic HexGridVisual.
 
     // Dynamic hexgrid data is a Bessel function

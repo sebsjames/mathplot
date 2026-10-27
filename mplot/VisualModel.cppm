@@ -3864,7 +3864,7 @@ export namespace mplot
             for (std::uint16_t i = 0U; i < 4U; ++i) { this->vertex_push (_n2, this->vertexNormals); }
 
             // Vertex colours are all the same
-            for (std::uint16_t i = 0U; i < 24U; ++i) { this->vertex_push (clr, this->vertexColors); }
+            for (std::uint16_t i = 0U; i < 24U; ++i) { this->vertex_push_colour (clr, this->vertexColors); }
 
             // Indices for 6 faces
             for (std::uint16_t i = 0U; i < 6U; ++i) {

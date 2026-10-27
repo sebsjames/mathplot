@@ -37,7 +37,7 @@ export namespace mplot
             for (auto i : _ind) { this->indices.push_back (i); }
             for (auto p : _posn) { this->vertex_push (p, this->vertexPositions); }
             for (auto n : _norm) { this->vertex_push (n, this->vertexNormals); }
-            for (auto c : _colr) { this->vertex_push (c, this->vertexColors); }
+            for (auto c : _colr) { this->vertex_push_colour (c, this->vertexColors); }
         }
     };
 

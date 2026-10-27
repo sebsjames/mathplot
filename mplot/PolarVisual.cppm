@@ -138,14 +138,14 @@ export namespace mplot
 
                     this->vertex_push (c_in, this->vertexPositions);
                     this->vertex_push (sm::vec<>::uz(), this->vertexNormals);
-                    this->vertex_push (clr, this->vertexColors);
+                    this->vertex_push_colour (clr, this->vertexColors);
 
                     sm::vec<float> c_out = sm::vec<>::uy() * sin(t) * r_out + sm::vec<>::ux() * cos(t) * r_out;
                     c_out[2] = outer_z;
 
                     this->vertex_push (c_out, this->vertexPositions);
                     this->vertex_push (sm::vec<>::uz(), this->vertexNormals);
-                    this->vertex_push (clr, this->vertexColors);
+                    this->vertex_push_colour (clr, this->vertexColors);
                 }
                 // Added 2*segments vertices to vertexPositions
                 for (std::int32_t j = 0; j < static_cast<std::int32_t>(this->numsegs); j++) {

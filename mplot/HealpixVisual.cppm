@@ -51,7 +51,7 @@ export namespace mplot
         {
             size_t n_data = this->n_pixels();
 
-            if (this->vertexColors.size() < n_data * 3) {
+            if (this->vertexColors.size() < n_data * this->ncol) {
                 throw std::runtime_error ("vertexColors is not big enough to reinitColours()");
             }
 
@@ -64,16 +64,18 @@ export namespace mplot
                 // Re-colour
                 for (size_t i = 0u; i < n_data; ++i) {
                     auto c = this->cm.convert (scaled_data[i]);
-                    this->vertexColors[3*i] = c[0];
-                    this->vertexColors[3*i+1] = c[1];
-                    this->vertexColors[3*i+2] = c[2];
+                    this->vertexColors[this->ncol * i] = c[0];
+                    this->vertexColors[this->ncol * i + 1] = c[1];
+                    this->vertexColors[this->ncol * i + 2] = c[2];
+                    if (this->ncol == 4) { this->vertexColors[this->ncol * i + 3] = 1.0f; }
                 }
             } else {
                 // Use colour in colourdata directly, assuming it is in correct range (0->1 for each channel)
                 for (size_t i = 0u; i < n_data; ++i) {
-                    this->vertexColors[3*i] = (*colourdata)[i][0];
-                    this->vertexColors[3*i+1] = (*colourdata)[i][1];
-                    this->vertexColors[3*i+2] = (*colourdata)[i][2];
+                    this->vertexColors[this->ncol * i] = (*colourdata)[i][0];
+                    this->vertexColors[this->ncol * i + 1] = (*colourdata)[i][1];
+                    this->vertexColors[this->ncol * i + 2] = (*colourdata)[i][2];
+                    if (this->ncol == 4) { this->vertexColors[this->ncol * i + 3] = 1.0f; }
                 }
             }
 
@@ -410,7 +412,7 @@ export namespace mplot
                 }
                 // Add the vertex info for pixel p
                 this->vertex_push (vpf * this->r, this->vertexPositions);
-                this->vertex_push (sc, this->vertexColors);
+                this->vertex_push_colour (sc, this->vertexColors);
                 vpf.renormalize();
                 this->vertex_push (vpf, this->vertexNormals);
             }

@@ -114,14 +114,14 @@ export namespace mplot
                 // Start vertex 1
                 v1 = (*this->dataCoords)[r1];
                 this->vertex_push ((*this->dataCoords)[r1], this->vertexPositions);
-                this->vertex_push (this->cm.convert(dcopy[r1]), this->vertexColors);
+                this->vertex_push_colour (this->cm.convert(dcopy[r1]), this->vertexColors);
                 //this->vertex_push (0.0f, 0.0f, 1.0f, this->vertexNormals);
                 this->indices.push_back (this->idx);
                 this->idx++;
                 // Start vertex 2
                 v2 = (*this->dataCoords)[r2];
                 this->vertex_push ((*this->dataCoords)[r2], this->vertexPositions);
-                this->vertex_push (this->cm.convert(dcopy[r2]), this->vertexColors);
+                this->vertex_push_colour (this->cm.convert(dcopy[r2]), this->vertexColors);
                 //this->vertex_push (0.0f, 0.0f, 1.0f, this->vertexNormals);
                 this->indices.push_back (this->idx);
                 this->idx++;
@@ -223,7 +223,7 @@ export namespace mplot
                         r1 = r1n;
                         v0 = (*this->dataCoords)[r1];
                         this->vertex_push ((*this->dataCoords)[r1], this->vertexPositions);
-                        this->vertex_push (this->cm.convert(dcopy[r1]), this->vertexColors);
+                        this->vertex_push_colour (this->cm.convert(dcopy[r1]), this->vertexColors);
                         this->indices.push_back (this->idx);
                         this->idx++;
 
@@ -232,7 +232,7 @@ export namespace mplot
                         r2 = r2n;
                         v0 = (*this->dataCoords)[r2];
                         this->vertex_push ((*this->dataCoords)[r2], this->vertexPositions);
-                        this->vertex_push (this->cm.convert(dcopy[r2]), this->vertexColors);
+                        this->vertex_push_colour (this->cm.convert(dcopy[r2]), this->vertexColors);
                         this->indices.push_back (this->idx);
                         this->idx++;
                     }
@@ -252,14 +252,14 @@ export namespace mplot
                     // Next tri:
                     v1 = (*this->dataCoords)[r1];
                     this->vertex_push ((*this->dataCoords)[r1], this->vertexPositions);
-                    this->vertex_push (this->cm.convert(dcopy[r1]), this->vertexColors);
+                    this->vertex_push_colour (this->cm.convert(dcopy[r1]), this->vertexColors);
                     this->vertex_push (vnorm, this->vertexNormals);
                     this->indices.push_back (this->idx);
                     this->idx++;
 
                     v2 = (*this->dataCoords)[r2];
                     this->vertex_push ((*this->dataCoords)[r2], this->vertexPositions);
-                    this->vertex_push (this->cm.convert(dcopy[r2]), this->vertexColors);
+                    this->vertex_push_colour (this->cm.convert(dcopy[r2]), this->vertexColors);
                     this->vertex_push (vnorm, this->vertexNormals);
                     this->indices.push_back (this->idx);
                     this->idx++;

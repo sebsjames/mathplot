@@ -63,17 +63,17 @@ export namespace mplot
                     // Update from vectorData direct
                     size_t n_omm = this->vectorData->size();
 
-                    if (n_verts < 3 * n_omm) {
+                    if (n_verts < this->ncol * n_omm) {
                         throw std::runtime_error ("DoubleHexGridVisual: n_verts/n_omm sizes mismatch!");
                     }
 
                     for (size_t i = 0u; i < n_omm; ++i) {
                         // Update the 3 RGB values in vertexColors
                         std::array<float, 3> clr = this->cm.convert ((*this->vectorData)[i][0]/255.0f, (*this->vectorData)[i][1]/255.0f);
-                        this->vertexColors[i*3] = clr[0];
-                        this->vertexColors[i*3+1] = clr[1];
-                        this->vertexColors[i*3+2] = clr[2];
-                        //this->vertex_push (clr, this->vertexColors);
+                        this->vertexColors[i * this->ncol] = clr[0];
+                        this->vertexColors[i * this->ncol + 1] = clr[1];
+                        this->vertexColors[i * this->ncol + 2] = clr[2];
+                        if (this->ncol == 4) { this->vertexColors[i * this->ncol + 3] = 1.0f; }
                     }
                 }
 
@@ -98,19 +98,20 @@ export namespace mplot
                         std::array<float, 3> clr = this->setColour (i);
                         for (size_t j = 0u; j < 7; ++j) {
 
-                            size_t base = i * (3 * 7) + j * 3;
+                            size_t base = i * (this->ncol * 7) + j * this->ncol;
 
                             // Hacky! FIXME when more awake
                             if (this->cm.getType() == mplot::ColourMapType::HSV) {
                                 this->vertexColors[base] = clr[0];
-                                this->vertexColors[base+1] = clr[1];
-                                this->vertexColors[base+2] = clr[2];
+                                this->vertexColors[base + 1] = clr[1];
+                                this->vertexColors[base + 2] = clr[2];
                             } else {
                                 // convert?
                                 this->vertexColors[base] = (*this->vectorData)[i][0];
-                                this->vertexColors[base+1] = (*this->vectorData)[i][1];
-                                this->vertexColors[base+2] = (*this->vectorData)[i][2];
+                                this->vertexColors[base + 1] = (*this->vectorData)[i][1];
+                                this->vertexColors[base + 2] = (*this->vectorData)[i][2];
                             }
+                            if (this->ncol == 4) { this->vertexColors[base + 3] = 1.0f; }
                         }
                     }
                 }
@@ -167,17 +168,17 @@ export namespace mplot
                     // If dataCoords has been populated, use these for hex positions, allowing for
                     // mapping of the 2D HexGrid onto a 3D manifold.
                     if (this->dataCoords == nullptr) {
-                        this->vertex_push (this->zoom*this->hg->d_x[hi],
-                                           this->zoom*this->hg->d_y[hi],
-                                           this->zoom*this->dcopy[hi], this->vertexPositions);
+                        this->vertex_push (this->zoom * this->hg->d_x[hi],
+                                           this->zoom * this->hg->d_y[hi],
+                                           this->zoom * this->dcopy[hi], this->vertexPositions);
 
                     } else { // Otherwise use the positions directly in the HexGrid:
                         this->vertex_push ((*this->dataCoords)[dhi], this->vertexPositions);
                     }
                     if (this->markedHexes.count(hi)) {
-                        this->vertex_push (blkclr, this->vertexColors);
+                        this->vertex_push_colour (blkclr, this->vertexColors);
                     } else {
-                        this->vertex_push (clr, this->vertexColors);
+                        this->vertex_push_colour (clr, this->vertexColors);
                     }
                     this->vertex_push (0.0f, 0.0f, 1.0f, this->vertexNormals);
                 }
@@ -593,35 +594,35 @@ export namespace mplot
                     // marked, then three of the vertices are given the colour black,
                     // marking the hex out visually.
                     if (std::isnan(this->dcolour[hi])) {
-                        this->vertex_push (clr, this->vertexColors);
-                        this->vertex_push (blkclr, this->vertexColors);
-                        this->vertex_push (blkclr, this->vertexColors);
-                        this->vertex_push (blkclr, this->vertexColors);
-                        this->vertex_push (blkclr, this->vertexColors);
-                        this->vertex_push (blkclr, this->vertexColors);
-                        this->vertex_push (blkclr, this->vertexColors);
+                        this->vertex_push_colour (clr, this->vertexColors);
+                        this->vertex_push_colour (blkclr, this->vertexColors);
+                        this->vertex_push_colour (blkclr, this->vertexColors);
+                        this->vertex_push_colour (blkclr, this->vertexColors);
+                        this->vertex_push_colour (blkclr, this->vertexColors);
+                        this->vertex_push_colour (blkclr, this->vertexColors);
+                        this->vertex_push_colour (blkclr, this->vertexColors);
                     } else {
-                        this->vertex_push (clr, this->vertexColors);
+                        this->vertex_push_colour (clr, this->vertexColors);
                         if (this->markedHexes.count(hi)) {
-                            this->vertex_push (blkclr, this->vertexColors);
+                            this->vertex_push_colour (blkclr, this->vertexColors);
                         } else {
-                            this->vertex_push (clr, this->vertexColors);
+                            this->vertex_push_colour (clr, this->vertexColors);
                         }
 
-                        this->vertex_push (clr, this->vertexColors);
+                        this->vertex_push_colour (clr, this->vertexColors);
 
                         if (this->markedHexes.count(hi)) {
-                            this->vertex_push (blkclr, this->vertexColors);
+                            this->vertex_push_colour (blkclr, this->vertexColors);
                         } else {
-                            this->vertex_push (clr, this->vertexColors);
+                            this->vertex_push_colour (clr, this->vertexColors);
                         }
-                        this->vertex_push (clr, this->vertexColors);
+                        this->vertex_push_colour (clr, this->vertexColors);
                         if (this->markedHexes.count(hi)) {
-                            this->vertex_push (blkclr, this->vertexColors);
+                            this->vertex_push_colour (blkclr, this->vertexColors);
                         } else {
-                            this->vertex_push (clr, this->vertexColors);
+                            this->vertex_push_colour (clr, this->vertexColors);
                         }
-                        this->vertex_push (clr, this->vertexColors);
+                        this->vertex_push_colour (clr, this->vertexColors);
                     }
 
                     // Define indices now to produce the 6 triangles in the hex

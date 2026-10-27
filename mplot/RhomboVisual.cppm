@@ -154,7 +154,7 @@ export namespace mplot
 
             // Vertex colours are all the same
             for (std::uint16_t i = 0U; i < 24U; ++i) {
-                this->vertex_push (this->col, this->vertexColors);
+                this->vertex_push_colour (this->col, this->vertexColors);
             }
 
             // Indices for 6 faces
@@ -244,9 +244,9 @@ export namespace mplot
             // Vertex colours are NOT all the same
             mplot::ColourMap<float> cm (this->facecm);
             for (std::uint16_t i = 0U; i < 36U; i += 3) {
-                this->vertex_push (cm.convert(static_cast<float>(i) / 35.0f), this->vertexColors);
-                this->vertex_push (cm.convert(static_cast<float>(i) / 35.0f), this->vertexColors);
-                this->vertex_push (cm.convert(static_cast<float>(i) / 35.0f), this->vertexColors);
+                this->vertex_push_colour (cm.convert(static_cast<float>(i) / 35.0f), this->vertexColors);
+                this->vertex_push_colour (cm.convert(static_cast<float>(i) / 35.0f), this->vertexColors);
+                this->vertex_push_colour (cm.convert(static_cast<float>(i) / 35.0f), this->vertexColors);
             }
 
             // Indices for 6 faces.

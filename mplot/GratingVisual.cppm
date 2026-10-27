@@ -73,7 +73,7 @@ export namespace mplot
             this->vertex_push (fp2.plus_one_dim(), this->vertexPositions);
             this->vertex_push (fq2.plus_one_dim(), this->vertexPositions);
             for (std::uint32_t vi = 0; vi < 4; ++vi) {
-                this->vertex_push (_col, this->vertexColors);
+                this->vertex_push_colour (_col, this->vertexColors);
                 this->vertex_push (sm::vec<>::uz(), this->vertexNormals);
             }
             this->indices.push_back (this->idx);
@@ -424,7 +424,7 @@ export namespace mplot
                     this->vertex_push (fq.plus_one_dim(), this->vertexPositions);
                     this->vertex_push (corner.plus_one_dim(), this->vertexPositions);
                     for (std::uint32_t vi = 0; vi < 3; ++vi) {
-                        this->vertex_push (_col, this->vertexColors);
+                        this->vertex_push_colour (_col, this->vertexColors);
                         this->vertex_push (sm::vec<>::uz(), this->vertexNormals);
                         this->indices.push_back (this->idx++);
                     }
@@ -435,7 +435,7 @@ export namespace mplot
                     this->vertex_push (fq.plus_one_dim(), this->vertexPositions);
                     this->vertex_push (corner_2.plus_one_dim(), this->vertexPositions);
                     for (std::uint32_t vi = 0; vi < 4; ++vi) {
-                        this->vertex_push (_col, this->vertexColors);
+                        this->vertex_push_colour (_col, this->vertexColors);
                         this->vertex_push (sm::vec<>::uz(), this->vertexNormals);
                     }
                     this->indices.push_back (this->idx);

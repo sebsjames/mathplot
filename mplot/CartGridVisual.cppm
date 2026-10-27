@@ -130,7 +130,7 @@ export namespace mplot
                 std::array<float, 3> clr = this->setColour (ri);
                 this->vertex_push (this->cg->d_x[ri]+centering_offset[0],
                                    this->cg->d_y[ri]+centering_offset[1], this->dcopy[ri], this->vertexPositions);
-                this->vertex_push (clr, this->vertexColors);
+                this->vertex_push_colour (clr, this->vertexColors);
                 this->vertex_push (0.0f, 0.0f, 1.0f, this->vertexNormals);
             }
 
@@ -285,11 +285,11 @@ export namespace mplot
                 this->vertex_push (vnorm, this->vertexNormals);
 
                 // Five vertices with the same colour
-                this->vertex_push (clr, this->vertexColors);
-                this->vertex_push (clr, this->vertexColors);
-                this->vertex_push (clr, this->vertexColors);
-                this->vertex_push (clr, this->vertexColors);
-                this->vertex_push (clr, this->vertexColors);
+                this->vertex_push_colour (clr, this->vertexColors);
+                this->vertex_push_colour (clr, this->vertexColors);
+                this->vertex_push_colour (clr, this->vertexColors);
+                this->vertex_push_colour (clr, this->vertexColors);
+                this->vertex_push_colour (clr, this->vertexColors);
 
                 // Define indices now to produce the 4 triangles in the hex
                 this->indices.push_back (this->idx+1);
@@ -360,13 +360,13 @@ export namespace mplot
                     this->vertex_push (vnorm, this->vertexNormals);
 
                     // Seven vertices with the same colour
-                    this->vertex_push (clr, this->vertexColors);
-                    this->vertex_push (clr, this->vertexColors);
-                    this->vertex_push (clr, this->vertexColors);
-                    this->vertex_push (clr, this->vertexColors);
-                    this->vertex_push (clr, this->vertexColors);
-                    this->vertex_push (clr, this->vertexColors);
-                    this->vertex_push (clr, this->vertexColors);
+                    this->vertex_push_colour (clr, this->vertexColors);
+                    this->vertex_push_colour (clr, this->vertexColors);
+                    this->vertex_push_colour (clr, this->vertexColors);
+                    this->vertex_push_colour (clr, this->vertexColors);
+                    this->vertex_push_colour (clr, this->vertexColors);
+                    this->vertex_push_colour (clr, this->vertexColors);
+                    this->vertex_push_colour (clr, this->vertexColors);
 
                     // Define indices now to produce the 6 triangles in the hex
                     this->indices.push_back (this->idx+1);

@@ -76,6 +76,8 @@ export namespace mplot
         //! Initialize vertex buffer objects and vertex array object.
         void initializeVertices()
         {
+            if (value_ptr != nullptr) { this->value = *value_ptr; }
+
             // Draw a rectangle in the x-y plane. That's it.
             this->computeRectangle (width, this->cm.convert (this->colourScale.transform_one (this->value))); // 4 indices
 
@@ -94,18 +96,22 @@ export namespace mplot
         // reinitColours to change the last rectangles worth of colour
         void reinitColours()
         {
+            if (value_ptr != nullptr) { this->value = *value_ptr; }
             // Change colour of just the rectangle
             auto c = this->cm.convert (this->colourScale.transform_one (this->value));
             for (std::size_t i = 0u; i < 4u; ++i) {
-                this->vertexColors[3 * i] = c[0];
-                this->vertexColors[3 * i + 1] = c[1];
-                this->vertexColors[3 * i + 2] = c[2];
+                this->vertexColors[this->ncol * i] = c[0];
+                this->vertexColors[this->ncol * i + 1] = c[1];
+                this->vertexColors[this->ncol * i + 2] = c[2];
+                if (this->ncol == 4) { this->vertexColors[this->ncol * i + 3] = 1.0f; }
             }
             this->reinit_colour_buffer();
         }
 
         // The scalar value to indicate
         T value = T{0};
+        // If a pointer is set, use that instead
+        T* value_ptr = nullptr;
         // The colour map to use
         ColourMap<float> cm;
         // A Scaling function for the colour map.

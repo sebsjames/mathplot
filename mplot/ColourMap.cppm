@@ -1746,6 +1746,16 @@ export namespace mplot
         std::array<float, 3> convert (T _datum1, T _datum2) const
         {
             std::array<float, 3> c = {0.0f, 0.0f, 0.0f};
+
+            // Check for nan and return a 'nan' colour for the colour map as necessary
+            if constexpr (std::is_same<std::decay_t<T>, double>::value == true
+                          || std::is_same<std::decay_t<T>, float>::value == true) {
+                if (std::isnan(_datum1) == true || std::isnan(_datum2) == true) {
+                    c = ColourMap<T>::nanColour (this->type);
+                    return c;
+                }
+            }
+
             if (this->type == ColourMapType::Duochrome) {
                 c = this->duochrome (_datum1, _datum2);
             } else if (this->type == ColourMapType::HSV
@@ -1824,6 +1834,16 @@ export namespace mplot
                 throw std::runtime_error ("Set ColourMapType to Trichrome, RGB, RGBMono or RGBGrey.");
             }
             std::array<float, 3> clr = { 0.0f, 0.0f, 0.0f };
+
+            // Check for nan and return a 'nan' colour for the colour map
+            if constexpr (std::is_same<std::decay_t<T>, double>::value == true
+                          || std::is_same<std::decay_t<T>, float>::value == true) {
+                if (std::isnan(_datum1) == true || std::isnan(_datum2) == true || std::isnan(_datum3) == true) {
+                    clr = ColourMap<T>::nanColour (this->type);
+                    return clr;
+                }
+            }
+
             switch (this->type) {
             case ColourMapType::Trichrome:
             {

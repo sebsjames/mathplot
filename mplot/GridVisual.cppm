@@ -113,7 +113,7 @@ export namespace mplot
                 break;
             }
             }
-            if (this->vertexColors.size() < n_data * n_cvertices_per_datum * 3) {
+            if (this->vertexColors.size() < n_data * n_cvertices_per_datum * this->ncol) {
                 throw std::runtime_error ("vertexColors is not big enough to reinitColours()");
             }
 
@@ -457,10 +457,11 @@ export namespace mplot
             I vnsz = static_cast<I>(this->vertexNormals.size());
             // How many additional vertices?
             I add_v = this->grid->n() * I{3};
+            I add_v_c = this->grid->n() * static_cast<I>(this->ncol);
 
             // Additional space in vertexPositions/Colors/Normals
             this->vertexPositions.resize (vpsz + add_v);
-            this->vertexColors.resize (vcsz + add_v);
+            this->vertexColors.resize (vcsz + add_v_c);
             this->vertexNormals.resize (vnsz + add_v);
 
             I vidx = 0;
@@ -472,10 +473,11 @@ export namespace mplot
                 this->vertexPositions[vidx++] = (*this->grid)[ri][1] + centering_offset[1];
                 this->vertexPositions[vidx++] = this->dcopy[ri];
 
-                vidx = vcsz + ri * 3;
+                vidx = vcsz + ri * this->ncol;
                 this->vertexColors[vidx++] = clr[0];
                 this->vertexColors[vidx++] = clr[1];
                 this->vertexColors[vidx++] = clr[2];
+                if (this->ncol == 4) { this->vertexColors[vidx++] = 1.0f; }
 
                 vidx = vnsz + ri * 3;
                 this->vertexNormals[vidx++] = 0.0f;
@@ -703,11 +705,11 @@ export namespace mplot
                 this->vertex_push (vnorm, this->vertexNormals);
 
                 // Five vertices with the same colour
-                this->vertex_push (clr, this->vertexColors);
-                this->vertex_push (clr, this->vertexColors);
-                this->vertex_push (clr, this->vertexColors);
-                this->vertex_push (clr, this->vertexColors);
-                this->vertex_push (clr, this->vertexColors);
+                this->vertex_push_colour (clr, this->vertexColors);
+                this->vertex_push_colour (clr, this->vertexColors);
+                this->vertex_push_colour (clr, this->vertexColors);
+                this->vertex_push_colour (clr, this->vertexColors);
+                this->vertex_push_colour (clr, this->vertexColors);
 
                 // Define indices now to produce the 4 triangles in the pixel
                 this->indices.push_back (this->idx+1);
@@ -842,32 +844,32 @@ export namespace mplot
                 this->vertex_push (vnorm_n, this->vertexNormals);
 
                 // Five vertices with the same colour
-                this->vertex_push (clr, this->vertexColors);
-                this->vertex_push (clr, this->vertexColors);
-                this->vertex_push (clr, this->vertexColors);
-                this->vertex_push (clr, this->vertexColors);
-                this->vertex_push (clr, this->vertexColors);
+                this->vertex_push_colour (clr, this->vertexColors);
+                this->vertex_push_colour (clr, this->vertexColors);
+                this->vertex_push_colour (clr, this->vertexColors);
+                this->vertex_push_colour (clr, this->vertexColors);
+                this->vertex_push_colour (clr, this->vertexColors);
 
                 if (this->options.test (gridvisual_flags::interpolate_colour_sides) == true) {
-                    this->vertex_push (clr, this->vertexColors);
-                    this->vertex_push (clr, this->vertexColors);
-                    this->vertex_push (clr_e, this->vertexColors);
-                    this->vertex_push (clr_e, this->vertexColors);
+                    this->vertex_push_colour (clr, this->vertexColors);
+                    this->vertex_push_colour (clr, this->vertexColors);
+                    this->vertex_push_colour (clr_e, this->vertexColors);
+                    this->vertex_push_colour (clr_e, this->vertexColors);
 
-                    this->vertex_push (clr, this->vertexColors);
-                    this->vertex_push (clr, this->vertexColors);
-                    this->vertex_push (clr_n, this->vertexColors);
-                    this->vertex_push (clr_n, this->vertexColors);
+                    this->vertex_push_colour (clr, this->vertexColors);
+                    this->vertex_push_colour (clr, this->vertexColors);
+                    this->vertex_push_colour (clr_n, this->vertexColors);
+                    this->vertex_push_colour (clr_n, this->vertexColors);
                 } else {
-                    this->vertex_push (this->clr_east_column, this->vertexColors);
-                    this->vertex_push (this->clr_east_column, this->vertexColors);
-                    this->vertex_push (this->clr_east_column, this->vertexColors);
-                    this->vertex_push (this->clr_east_column, this->vertexColors);
+                    this->vertex_push_colour (this->clr_east_column, this->vertexColors);
+                    this->vertex_push_colour (this->clr_east_column, this->vertexColors);
+                    this->vertex_push_colour (this->clr_east_column, this->vertexColors);
+                    this->vertex_push_colour (this->clr_east_column, this->vertexColors);
 
-                    this->vertex_push (this->clr_north_column, this->vertexColors);
-                    this->vertex_push (this->clr_north_column, this->vertexColors);
-                    this->vertex_push (this->clr_north_column, this->vertexColors);
-                    this->vertex_push (this->clr_north_column, this->vertexColors);
+                    this->vertex_push_colour (this->clr_north_column, this->vertexColors);
+                    this->vertex_push_colour (this->clr_north_column, this->vertexColors);
+                    this->vertex_push_colour (this->clr_north_column, this->vertexColors);
+                    this->vertex_push_colour (this->clr_north_column, this->vertexColors);
                 }
 
                 // Define indices now to produce the 4 triangles in the pixel
@@ -985,11 +987,11 @@ export namespace mplot
                 this->vertex_push (vnorm, this->vertexNormals);
 
                 // Five vertices with the same colour
-                this->vertex_push (clr, this->vertexColors);
-                this->vertex_push (clr, this->vertexColors);
-                this->vertex_push (clr, this->vertexColors);
-                this->vertex_push (clr, this->vertexColors);
-                this->vertex_push (clr, this->vertexColors);
+                this->vertex_push_colour (clr, this->vertexColors);
+                this->vertex_push_colour (clr, this->vertexColors);
+                this->vertex_push_colour (clr, this->vertexColors);
+                this->vertex_push_colour (clr, this->vertexColors);
+                this->vertex_push_colour (clr, this->vertexColors);
 
                 // Define indices now to produce the 4 triangles in the pixel
                 this->indices.push_back (this->idx+1);
@@ -1154,11 +1156,12 @@ export namespace mplot
             // Replace elements of vertexColors
             for (std::size_t i = 0u; i < n_data; ++i) {
                 auto c = this->cm.convert (this->dcolour[i]);
-                std::size_t d_idx = 3 * i * n_cvertices_per_datum;
+                std::size_t d_idx = this->ncol * i * n_cvertices_per_datum;
                 for (std::size_t j = 0; j < n_cvertices_per_datum; ++j) {
-                    this->vertexColors[d_idx + 3 * j] = c[0];
-                    this->vertexColors[d_idx + 3 * j + 1] = c[1];
-                    this->vertexColors[d_idx + 3 * j + 2] = c[2];
+                    this->vertexColors[d_idx + this->ncol * j] = c[0];
+                    this->vertexColors[d_idx + this->ncol * j + 1] = c[1];
+                    this->vertexColors[d_idx + this->ncol * j + 2] = c[2];
+                    if (this->ncol == 4) { this->vertexColors[d_idx + this->ncol * j + 3] = 1.0f; }
                 }
             }
 
@@ -1189,9 +1192,10 @@ export namespace mplot
                 std::array<float, 3> c = this->setColour (i);
                 std::size_t d_idx = 3 * i * n_cvertices_per_datum;
                 for (std::size_t j = 0; j < n_cvertices_per_datum; ++j) {
-                    this->vertexColors[d_idx + 3 * j] = c[0];
-                    this->vertexColors[d_idx + 3 * j + 1] = c[1];
-                    this->vertexColors[d_idx + 3 * j + 2] = c[2];
+                    this->vertexColors[d_idx + this->ncol * j] = c[0];
+                    this->vertexColors[d_idx + this->ncol * j + 1] = c[1];
+                    this->vertexColors[d_idx + this->ncol * j + 2] = c[2];
+                    if (this->ncol == 4) { this->vertexColors[d_idx + this->ncol * j + 3] = 1.0f; }
                 }
             }
 

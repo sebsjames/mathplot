@@ -136,11 +136,11 @@ export namespace mplot
                     sm::vec<float> c_in = sm::vec<>::uy() * sin(t) * r_in + sm::vec<>::ux() * cos(t) * r_in;
                     this->vertex_push (centre+c_in, this->vertexPositions);
                     this->vertex_push (sm::vec<>::uz(), this->vertexNormals);
-                    this->vertex_push (col_in, this->vertexColors);
+                    this->vertex_push_colour (col_in, this->vertexColors);
                     sm::vec<float> c_out = sm::vec<>::uy() * sin(t) * r_out + sm::vec<>::ux() * cos(t) * r_out;
                     this->vertex_push (centre+c_out, this->vertexPositions);
                     this->vertex_push (sm::vec<>::uz(), this->vertexNormals);
-                    this->vertex_push (col_out, this->vertexColors);
+                    this->vertex_push_colour (col_out, this->vertexColors);
                 }
                 // Added 2*segments vertices to vertexPositions
 

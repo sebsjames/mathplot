@@ -144,7 +144,7 @@ export namespace mplot
                 for (size_t i = 0u; i < n_data; ++i) {
                     // Update the 3 RGB values in vertexColors
                     for (std::int32_t ci = 0; ci < (this->colourFaces == true ? 3 : 1); ++ci) {
-                        this->vertex_push (cdata[i], this->vertexColors);
+                        this->vertex_push_colour (cdata[i], this->vertexColors);
                     }
                 }
 
@@ -171,7 +171,7 @@ export namespace mplot
                     // Update the 3 RGB values in vertexColors
                     auto c = this->cm.convert (scaled_data[i]);
                     for (std::int32_t ci = 0; ci < (this->colourFaces == true ? 3 : 1); ++ci) {
-                        this->vertex_push (c, this->vertexColors);
+                        this->vertex_push_colour (c, this->vertexColors);
                     }
                 }
             }

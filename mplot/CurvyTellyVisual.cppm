@@ -181,11 +181,11 @@ export namespace mplot
                 this->vertex_push (vnorm, this->vertexNormals);
 
                 // Five vertices with the same colour
-                this->vertex_push (clr, this->vertexColors);
-                this->vertex_push (clr, this->vertexColors);
-                this->vertex_push (clr, this->vertexColors);
-                this->vertex_push (clr, this->vertexColors);
-                this->vertex_push (clr, this->vertexColors);
+                this->vertex_push_colour (clr, this->vertexColors);
+                this->vertex_push_colour (clr, this->vertexColors);
+                this->vertex_push_colour (clr, this->vertexColors);
+                this->vertex_push_colour (clr, this->vertexColors);
+                this->vertex_push_colour (clr, this->vertexColors);
 
                 // Define indices now to produce the 4 triangles in the hex
                 this->indices.push_back (this->idx);

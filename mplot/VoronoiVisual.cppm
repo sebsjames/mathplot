@@ -451,12 +451,13 @@ export namespace mplot
             std::uint32_t tcounts = 0;
             for (std::size_t i = 0u; i < this->triangle_counts.size(); ++i) {
                 auto c = this->cm.convert (this->dcolour[this->site_indices[i]]);
-                std::size_t d_idx = tcounts * 9; // 3 floats per vtx, 3 vtxs per tri
+                std::size_t d_idx = tcounts * 3 * this->ncol; // ncol floats per vtx, 3 vtxs per tri
                 for (std::size_t j = 0; j < 3 * this->triangle_counts[i]; ++j) {
                     // This is ONE colour vertex. Need 3 per triangle.
-                    this->vertexColors[d_idx + 3 * j]     = c[0];
-                    this->vertexColors[d_idx + 3 * j + 1] = c[1];
-                    this->vertexColors[d_idx + 3 * j + 2] = c[2];
+                    this->vertexColors[d_idx + this->ncol * j]     = c[0];
+                    this->vertexColors[d_idx + this->ncol * j + 1] = c[1];
+                    this->vertexColors[d_idx + this->ncol * j + 2] = c[2];
+                    if (this->ncol == 4) { this->vertexColors[d_idx + this->ncol * j + 3] = 1.0f; }
                 }
                 tcounts += this->triangle_counts[i];
             }
@@ -489,12 +490,13 @@ export namespace mplot
             std::uint32_t tcounts = 0;
             for (std::size_t i = 0u; i < this->triangle_counts.size(); ++i) {
                 std::array<float, 3> c = this->setColour (this->site_indices[i]);
-                std::size_t d_idx = tcounts * 9; // 3 floats per vtx, 3 vtxs per tri
+                std::size_t d_idx = tcounts * 3 * this->ncol; // ncol floats per vtx, 3 vtxs per tri
                 for (std::size_t j = 0; j < 3 * this->triangle_counts[i]; ++j) {
                     // This is ONE colour vertex. Need 3 per triangle.
-                    this->vertexColors[d_idx + 3 * j]     = c[0];
-                    this->vertexColors[d_idx + 3 * j + 1] = c[1];
-                    this->vertexColors[d_idx + 3 * j + 2] = c[2];
+                    this->vertexColors[d_idx + this->ncol * j]     = c[0];
+                    this->vertexColors[d_idx + this->ncol * j + 1] = c[1];
+                    this->vertexColors[d_idx + this->ncol * j + 2] = c[2];
+                    if (this->ncol == 4) { this->vertexColors[d_idx + this->ncol * j + 3] = 1.0f; }
                 }
                 tcounts += this->triangle_counts[i];
             }
@@ -505,7 +507,7 @@ export namespace mplot
 
         void reinitColours()
         {
-            if (this->vertexColors.size() < this->triangle_count_sum * 3) {
+            if (this->vertexColors.size() < this->triangle_count_sum * this->ncol) {
                 throw std::runtime_error ("vertexColors is not big enough to reinitColours()");
             }
 
@@ -572,7 +574,7 @@ export namespace mplot
             this->vertex_push (c3, this->vertexPositions);
             // Colours/normals
             for (std::uint32_t i = 0; i < 3U; ++i) {
-                this->vertex_push (colr, this->vertexColors);
+                this->vertex_push_colour (colr, this->vertexColors);
                 this->vertex_push (v, this->vertexNormals);
             }
             this->indices.push_back (this->idx++);

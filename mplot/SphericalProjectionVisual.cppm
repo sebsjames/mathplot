@@ -71,7 +71,7 @@ export namespace mplot
             this->vertex_push (c3.as_float(), this->vertexPositions);
             // Colours/normals
             for (std::uint32_t i = 0; i < 3U; ++i) {
-                this->vertex_push (colr, this->vertexColors);
+                this->vertex_push_colour (colr, this->vertexColors);
                 this->vertex_push (v.as_float(), this->vertexNormals);
             }
             this->indices.push_back (this->idx++);

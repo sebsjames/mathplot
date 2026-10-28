@@ -132,9 +132,9 @@ export namespace mplot
             // Binds data from the "C++ world" to the OpenGL shader world for
             // "position", "normalin" and "color"
             // (bind, buffer and set vertex array object attribute)
-            this->setupVBO (this->vbos[this->posnVBO], this->vertexPositions, visgl::posnLoc);
-            this->setupVBO (this->vbos[this->normVBO], this->vertexNormals, visgl::normLoc);
-            this->setupVBO (this->vbos[this->colVBO], this->vertexColors, visgl::colLoc);
+            this->setupVBO (this->vbos[this->posnVBO], this->vertexPositions, visgl::posnLoc, 3);
+            this->setupVBO (this->vbos[this->normVBO], this->vertexNormals, visgl::normLoc, 3);
+            this->setupVBO (this->vbos[this->colVBO], this->vertexColors, visgl::colLoc, this->ncol);
 
             // Unbind only the vertex array (not the buffers, that causes GL_INVALID_ENUM errors)
             glfn->BindVertexArray(0); // carefully unbind and rebind
@@ -172,9 +172,9 @@ export namespace mplot
                 // Binds data from the "C++ world" to the OpenGL shader world for
                 // "position", "normalin" and "color"
                 // (bind, buffer and set vertex array object attribute)
-                this->setupVBO (this->vbos_bb[this->posnVBO], this->vpos_bb, visgl::posnLoc);
-                this->setupVBO (this->vbos_bb[this->normVBO], this->vnorm_bb, visgl::normLoc);
-                this->setupVBO (this->vbos_bb[this->colVBO], this->vcol_bb, visgl::colLoc);
+                this->setupVBO (this->vbos_bb[this->posnVBO], this->vpos_bb, visgl::posnLoc, 3);
+                this->setupVBO (this->vbos_bb[this->normVBO], this->vnorm_bb, visgl::normLoc, 3);
+                this->setupVBO (this->vbos_bb[this->colVBO], this->vcol_bb, visgl::colLoc, this->ncol);
 
                 // Unbind only the vertex array (not the buffers, that causes GL_INVALID_ENUM errors)
                 glfn->BindVertexArray(0); // carefully unbind and rebind
@@ -352,9 +352,9 @@ export namespace mplot
 
             std::size_t sz = this->indices.size() * sizeof(std::uint32_t);
             glfn->BufferData (GL_ELEMENT_ARRAY_BUFFER, sz, this->indices.data(), GL_STATIC_DRAW);
-            this->setupVBO (this->vbos[this->posnVBO], this->vertexPositions, visgl::posnLoc);
-            this->setupVBO (this->vbos[this->normVBO], this->vertexNormals, visgl::normLoc);
-            this->setupVBO (this->vbos[this->colVBO], this->vertexColors, visgl::colLoc);
+            this->setupVBO (this->vbos[this->posnVBO], this->vertexPositions, visgl::posnLoc, 3);
+            this->setupVBO (this->vbos[this->normVBO], this->vertexNormals, visgl::normLoc, 3);
+            this->setupVBO (this->vbos[this->colVBO], this->vertexColors, visgl::colLoc, this->ncol);
 
             glfn->BindVertexArray(0);                                // carefully unbind and rebind
             mplot::gl::Util::checkError (__FILE__, __LINE__, glfn);  // carefully unbind and rebind
@@ -366,9 +366,9 @@ export namespace mplot
 
                 std::size_t sz = this->indices_bb.size() * sizeof(std::uint32_t);
                 glfn->BufferData (GL_ELEMENT_ARRAY_BUFFER, sz, this->indices_bb.data(), GL_STATIC_DRAW);
-                this->setupVBO (this->vbos_bb[this->posnVBO], this->vpos_bb, visgl::posnLoc);
-                this->setupVBO (this->vbos_bb[this->normVBO], this->vnorm_bb, visgl::normLoc);
-                this->setupVBO (this->vbos_bb[this->colVBO], this->vcol_bb, visgl::colLoc);
+                this->setupVBO (this->vbos_bb[this->posnVBO], this->vpos_bb, visgl::posnLoc, 3);
+                this->setupVBO (this->vbos_bb[this->normVBO], this->vnorm_bb, visgl::normLoc, 3);
+                this->setupVBO (this->vbos_bb[this->colVBO], this->vcol_bb, visgl::colLoc, this->ncol);
 
                 glfn->BindVertexArray(0);
                 mplot::gl::Util::checkError (__FILE__, __LINE__, glfn);
@@ -383,7 +383,7 @@ export namespace mplot
             GladGLContext* glfn = mplot::VisualResources<glver>::i().get_glfn (this->parentVis);
             // Now re-set up the VBOs
             glfn->BindVertexArray (this->vao);  // carefully unbind and rebind
-            this->setupVBO (this->vbos[this->colVBO], this->vertexColors, visgl::colLoc);
+            this->setupVBO (this->vbos[this->colVBO], this->vertexColors, visgl::colLoc, this->ncol);
             glfn->BindVertexArray(0);  // carefully unbind and rebind
             mplot::gl::Util::checkError (__FILE__, __LINE__, glfn);
         }
@@ -468,7 +468,7 @@ export namespace mplot
         {
             this->vertexPositions.reserve (3u * n_vertices);
             this->vertexNormals.reserve (3u * n_vertices);
-            this->vertexColors.reserve (3u * n_vertices);
+            this->vertexColors.reserve (this->ncol * n_vertices);
             this->indices.reserve (6u * n_vertices);
         }
 
@@ -1085,13 +1085,10 @@ export namespace mplot
                 throw std::runtime_error ("Expect vertexPositions, Colors and Normals vectors all to have same size");
             }
 
-            for (std::size_t i = 0u; i < this->vertexPositions.size(); i+=3u) {
+            for (std::size_t i = 0u; i < this->vertexPositions.size(); i += 3u) {
                 vpos_maxes[0] =  (vertexPositions[i] > vpos_maxes[0]) ? vertexPositions[i] : vpos_maxes[0];
                 vpos_maxes[1] =  (vertexPositions[i+1] > vpos_maxes[1]) ? vertexPositions[i+1] : vpos_maxes[1];
                 vpos_maxes[2] =  (vertexPositions[i+2] > vpos_maxes[2]) ? vertexPositions[i+2] : vpos_maxes[2];
-                vcol_maxes[0] =  (vertexColors[i] > vcol_maxes[0]) ? vertexColors[i] : vcol_maxes[0];
-                vcol_maxes[1] =  (vertexColors[i+1] > vcol_maxes[1]) ? vertexColors[i+1] : vcol_maxes[1];
-                vcol_maxes[2] =  (vertexColors[i+2] > vcol_maxes[2]) ? vertexColors[i+2] : vcol_maxes[2];
                 vnorm_maxes[0] =  (vertexNormals[i] > vnorm_maxes[0]) ? vertexNormals[i] : vnorm_maxes[0];
                 vnorm_maxes[1] =  (vertexNormals[i+1] > vnorm_maxes[1]) ? vertexNormals[i+1] : vnorm_maxes[1];
                 vnorm_maxes[2] =  (vertexNormals[i+2] > vnorm_maxes[2]) ? vertexNormals[i+2] : vnorm_maxes[2];
@@ -1099,12 +1096,17 @@ export namespace mplot
                 vpos_mins[0] =  (vertexPositions[i] < vpos_mins[0]) ? vertexPositions[i] : vpos_mins[0];
                 vpos_mins[1] =  (vertexPositions[i+1] < vpos_mins[1]) ? vertexPositions[i+1] : vpos_mins[1];
                 vpos_mins[2] =  (vertexPositions[i+2] < vpos_mins[2]) ? vertexPositions[i+2] : vpos_mins[2];
-                vcol_mins[0] =  (vertexColors[i] < vcol_mins[0]) ? vertexColors[i] : vcol_mins[0];
-                vcol_mins[1] =  (vertexColors[i+1] < vcol_mins[1]) ? vertexColors[i+1] : vcol_mins[1];
-                vcol_mins[2] =  (vertexColors[i+2] < vcol_mins[2]) ? vertexColors[i+2] : vcol_mins[2];
                 vnorm_mins[0] =  (vertexNormals[i] < vnorm_mins[0]) ? vertexNormals[i] : vnorm_mins[0];
                 vnorm_mins[1] =  (vertexNormals[i+1] < vnorm_mins[1]) ? vertexNormals[i+1] : vnorm_mins[1];
                 vnorm_mins[2] =  (vertexNormals[i+2] < vnorm_mins[2]) ? vertexNormals[i+2] : vnorm_mins[2];
+            }
+            for (std::size_t i = 0u; i < this->vertexPositions.size(); i += this->ncol) {
+                vcol_maxes[0] =  (vertexColors[i] > vcol_maxes[0]) ? vertexColors[i] : vcol_maxes[0];
+                vcol_maxes[1] =  (vertexColors[i+1] > vcol_maxes[1]) ? vertexColors[i+1] : vcol_maxes[1];
+                vcol_maxes[2] =  (vertexColors[i+2] > vcol_maxes[2]) ? vertexColors[i+2] : vcol_maxes[2];
+                vcol_mins[0] =  (vertexColors[i] < vcol_mins[0]) ? vertexColors[i] : vcol_mins[0];
+                vcol_mins[1] =  (vertexColors[i+1] < vcol_mins[1]) ? vertexColors[i+1] : vcol_mins[1];
+                vcol_mins[2] =  (vertexColors[i+2] < vcol_mins[2]) ? vertexColors[i+2] : vcol_mins[2];
             }
         }
 
@@ -1396,6 +1398,9 @@ export namespace mplot
         //! CPU-side data for vertex colours
         std::vector<float> vertexColors = {};
 
+        //! Number of elements in a colour (if 4, then last element is alpha)
+        std::uint32_t ncol = 3;
+
         // OpenGL arrays for the bounding box, if needed
         std::uint32_t vao_bb = 0;
         std::unique_ptr<std::uint32_t[]> vbos_bb;
@@ -1435,8 +1440,9 @@ export namespace mplot
         //! A vector of pointers to text models that should be rendered.
         std::vector<std::unique_ptr<mplot::VisualTextModel<glver>>> texts;
 
-        //! Set up a vertex buffer object - bind, buffer and set vertex array object attribute
-        void setupVBO (std::uint32_t& buf, std::vector<float>& dat, std::uint32_t bufferAttribPosition)
+        //! Set up a vertex buffer object - bind, buffer and set vertex array object
+        //! attribute. n_dims = 3 for position, normal, 3 or 4 for colour.
+        void setupVBO (std::uint32_t& buf, std::vector<float>& dat, std::uint32_t bufferAttribPosition, std::uint32_t n_dims)
         {
             std::size_t sz = dat.size() * sizeof(float);
 
@@ -1448,7 +1454,7 @@ export namespace mplot
             mplot::gl::Util::checkError (__FILE__, __LINE__, glfn);
             glfn->BufferData (GL_ARRAY_BUFFER, sz, dat.data(), GL_STATIC_DRAW);
             mplot::gl::Util::checkError (__FILE__, __LINE__, glfn);
-            glfn->VertexAttribPointer (bufferAttribPosition, 3, GL_FLOAT, GL_FALSE, 0, (void*)(0));
+            glfn->VertexAttribPointer (bufferAttribPosition, n_dims, GL_FLOAT, GL_FALSE, 0, (void*)(0));
             mplot::gl::Util::checkError (__FILE__, __LINE__, glfn);
             glfn->EnableVertexAttribArray (bufferAttribPosition);
             mplot::gl::Util::checkError (__FILE__, __LINE__, glfn);
@@ -1461,13 +1467,23 @@ export namespace mplot
             vp.emplace_back (y);
             vp.emplace_back (z);
         }
-        //! Push array of 3 floats onto the vector of floats \a vp
+        //! Push four floats onto the vector of floats \a vp
+        void vertex_push (const float& x, const float& y, const float& z, const float& w, std::vector<float>& vp)
+        {
+            vp.emplace_back (x);
+            vp.emplace_back (y);
+            vp.emplace_back (z);
+            vp.emplace_back (w);
+        }
+        //! Push array of 3 floats onto the vector of floats \a vp N is the number of dimensions in
+        //! the passed in normal or position arr, but only 3 are ever stored.
         template<std::size_t N = 3> requires (N == 3 || N == 4)
         void vertex_push (const std::array<float, N>& arr, std::vector<float>& vp)
         {
             vp.emplace_back (arr[0]);
             vp.emplace_back (arr[1]);
             vp.emplace_back (arr[2]);
+            // Ignore any fourth element
         }
         //! Push sm::vec of 3 floats onto the vector of floats \a vp
         template<std::size_t N = 3> requires (N == 3 || N == 4)
@@ -1476,6 +1492,37 @@ export namespace mplot
             vp.emplace_back (vec[0]);
             vp.emplace_back (vec[1]);
             vp.emplace_back (vec[2]);
+            // Ignore any fourth element
+        }
+        template<std::size_t N = 3> requires (N == 3 || N == 4)
+        void vertex_push_colour (const std::array<float, N>& arr, std::vector<float>& vp)
+        {
+            vp.emplace_back (arr[0]);
+            vp.emplace_back (arr[1]);
+            vp.emplace_back (arr[2]);
+            // For colour, fourth element may be alpha
+            if (this->ncol == 4) {
+                if constexpr (N == 4) {
+                    vp.emplace_back (arr[3]);
+                } else {
+                    vp.emplace_back (1.0f);
+                }
+            }
+        }
+        //! Push sm::vec of 3 floats onto the vector of floats \a vp
+        template<std::size_t N = 3> requires (N == 3 || N == 4)
+        void vertex_push_colour (const sm::vec<float, N>& vec, std::vector<float>& vp)
+        {
+            vp.emplace_back (vec[0]);
+            vp.emplace_back (vec[1]);
+            vp.emplace_back (vec[2]);
+            if (this->ncol == 4) {
+                if constexpr (N == 4) {
+                    vp.emplace_back (vec[3]);
+                } else {
+                    vp.emplace_back (1.0f);
+                }
+            }
         }
 
         /*!
@@ -1493,9 +1540,9 @@ export namespace mplot
                 this->vertex_push (mg.transform * mg.positions[i], this->vertexPositions);
                 this->vertex_push (mg.transform * mg.normals[i], this->vertexNormals);
                 if (single_colr) {
-                    this->vertex_push (mg.single_colour, this->vertexColors);
+                    this->vertex_push_colour (mg.single_colour, this->vertexColors);
                 } else {
-                    this->vertex_push (mg.colours[i], this->vertexColors);
+                    this->vertex_push_colour (mg.colours[i], this->vertexColors);
                 }
             }
             for (std::uint32_t i = 0; i < mg.indices.size(); ++i) {
@@ -1578,7 +1625,7 @@ export namespace mplot
             // Push the central point of the start cap - this is at location vstart
             this->vertex_push (vstart, vp);
             this->vertex_push (-v, vn);
-            this->vertex_push (colStart, vc);
+            this->vertex_push_colour (colStart, vc);
 
             // Start cap vertices (a triangle fan)
             for (std::int32_t j = 0; j < segments; j++) {
@@ -1587,7 +1634,7 @@ export namespace mplot
                 sm::vec<float> c = _ux * std::sin(t) * r + _uy * std::cos(t) * r;
                 this->vertex_push (vstart+c, vp);
                 this->vertex_push (-v, vn);
-                this->vertex_push (colStart, vc);
+                this->vertex_push_colour (colStart, vc);
             }
 
             // Intermediate, near start cap. Normals point in direction c
@@ -1597,7 +1644,7 @@ export namespace mplot
                 this->vertex_push (vstart+c, vp);
                 c.renormalize();
                 this->vertex_push (c, vn);
-                this->vertex_push (colStart, vc);
+                this->vertex_push_colour (colStart, vc);
             }
 
             // Intermediate, near end cap. Normals point in direction c
@@ -1607,7 +1654,7 @@ export namespace mplot
                 this->vertex_push (vend+c, vp);
                 c.renormalize();
                 this->vertex_push (c, vn);
-                this->vertex_push (colEnd, vc);
+                this->vertex_push_colour (colEnd, vc);
             }
 
             // Bottom cap vertices
@@ -1616,13 +1663,13 @@ export namespace mplot
                 sm::vec<float> c = _ux * std::sin(t) * r + _uy * std::cos(t) * r;
                 this->vertex_push (vend+c, vp);
                 this->vertex_push (v, vn);
-                this->vertex_push (colEnd, vc);
+                this->vertex_push_colour (colEnd, vc);
             }
 
             // Bottom cap. Push centre vertex as the last vertex.
             this->vertex_push (vend, vp);
             this->vertex_push (v, vn);
-            this->vertex_push (colEnd, vc);
+            this->vertex_push_colour (colEnd, vc);
 
             // Number of vertices = segments * 4 + 2.
             std::int32_t nverts = (segments * 4) + 2;
@@ -1798,7 +1845,7 @@ export namespace mplot
             // Push the central point of the start cap - this is at location vstart
             this->vertex_push (vstart, this->vertexPositions);
             this->vertex_push (-v, this->vertexNormals);
-            this->vertex_push (colStart, this->vertexColors);
+            this->vertex_push_colour (colStart, this->vertexColors);
 
             // Start cap vertices. Draw as a triangle fan, but record indices so that we
             // only need a single call to glDrawElements.
@@ -1808,7 +1855,7 @@ export namespace mplot
                 sm::vec<float> c = inplane * std::sin(t) * r + v_x_inplane * std::cos(t) * r;
                 this->vertex_push (vstart+c, this->vertexPositions);
                 this->vertex_push (-v, this->vertexNormals);
-                this->vertex_push (colStart, this->vertexColors);
+                this->vertex_push_colour (colStart, this->vertexColors);
             }
 
             // Intermediate, near start cap. Normals point in direction c
@@ -1818,7 +1865,7 @@ export namespace mplot
                 this->vertex_push (vstart+c, this->vertexPositions);
                 c.renormalize();
                 this->vertex_push (c, this->vertexNormals);
-                this->vertex_push (colStart, this->vertexColors);
+                this->vertex_push_colour (colStart, this->vertexColors);
             }
 
             // Intermediate, near end cap. Normals point in direction c
@@ -1828,7 +1875,7 @@ export namespace mplot
                 this->vertex_push (vend+c, this->vertexPositions);
                 c.renormalize();
                 this->vertex_push (c, this->vertexNormals);
-                this->vertex_push (colEnd, this->vertexColors);
+                this->vertex_push_colour (colEnd, this->vertexColors);
             }
 
             // Bottom cap vertices
@@ -1837,13 +1884,13 @@ export namespace mplot
                 sm::vec<float> c = inplane * std::sin(t) * r_end + v_x_inplane * std::cos(t) * r_end;
                 this->vertex_push (vend+c, this->vertexPositions);
                 this->vertex_push (v, this->vertexNormals);
-                this->vertex_push (colEnd, this->vertexColors);
+                this->vertex_push_colour (colEnd, this->vertexColors);
             }
 
             // Bottom cap. Push centre vertex as the last vertex.
             this->vertex_push (vend, this->vertexPositions);
             this->vertex_push (v, this->vertexNormals);
-            this->vertex_push (colEnd, this->vertexColors);
+            this->vertex_push_colour (colEnd, this->vertexColors);
 
             // Note: number of vertices = segments * 4 + 2.
             std::int32_t nverts = (segments * 4) + 2;
@@ -1970,12 +2017,12 @@ export namespace mplot
             // c1(t) = ( (p1-x1).normalized std::sin(t) + v.normalized cross (p1-x1).normalized * std::cos(t) )
             // c1(t) = ( inplane std::sin(t) + v * inplane * std::cos(t)
             for (std::int32_t j = 0; j < segments; j++) {
-                float t = j * sm::mathconst<float>::two_pi / static_cast<float>(segments);
+                float t = static_cast<float>(j) * sm::mathconst<float>::two_pi / static_cast<float>(segments);
                 sm::vec<float> c = inplane * std::sin(t) * r + v_x_inplane * std::cos(t) * r_mod;
-                this->vertex_push (vstart+c, this->vertexPositions);
+                this->vertex_push (vstart + c, this->vertexPositions);
                 c.renormalize();
                 this->vertex_push (c, this->vertexNormals);
-                this->vertex_push (colStart, this->vertexColors);
+                this->vertex_push_colour (colStart, this->vertexColors);
             }
 
             // end ring of vertices. Normals point in direction c
@@ -1984,12 +2031,12 @@ export namespace mplot
             r_mod = r_end / v_x_inplane.cross (v).length();
 
             for (std::int32_t j = 0; j < segments; j++) {
-                float t = (float)j * sm::mathconst<float>::two_pi / static_cast<float>(segments);
+                float t = static_cast<float>(j) * sm::mathconst<float>::two_pi / static_cast<float>(segments);
                 sm::vec<float> c = inplane * std::sin(t) * r_end + v_x_inplane * std::cos(t) * r_mod;
-                this->vertex_push (vend+c, this->vertexPositions);
+                this->vertex_push (vend + c, this->vertexPositions);
                 c.renormalize();
                 this->vertex_push (c, this->vertexNormals);
-                this->vertex_push (colEnd, this->vertexColors);
+                this->vertex_push_colour (colEnd, this->vertexColors);
             }
 
             // Number of vertices
@@ -2072,6 +2119,8 @@ export namespace mplot
                     this->vertexColors[vcsz++] = col[j];
                     this->vertexNormals[vnsz++] = v[j];
                 }
+                // Alpha 1 as incoming colour does not have alpha
+                if (this->ncol == 4) { this->vertexColors[vcsz++] = 1.0f; }
             }
 
             std::size_t i0 = this->indices.size();
@@ -2111,7 +2160,7 @@ export namespace mplot
             // Push the central point of the start cap - this is at location vstart
             this->vertex_push (vstart, this->vertexPositions);
             this->vertex_push (-v, this->vertexNormals);
-            this->vertex_push (col, this->vertexColors);
+            this->vertex_push_colour (col, this->vertexColors);
 
             // Polygon vertices (a triangle fan)
             for (std::int32_t j = 0; j < segments; j++) {
@@ -2120,7 +2169,7 @@ export namespace mplot
                 sm::vec<float> c = _ux * std::sin(t) * r + _uy * std::cos(t) * r;
                 this->vertex_push (vstart+c, this->vertexPositions);
                 this->vertex_push (-v, this->vertexNormals);
-                this->vertex_push (col, this->vertexColors);
+                this->vertex_push_colour (col, this->vertexColors);
             }
 
             // Number of vertices
@@ -2347,7 +2396,7 @@ export namespace mplot
             for (auto v : geo.poly.vertices) {
                 this->vertex_push (v.as_float() * r + so, this->vertexPositions);
                 this->vertex_push (v.as_float(), this->vertexNormals);
-                this->vertex_push (sc, this->vertexColors);
+                this->vertex_push_colour (sc, this->vertexColors);
             }
             for (auto f : geo.poly.faces) {
                 this->indices.push_back (this->idx + f[0]);
@@ -2404,7 +2453,7 @@ export namespace mplot
                 sm::vec<float, 3> nf = (norm / F{3}).as_float();
                 for (std::int32_t j = 0; j < 3; ++j) { // Faces all have size 3
                     this->vertex_push (nf, this->vertexNormals);
-                    this->vertex_push (sc, this->vertexColors); // A default colour
+                    this->vertex_push_colour (sc, this->vertexColors); // A default colour
                     this->indices.push_back (this->idx + (3 * i) + j); // indices is vertex index
                 }
             }
@@ -2433,7 +2482,7 @@ export namespace mplot
             for (auto v : geo.poly.vertices) {
                 this->vertex_push (v.as_float() * r + so, this->vertexPositions);
                 this->vertex_push (v.as_float(), this->vertexNormals);
-                this->vertex_push (sc, this->vertexColors);
+                this->vertex_push_colour (sc, this->vertexColors);
             }
             for (auto f : geo.poly.faces) {
                 this->indices.push_back (this->idx + f[0]);
@@ -2476,7 +2525,7 @@ export namespace mplot
             // Push the central point
             this->vertex_push (so[0]+0.0f, so[1]+0.0f, so[2]+z0, this->vertexPositions);
             this->vertex_push (0.0f, 0.0f, -1.0f, this->vertexNormals);
-            this->vertex_push (sc, this->vertexColors);
+            this->vertex_push_colour (sc, this->vertexColors);
 
             std::uint32_t capMiddle = this->idx++;
             std::uint32_t ringStartIdx = this->idx;
@@ -2495,7 +2544,7 @@ export namespace mplot
 
                 this->vertex_push (so[0]+x1, so[1]+y1, so[2]+z1, this->vertexPositions);
                 this->vertex_push (_x1, _y1, _z1, this->vertexNormals);
-                this->vertex_push (sc, this->vertexColors);
+                this->vertex_push_colour (sc, this->vertexColors);
 
                 if (!firstseg) {
                     this->indices.push_back (capMiddle);
@@ -2536,7 +2585,7 @@ export namespace mplot
                     // The vertex normal of a vertex that makes up a sphere is
                     // just a normal vector in the direction of the vertex.
                     this->vertex_push (_x0, _y0, _z0, this->vertexNormals);
-                    this->vertex_push (sc, this->vertexColors);
+                    this->vertex_push_colour (sc, this->vertexColors);
 
                     if (j == segments - 1) {
                         // Last vertex is back to the start
@@ -2566,7 +2615,7 @@ export namespace mplot
             // Push the central point of the bottom cap
             this->vertex_push (so[0]+0.0f, so[1]+0.0f, so[2]+z0, this->vertexPositions);
             this->vertex_push (0.0f, 0.0f, 1.0f, this->vertexNormals);
-            this->vertex_push (sc, this->vertexColors);
+            this->vertex_push_colour (sc, this->vertexColors);
             capMiddle = this->idx++;
             firstseg = true;
             // No more vertices to push, just do the indices for the bottom cap
@@ -2614,7 +2663,7 @@ export namespace mplot
             // Push the central point
             this->vertex_push (so[0]+0.0f, so[1]+0.0f, so[2]+z0, this->vertexPositions);
             this->vertex_push (0.0f, 0.0f, -1.0f, this->vertexNormals);
-            this->vertex_push (sc2, this->vertexColors);
+            this->vertex_push_colour (sc2, this->vertexColors);
 
             std::uint32_t capMiddle = this->idx++;
             std::uint32_t ringStartIdx = this->idx;
@@ -2633,7 +2682,7 @@ export namespace mplot
 
                 this->vertex_push (so[0]+x1, so[1]+y1, so[2]+z1, this->vertexPositions);
                 this->vertex_push (_x1, _y1, _z1, this->vertexNormals);
-                this->vertex_push (sc2, this->vertexColors);
+                this->vertex_push_colour (sc2, this->vertexColors);
 
                 if (!firstseg) {
                     this->indices.push_back (capMiddle);
@@ -2675,9 +2724,9 @@ export namespace mplot
                     // just a normal vector in the direction of the vertex.
                     this->vertex_push (_x0, _y0, _z0, this->vertexNormals);
                     if (i == 2 || i > (rings-2)) {
-                        this->vertex_push (sc2, this->vertexColors);
+                        this->vertex_push_colour(sc2, this->vertexColors);
                     } else {
-                        this->vertex_push (sc, this->vertexColors);
+                        this->vertex_push_colour (sc, this->vertexColors);
                     }
                     if (j == segments - 1) {
                         // Last vertex is back to the start
@@ -2707,7 +2756,7 @@ export namespace mplot
             // Push the central point of the bottom cap
             this->vertex_push (so[0]+0.0f, so[1]+0.0f, so[2]+z0, this->vertexPositions);
             this->vertex_push (0.0f, 0.0f, 1.0f, this->vertexNormals);
-            this->vertex_push (sc2, this->vertexColors);
+            this->vertex_push_colour (sc2, this->vertexColors);
             capMiddle = this->idx++;
             firstseg = true;
             // No more vertices to push, just do the indices for the bottom cap
@@ -2774,7 +2823,7 @@ export namespace mplot
             this->vertex_push (so + (tr * p).less_one_dim(), this->vertexPositions);
             n = { 0, 0, 1 };
             this->vertex_push (n, this->vertexNormals);
-            this->vertex_push (_sc, this->vertexColors);
+            this->vertex_push_colour (_sc, this->vertexColors);
 
             std::uint32_t capMiddle = this->idx++;
             std::uint32_t ringStartIdx = this->idx;
@@ -2798,7 +2847,7 @@ export namespace mplot
                 this->vertex_push (n, this->vertexNormals);
 
                 sm::vec<float> sc_ring = _sc * (1.0f - 1.0f / rings)  + _sc2 * 1.0f / rings;
-                this->vertex_push (sc_ring, this->vertexColors);
+                this->vertex_push_colour (sc_ring, this->vertexColors);
 
                 if (!firstseg) {
                     this->indices.push_back (capMiddle);
@@ -2837,7 +2886,7 @@ export namespace mplot
                     n.renormalize();
                     this->vertex_push (n, this->vertexNormals);
 
-                    this->vertex_push (sc_ring, this->vertexColors);
+                    this->vertex_push_colour (sc_ring, this->vertexColors);
 
                     if (j == segments - 1) {
                         // Last vertex is back to the start
@@ -2866,7 +2915,7 @@ export namespace mplot
             this->vertex_push (so + (tr * p).less_one_dim(), this->vertexPositions);
             n = { 0, 0, -1 };
             this->vertex_push (n, this->vertexNormals);
-            this->vertex_push (_sc2, this->vertexColors);
+            this->vertex_push_colour (_sc2, this->vertexColors);
             capMiddle = this->idx++;
             firstseg = true;
             // No more vertices to push, just do the indices for the bottom cap
@@ -2902,7 +2951,7 @@ export namespace mplot
                 this->vertex_push (centre + (ico.vertices[ico.faces[j][2]] * r), this->vertexPositions);
                 for (std::int32_t i = 0; i < 3; ++i) {
                     this->vertex_push (norml, this->vertexNormals);
-                    this->vertex_push (face_colours[j], this->vertexColors);
+                    this->vertex_push_colour (face_colours[j], this->vertexColors);
                 }
                 // Indices...
                 this->indices.push_back (this->idx);
@@ -2953,7 +3002,7 @@ export namespace mplot
             // Push the central point of the start cap - this is at location vstart
             this->vertex_push (vbase, this->vertexPositions);
             this->vertex_push (-v, this->vertexNormals);
-            this->vertex_push (col, this->vertexColors);
+            this->vertex_push_colour (col, this->vertexColors);
 
             // Base ring with normals in direction -v
             for (std::int32_t j = 0; j < segments; j++) {
@@ -2963,7 +3012,7 @@ export namespace mplot
                 c = c + (v * ringoffset);
                 this->vertex_push (vbase+c, this->vertexPositions);
                 this->vertex_push (-v, this->vertexNormals);
-                this->vertex_push (col, this->vertexColors);
+                this->vertex_push_colour (col, this->vertexColors);
             }
 
             // Intermediate ring of vertices around/aligned with the base ring with normals in direction c
@@ -2974,7 +3023,7 @@ export namespace mplot
                 this->vertex_push (vbase+c, this->vertexPositions);
                 c.renormalize();
                 this->vertex_push (c, this->vertexNormals);
-                this->vertex_push (col, this->vertexColors);
+                this->vertex_push_colour (col, this->vertexColors);
             }
 
             // Intermediate ring of vertices around the tip with normals direction c
@@ -2985,13 +3034,13 @@ export namespace mplot
                 this->vertex_push (vtip, this->vertexPositions);
                 c.renormalize();
                 this->vertex_push (c, this->vertexNormals);
-                this->vertex_push (col, this->vertexColors);
+                this->vertex_push_colour (col, this->vertexColors);
             }
 
             // Push tip vertex as the last vertex, normal is in direction v
             this->vertex_push (vtip, this->vertexPositions);
             this->vertex_push (v, this->vertexNormals);
-            this->vertex_push (col, this->vertexColors);
+            this->vertex_push_colour (col, this->vertexColors);
 
             // Number of vertices = segments * 3 + 2.
             std::int32_t nverts = segments * 3 + 2;
@@ -3106,7 +3155,7 @@ export namespace mplot
             // Push the central point of the start cap - this is at location vstart
             this->vertex_push (vstart, this->vertexPositions);
             this->vertex_push (-v, this->vertexNormals);
-            this->vertex_push (colStart, this->vertexColors);
+            this->vertex_push_colour (colStart, this->vertexColors);
 
             // Compute the 'face angles' that will give the correct width and thickness for the line
             std::array<float, 8> angles;
@@ -3129,7 +3178,7 @@ export namespace mplot
                 sm::vec<float> c = _uz * std::sin(angles[j]) * r + vv * std::cos(angles[j]) * r;
                 this->vertex_push (vstart+c, this->vertexPositions);
                 this->vertex_push (-v, this->vertexNormals);
-                this->vertex_push (colStart, this->vertexColors);
+                this->vertex_push_colour (colStart, this->vertexColors);
             }
 
             // Intermediate, near start cap. Normals point outwards. Need Additional vertices
@@ -3137,7 +3186,7 @@ export namespace mplot
                 sm::vec<float> c = _uz * std::sin(angles[j]) * r + vv * std::cos(angles[j]) * r;
                 this->vertex_push (vstart+c, this->vertexPositions);
                 this->vertex_push (norms[j], this->vertexNormals);
-                this->vertex_push (colStart, this->vertexColors);
+                this->vertex_push_colour (colStart, this->vertexColors);
             }
 
             // Intermediate, near end cap. Normals point in direction c
@@ -3145,7 +3194,7 @@ export namespace mplot
                 sm::vec<float> c = _uz * std::sin(angles[j]) * r + vv * std::cos(angles[j]) * r;
                 this->vertex_push (vend+c, this->vertexPositions);
                 this->vertex_push (norms[j], this->vertexNormals);
-                this->vertex_push (colEnd, this->vertexColors);
+                this->vertex_push_colour (colEnd, this->vertexColors);
             }
 
             // Bottom cap vertices
@@ -3153,13 +3202,13 @@ export namespace mplot
                 sm::vec<float> c = _uz * std::sin(angles[j]) * r + vv * std::cos(angles[j]) * r;
                 this->vertex_push (vend+c, this->vertexPositions);
                 this->vertex_push (v, this->vertexNormals);
-                this->vertex_push (colEnd, this->vertexColors);
+                this->vertex_push_colour (colEnd, this->vertexColors);
             }
 
             // Bottom cap. Push centre vertex as the last vertex.
             this->vertex_push (vend, this->vertexPositions);
             this->vertex_push (v, this->vertexNormals);
-            this->vertex_push (colEnd, this->vertexColors);
+            this->vertex_push_colour (colEnd, this->vertexColors);
 
             // Number of vertices = segments * 4 + 2.
             std::int32_t nverts = (segments * 4) + 2;
@@ -3252,19 +3301,19 @@ export namespace mplot
 
             this->vertex_push (c1, this->vertexPositions);
             this->vertex_push (_uz, this->vertexNormals);
-            this->vertex_push (col, this->vertexColors);
+            this->vertex_push_colour (col, this->vertexColors);
 
             this->vertex_push (c2, this->vertexPositions);
             this->vertex_push (_uz, this->vertexNormals);
-            this->vertex_push (col, this->vertexColors);
+            this->vertex_push_colour (col, this->vertexColors);
 
             this->vertex_push (c3, this->vertexPositions);
             this->vertex_push (_uz, this->vertexNormals);
-            this->vertex_push (col, this->vertexColors);
+            this->vertex_push_colour (col, this->vertexColors);
 
             this->vertex_push (c4, this->vertexPositions);
             this->vertex_push (_uz, this->vertexNormals);
-            this->vertex_push (col, this->vertexColors);
+            this->vertex_push_colour (col, this->vertexColors);
 
             // Number of vertices = segments * 4 + 2.
             std::int32_t nverts = 4;
@@ -3321,7 +3370,7 @@ export namespace mplot
                 // Push the central point of the start cap - this is at location vstart
                 this->vertex_push (vstart, this->vertexPositions);
                 this->vertex_push (_uz, this->vertexNormals);
-                this->vertex_push (col, this->vertexColors);
+                this->vertex_push_colour (col, this->vertexColors);
                 ++startvertices;
                 // Start cap vertices (a triangle fan)
                 for (std::int32_t j = 0; j < segments; j++) {
@@ -3329,33 +3378,33 @@ export namespace mplot
                     sm::vec<float> c = { std::sin(t) * r, std::cos(t) * r, 0.0f };
                     this->vertex_push (vstart+c, this->vertexPositions);
                     this->vertex_push (_uz, this->vertexNormals);
-                    this->vertex_push (col, this->vertexColors);
+                    this->vertex_push_colour (col, this->vertexColors);
                     ++startvertices;
                 }
             }
 
             this->vertex_push (c1, this->vertexPositions);
             this->vertex_push (_uz, this->vertexNormals);
-            this->vertex_push (col, this->vertexColors);
+            this->vertex_push_colour (col, this->vertexColors);
 
             this->vertex_push (c2, this->vertexPositions);
             this->vertex_push (_uz, this->vertexNormals);
-            this->vertex_push (col, this->vertexColors);
+            this->vertex_push_colour (col, this->vertexColors);
 
             this->vertex_push (c3, this->vertexPositions);
             this->vertex_push (_uz, this->vertexNormals);
-            this->vertex_push (col, this->vertexColors);
+            this->vertex_push_colour (col, this->vertexColors);
 
             this->vertex_push (c4, this->vertexPositions);
             this->vertex_push (_uz, this->vertexNormals);
-            this->vertex_push (col, this->vertexColors);
+            this->vertex_push_colour (col, this->vertexColors);
 
             std::uint32_t endvertices = 0u;
             if (endcaps) {
                 // Push the central point of the end cap - this is at location vend
                 this->vertex_push (vend, this->vertexPositions);
                 this->vertex_push (_uz, this->vertexNormals);
-                this->vertex_push (col, this->vertexColors);
+                this->vertex_push_colour (col, this->vertexColors);
                 ++endvertices;
                 // End cap vertices (a triangle fan)
                 for (std::int32_t j = 0; j < segments; j++) {
@@ -3363,7 +3412,7 @@ export namespace mplot
                     sm::vec<float> c = { std::sin(t) * r, std::cos(t) * r, 0.0f };
                     this->vertex_push (vend+c, this->vertexPositions);
                     this->vertex_push (_uz, this->vertexNormals);
-                    this->vertex_push (col, this->vertexColors);
+                    this->vertex_push_colour (col, this->vertexColors);
                     ++endvertices;
                 }
             }
@@ -3562,19 +3611,19 @@ export namespace mplot
             // Now create the vertices from these four corners, c1-c4
             this->vertex_push (c1, this->vertexPositions);
             this->vertex_push (_uz, this->vertexNormals);
-            this->vertex_push (col, this->vertexColors);
+            this->vertex_push_colour (col, this->vertexColors);
 
             this->vertex_push (c2, this->vertexPositions);
             this->vertex_push (_uz, this->vertexNormals);
-            this->vertex_push (col, this->vertexColors);
+            this->vertex_push_colour (col, this->vertexColors);
 
             this->vertex_push (c3, this->vertexPositions);
             this->vertex_push (_uz, this->vertexNormals);
-            this->vertex_push (col, this->vertexColors);
+            this->vertex_push_colour (col, this->vertexColors);
 
             this->vertex_push (c4, this->vertexPositions);
             this->vertex_push (_uz, this->vertexNormals);
-            this->vertex_push (col, this->vertexColors);
+            this->vertex_push_colour (col, this->vertexColors);
 
             this->indices.push_back (this->idx);
             this->indices.push_back (this->idx+1);
@@ -3654,19 +3703,19 @@ export namespace mplot
 
                 this->vertex_push (c1, this->vertexPositions);
                 this->vertex_push (_uz, this->vertexNormals);
-                this->vertex_push (col, this->vertexColors);
+                this->vertex_push_colour (col, this->vertexColors);
 
                 this->vertex_push (c2, this->vertexPositions);
                 this->vertex_push (_uz, this->vertexNormals);
-                this->vertex_push (col, this->vertexColors);
+                this->vertex_push_colour (col, this->vertexColors);
 
                 this->vertex_push (c3, this->vertexPositions);
                 this->vertex_push (_uz, this->vertexNormals);
-                this->vertex_push (col, this->vertexColors);
+                this->vertex_push_colour (col, this->vertexColors);
 
                 this->vertex_push (c4, this->vertexPositions);
                 this->vertex_push (_uz, this->vertexNormals);
-                this->vertex_push (col, this->vertexColors);
+                this->vertex_push_colour (col, this->vertexColors);
 
                 // Number of vertices = segments * 4 + 2.
                 std::int32_t nverts = 4;
@@ -3708,11 +3757,11 @@ export namespace mplot
                 sm::vec<float> c_in = inplane * std::sin(t) * r_in + norm_x_inplane * std::cos(t) * r_in;
                 this->vertex_push (centre+c_in, this->vertexPositions);
                 this->vertex_push (norm, this->vertexNormals);
-                this->vertex_push (col, this->vertexColors);
+                this->vertex_push_colour (col, this->vertexColors);
                 sm::vec<float> c_out = inplane * std::sin(t) * r_out + norm_x_inplane * std::cos(t) * r_out;
                 this->vertex_push (centre+c_out, this->vertexPositions);
                 this->vertex_push (norm, this->vertexNormals);
-                this->vertex_push (col, this->vertexColors);
+                this->vertex_push_colour (col, this->vertexColors);
             }
             // Added 2*segments vertices to vertexPositions
 
@@ -3815,7 +3864,7 @@ export namespace mplot
             for (std::uint16_t i = 0U; i < 4U; ++i) { this->vertex_push (_n2, this->vertexNormals); }
 
             // Vertex colours are all the same
-            for (std::uint16_t i = 0U; i < 24U; ++i) { this->vertex_push (clr, this->vertexColors); }
+            for (std::uint16_t i = 0U; i < 24U; ++i) { this->vertex_push_colour (clr, this->vertexColors); }
 
             // Indices for 6 faces
             for (std::uint16_t i = 0U; i < 6U; ++i) {

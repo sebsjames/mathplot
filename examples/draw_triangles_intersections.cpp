@@ -32,7 +32,7 @@ public:
         // Push corner vertices, colours and normals
         for (unsigned int i = 0; i < 3U; ++i) {
             this->vertex_push (this->coords[i], this->vertexPositions);
-            this->vertex_push (this->colours[i], this->vertexColors);
+            this->vertex_push_colour (this->colours[i], this->vertexColors);
             this->vertex_push (this->normal, this->vertexNormals);
         }
 
@@ -104,7 +104,7 @@ public:
         // Push corner vertices, colours and normals
         for (unsigned int i = 0; i < 4U; ++i) {
             this->vertex_push (this->coords[i], this->vertexPositions);
-            this->vertex_push (this->colours[i], this->vertexColors);
+            this->vertex_push_colour (this->colours[i], this->vertexColors);
             this->vertex_push (this->normal, this->vertexNormals);
         }
 
@@ -186,7 +186,7 @@ public:
         // Push corner vertices, colours and normals
         for (unsigned int i = 0; i < 6U; ++i) {
             this->vertex_push (this->coords[i], this->vertexPositions);
-            this->vertex_push (this->colours[i], this->vertexColors);
+            this->vertex_push_colour (this->colours[i], this->vertexColors);
             this->vertex_push (this->normals[i<3?0:1], this->vertexNormals);
         }
 

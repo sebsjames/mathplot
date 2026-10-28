@@ -108,10 +108,10 @@ export namespace mplot
 
                 // All same colours
                 std::array<float, 3> clr = this->cm.convert(dcopy[qi]);
-                this->vertex_push (clr, this->vertexColors);
-                this->vertex_push (clr, this->vertexColors);
-                this->vertex_push (clr, this->vertexColors);
-                this->vertex_push (clr, this->vertexColors);
+                this->vertex_push_colour (clr, this->vertexColors);
+                this->vertex_push_colour (clr, this->vertexColors);
+                this->vertex_push_colour (clr, this->vertexColors);
+                this->vertex_push_colour (clr, this->vertexColors);
 
                 this->vertex_push (vnorm, this->vertexNormals);
                 this->vertex_push (vnorm, this->vertexNormals);
@@ -130,10 +130,10 @@ export namespace mplot
                     this->vertex_push (v2-depth, this->vertexPositions);
                     this->vertex_push (v3-depth, this->vertexPositions);
 
-                    this->vertex_push (clr, this->vertexColors);
-                    this->vertex_push (clr, this->vertexColors);
-                    this->vertex_push (clr, this->vertexColors);
-                    this->vertex_push (clr, this->vertexColors);
+                    this->vertex_push_colour (clr, this->vertexColors);
+                    this->vertex_push_colour (clr, this->vertexColors);
+                    this->vertex_push_colour (clr, this->vertexColors);
+                    this->vertex_push_colour (clr, this->vertexColors);
 
                     this->vertex_push (-vnorm, this->vertexNormals);
                     this->vertex_push (-vnorm, this->vertexNormals);

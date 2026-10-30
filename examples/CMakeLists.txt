@@ -10,6 +10,7 @@ set(MATHPLOT_EXAMPLES_MODULES
   ${PROJECT_SOURCE_DIR}/maths/sm/bootstrap.cppm
   ${PROJECT_SOURCE_DIR}/maths/sm/rungekutta4.cppm
   ${SM_HEXFFT_MODULES}
+  ${SM_PCA_MODULES}
 )
 list(REMOVE_DUPLICATES MATHPLOT_EXAMPLES_MODULES)
 add_library(mathplot_examples STATIC)
@@ -642,15 +643,10 @@ target_link_libraries(show_boundingboxes mathplot_examples)
 add_executable(trace_boundary trace_boundary.cpp)
 target_link_libraries(trace_boundary mathplot_examples)
 
+add_executable(ellipse_pca ellipse_pca.cpp)
+target_link_libraries(ellipse_pca mathplot_examples)
+
 if (0) # During development
-
-
-
-  if(0)
-    # I made use of principle component analysis from arma in this example.
-    add_executable(ellipse_pca ellipse_pca.cpp)
-    target_link_libraries(ellipse_pca ${ARMADILLO_LIBRARY} ${ARMADILLO_LIBRARIES} OpenGL::GL glfw Freetype::Freetype glad mplot_fontdata)
-  endif()
 
   # Shader compute examples. Not supported on Apple, which is limited to
   # OpenGL 4.1 or Windows because I want to keep the GL header inclusion

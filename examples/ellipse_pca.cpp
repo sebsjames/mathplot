@@ -1,16 +1,18 @@
 /*
- * Applying principle component analysis (using arma) to some random data
+ * Applying principle component analysis to some random data
  */
 #include <iostream>
+#include <memory>
+#include <string>
+#include <cmath>
 
-#include <sm/mathconst>
-#include <sm/random>
-#include <sm/mat>
+import sm.mathconst;
+import sm.random;
+import sm.mat;
+import sm.pca;
 
-#include <armadillo>
-
-#include <mplot/Visual.h>
-#include <mplot/GraphVisual.h>
+import mplot.visual;
+import mplot.graphvisual;
 
 int main()
 {
@@ -27,52 +29,36 @@ int main()
     }
 
     // Graph the data
-    mplot::Visual v(1024, 768, "Principle component analysis with armadillo");
+    mplot::Visual v(1024, 768, "Principle component analysis with sm.pca");
     // Create a GraphVisual object (obtaining a unique_ptr to the object) with a spatial offset within the scene of 0,0,0
     auto gv = std::make_unique<mplot::GraphVisual<float>> (sm::vec<float>{-0.5f,-0.5f,0.0f});
     mplot::DatasetStyle ds (mplot::stylepolicy::markers);
     ds.datalabel = std::string("data");
-    v.bindmodel (gv);
+    gv->set_parent (v.get_id());
     gv->setlimits (-8, 8, -8, 8);
     gv->setdata (_x, ds);
 
-    std::cout << "\narma gives:\n";
-    // Place data in arma::Mat
-    arma::Mat<float> x(_x.size(), 2);
-    for (unsigned int i = 0; i < _x.size(); ++i) {
-        x(i, 0) = _x[i][0];
-        x(i, 1) = _x[i][1];
-    }
+    // Compute principle components using sm.pca
+    sm::pca::result<float, 2> pca_res = sm::pca::compute<float, 2> (_x);
 
-    // Apply arma::princomp
-    arma::Mat<float> co, sc;
-    arma::Col<float> lat, tsq;
-    arma::princomp (co, sc, lat, tsq, x);
+    std::cout << "Angle of first component " << pca_res.pc_vectors[0] << " is "
+              << pca_res.pc_vectors[0].angle() * sm::mathconst<float>::rad2deg
+              << " and magnitude(variance) " << pca_res.pc_magnitudes[0] << std::endl;
 
-    std::cout << "coeff: " << co << std::endl;
-    //std::cout << "scores: " << sc << std::endl;
-    std::cout << "latent: " << lat << std::endl;
+    std::cout << "Angle of 2nd component " << pca_res.pc_vectors[1] << " is "
+              << pca_res.pc_vectors[1].angle() * sm::mathconst<float>::rad2deg
+              << " and magnitude(variance) " <<  pca_res.pc_magnitudes[1] << std::endl;
 
-    // Mat access is (r, c)
-    sm::vec<float, 2> pc1vec = { co(0, 0), co(1, 0) };
-    float angle1 = pc1vec.angle();
-    std::cout << "Angle of first component " << pc1vec << " is " << angle1 * sm::mathconst<float>::rad2deg
-              << " and length is " << lat(0) << std::endl;
-    sm::vec<float, 2> pc2vec = { co(0, 1), co(1, 1) };
-    float angle2 = pc2vec.angle();
-    std::cout << "Angle of 2nd component " << pc2vec << " is " << angle2 * sm::mathconst<float>::rad2deg
-              << " and length is " << lat(1) << std::endl;
-
-    mplot::DatasetStyle ds2 (mplot::stylepolicy::lines);
     // Show 3 sigma axes
+    mplot::DatasetStyle ds2 (mplot::stylepolicy::lines);
     ds2.setcolour (mplot::colour::crimson);
     ds2.datalabel = std::string("PC1 3") + mplot::unicode::toUtf8 (mplot::unicode::sigma);
-    sm::vvec<sm::vec<float, 2>> pc1vv = { {0,0}, pc1vec * 3.0f * std::sqrt(lat(0))};
+    sm::vvec<sm::vec<float, 2>> pc1vv = { {0,0}, pca_res.pc_vectors[0] * 3.0f * std::sqrt(pca_res.pc_magnitudes[0])};
     gv->setdata (pc1vv, ds2);
 
     ds2.setcolour (mplot::colour::orange);
     ds2.datalabel = std::string("PC2 3") + mplot::unicode::toUtf8 (mplot::unicode::sigma);
-    sm::vvec<sm::vec<float, 2>> pc2vv = { {0,0}, pc2vec * 3.0f * std::sqrt(lat(1)) };
+    sm::vvec<sm::vec<float, 2>> pc2vv = { {0,0}, pca_res.pc_vectors[1] * 3.0f * std::sqrt(pca_res.pc_magnitudes[1]) };
     gv->setdata (pc2vv, ds2);
 
     gv->finalize();

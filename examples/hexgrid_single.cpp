@@ -29,7 +29,7 @@ namespace hexexample
     {
         data.resize (hg.num(), F{0});
         for (unsigned int ri = 0; ri < hg.num(); ++ri) {
-            data[ri] = 0.05f * std::sin (20.0f * hg.d_x[ri]) * std::sin (10.0f * hg.d_y[ri]) ; // Range 0->1
+            data[ri] = 0.01f * std::sin (30.0f * hg.d_x[ri]) * std::sin (15.0f * hg.d_y[ri]) ; // Range 0->1
         }
     }
 }
@@ -51,12 +51,14 @@ int main()
     v.rotateAboutNearest (true);
 
     sm::vec<float> label_pos = { -0.1f, -0.15f, 0.0f };
-    const mplot::TextFeatures tf(0.02f);
+    // Choose font size 0.02 and bitmap density 64 (higher than default as the text is quite big on
+    // the screen)
+    const mplot::TextFeatures tf(0.02f, 64);
 
     // Create a HexGrid to show in the scene. Hexes outside the circular boundary will all be
     // discarded.
-    sm::hexgrid<float, sm::hexalign::point_up> hg1(0.01f, 0.205f, 0.0f);
-    hg1.set_circular_boundary (0.1f);
+    sm::hexgrid<float, sm::hexalign::point_up> hg1(0.005f, 0.605f, 0.0f);
+    hg1.set_elliptical_boundary (0.2f, 0.1f);
     // Make data for hg1
     sm::vvec<float> data1 = {};
     hexexample::orthogonal_sines (hg1, data1);
@@ -72,7 +74,7 @@ int main()
     hgv_pu->hex_size_factor = 0.95f;
     hgv_pu->hex_draw_threshold = 0.1f;
     hgv_pu->hex_invisible_alpha = 0.5f;
-    hgv_pu->addLabel ("hexalign::point_up\n3D (value is z and colour)\ncircular boundary\nboundary shown\nLower values transparent\nHexVisMode::HexInterp\nhex_size_factor 0.95\nColourMapType::CET_L04",
+    hgv_pu->addLabel ("hexalign::point_up\n3D (value is z and colour)\nelliptic boundary\nboundary shown\nLower values transparent\nHexVisMode::HexInterp\nhex_size_factor 0.95\nColourMapType::CET_L04",
                       label_pos, tf);
     hgv_pu->finalize();
     v.addVisualModel (hgv_pu);

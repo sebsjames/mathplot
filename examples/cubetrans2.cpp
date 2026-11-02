@@ -34,6 +34,7 @@ int main()
     rv->name = "Cube.002";
     rv->facecm = mplot::ColourMapType::Rainbow; // Try Rainbow, Batlow, Tofino
     rv->annotate = true;
+    rv->tf.fontres = 64;
     //rv->setAlpha (0.7f);
     rv->finalize();
 

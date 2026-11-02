@@ -34,6 +34,7 @@ int main (int argc, char** argv)
 
     mplot::Visual<glver> v(1024, 768, "Crawling a surface with NavMesh features");
     v.rotateAboutNearest (true);
+    v.backgroundBlack();
 
     // How big to make the sphere?
     constexpr float radius = 2.0f;
@@ -78,7 +79,7 @@ int main (int argc, char** argv)
     gv->iterations = geo_itrns;
     std::string lbl = "GeodesicVisual with computed NavMesh";
     gv->addLabel (lbl, {0, -(radius + 0.1f), 0}, mplot::TextFeatures (0.06f));
-    gv->cm.setType (mplot::ColourMapType::NaviaW);
+    gv->cm.setType (mplot::ColourMapType::CET_L06);
     gv->colour_bb = cl;
     gv->finalize();
     auto gvp = v.addVisualModel (gv);
@@ -115,7 +116,7 @@ int main (int argc, char** argv)
         v.render();
 
         // Wait .018 s and also poll for mouse/keyboard events
-        v.waitevents (0.002);
+        v.waitevents (0.018);
 
         // Compute a new movement over the landscape mesh (the sphere)
         try {

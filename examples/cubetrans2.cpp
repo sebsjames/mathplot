@@ -114,7 +114,7 @@ int main()
         cavm->thickness = 0.5f;
         cavm->em = 0.0f;
         cavm->showneg = true;
-        cavm->endsphere_size = 10.0f;
+        cavm->endsphere_size = 0.1f;
         cavm->finalize();
         ptrs[i] = v.addVisualModel (cavm);
     }

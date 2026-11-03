@@ -172,6 +172,7 @@ export namespace mplot
         HSV1D,            // A 1D version of HSV, traverses a line across the HSV circle for a set value of hue,
                           // which determines what colour the value 1 will return. Useful for positive/negative ranges, but
                           // perceptual uniformity is not great.
+        HSVHue,           // Another 1D version of HSV, which traverses all the hue values (with sat and val fixed).
 
         Duochrome,    // Two fixed hues, vary saturation of each with two input numbers.
         Trichrome,    // As for Duochrome, but with three inputs
@@ -396,6 +397,7 @@ export namespace mplot
             || t == ColourMapType::CET_C6
             || t == ColourMapType::CET_C7
             || t == ColourMapType::HSV
+            || t == ColourMapType::HSVHue
             || t == ColourMapType::DiscFourWhite
             || t == ColourMapType::DiscFourBlack
             || t == ColourMapType::DiscSixWhite
@@ -414,6 +416,7 @@ export namespace mplot
         // PU
         if (t == ColourMapType::HSV
             || t == ColourMapType::HSV1D
+            || t == ColourMapType::HSVHue
             || t == ColourMapType::Monochrome
             || t == ColourMapType::MonochromeRed
             || t == ColourMapType::MonochromeGreen
@@ -604,6 +607,8 @@ export namespace mplot
                 cmt = mplot::ColourMapType::HSV; break;
             case sm::crc32 ("hsv1d"sv):
                 cmt = mplot::ColourMapType::HSV1D; break;
+            case sm::crc32 ("hsvhue"sv):
+                cmt = mplot::ColourMapType::HSVHue; break;
             case sm::crc32 ("monochromegreen"sv):
                 cmt = mplot::ColourMapType::MonochromeGreen; break;
             case sm::crc32 ("monochromeblue"sv):
@@ -946,6 +951,11 @@ export namespace mplot
             case mplot::ColourMapType::HSV1D:
             {
                 s = "HSV1D";
+                break;
+            }
+            case mplot::ColourMapType::HSVHue:
+            {
+                s = "HSVHue";
                 break;
             }
             case mplot::ColourMapType::MonochromeGreen:
@@ -2685,6 +2695,11 @@ export namespace mplot
                 }
                 break;
             }
+            case ColourMapType::HSVHue:
+            {
+                c = ColourMap::hsv2rgb (datum, this->sat, this->val);
+                break;
+            }
             case ColourMapType::Fixed:
             {
                 c = ColourMap::hsv2rgb (this->hue, this->sat, this->val);
@@ -2741,6 +2756,12 @@ export namespace mplot
             case ColourMapType::HSV1D:
             {
                 this->setHue (0.0f); // sets hue and hue2 (the 'anti' or 'opposite' hue)
+                break;
+            }
+            case ColourMapType::HSVHue:
+            {
+                this->val = 1.0f; // default to full sat/val, but user can change if desired
+                this->sat = 1.0f;
                 break;
             }
             default:

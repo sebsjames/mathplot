@@ -3028,13 +3028,13 @@ export namespace mplot
         }
 
         //! HSB to RGB. std::array input/output
-        static std::array<float, 3> hsv2rgb (const std::array<float, 3>& hsv)
+        static constexpr std::array<float, 3> hsv2rgb (const std::array<float, 3>& hsv)
         {
             return ColourMap<T>::hsv2rgb (hsv[0], hsv[1], hsv[2]);
         }
 
         //! HSB to RGB. sm::vec input/output
-        static sm::vec<float, 3> hsv2rgb_vec (const sm::vec<float, 3>& hsv)
+        static constexpr sm::vec<float, 3> hsv2rgb_vec (const sm::vec<float, 3>& hsv)
         {
             std::array<float, 3> rgb_ar = ColourMap<T>::hsv2rgb (hsv[0], hsv[1], hsv[2]);
             sm::vec<float, 3> rgb;
@@ -3043,7 +3043,7 @@ export namespace mplot
         }
 
         //! Convert hue, saturation, value to RGB. single precision arguments.
-        static std::array<float,3> hsv2rgb (float h, float s, float v)
+        static constexpr std::array<float,3> hsv2rgb (float h, float s, float v)
         {
             std::array<float, 3> rgb = { 0.0f, 0.0f, 0.0f };
             std::int32_t i = floor(h * 6);
@@ -3064,19 +3064,19 @@ export namespace mplot
         }
 
         //! Convert RGB to HSV, receiving input and returning output as std::array
-        static std::array<float, 3> rgb2hsv (const std::array<float, 3>& rgb)
+        static constexpr std::array<float, 3> rgb2hsv (const std::array<float, 3>& rgb)
         {
             return ColourMap<T>::rgb2hsv (rgb[0], rgb[1], rgb[2]);
         }
 
         //! Convert RGB (given as std::uint32_t) to HSV, receiving input and returning output as std::array
-        static std::array<float, 3> rgb2hsv (const std::uint32_t rgb)
+        static constexpr std::array<float, 3> rgb2hsv (const std::uint32_t rgb)
         {
             return ColourMap<T>::rgb2hsv (ColourMap<T>::rgb_array (rgb));
         }
 
         //! Convert RGB to HSV, receiving input and returning output as sm::vec
-        static sm::vec<float, 3> rgb2hsv_vec (const sm::vec<float, 3>& rgb)
+        static constexpr sm::vec<float, 3> rgb2hsv_vec (const sm::vec<float, 3>& rgb)
         {
             sm::vec<float, 3> hsv = {};
             hsv.set_from (ColourMap<T>::rgb2hsv (rgb[0], rgb[1], rgb[2]));
@@ -3084,7 +3084,7 @@ export namespace mplot
         }
 
         //! Convert RGB (given as std::uint32_t) to HSV, returning output as sm::vec
-        static sm::vec<float, 3> rgb2hsv_vec (const std::uint32_t rgb)
+        static constexpr sm::vec<float, 3> rgb2hsv_vec (const std::uint32_t rgb)
         {
             sm::vec<float, 3> hsv = {};
             hsv.set_from (ColourMap<T>::rgb2hsv (ColourMap<T>::rgb_array (rgb)));
@@ -3092,7 +3092,7 @@ export namespace mplot
         }
 
         //! Convert RGB to hue, saturation, value. single precision arguments.
-        static std::array<float, 3> rgb2hsv (float r, float g, float b)
+        static constexpr std::array<float, 3> rgb2hsv (float r, float g, float b)
         {
             std::array<float, 3> hsv = { 0.0f, 0.0f, 0.0f };
             float min = 0.0f, max = 0.0f, delta = 0.0f;
@@ -3137,7 +3137,7 @@ export namespace mplot
         }
 
         // Convert hex colour value (e.g. 0x2971c3) into our usual array of floats in range [0, 1]
-        static std::array<float,3> rgb_array (const std::uint32_t rgb)
+        static constexpr std::array<float,3> rgb_array (const std::uint32_t rgb)
         {
             return std::array<float,3>{ ((rgb >> 16) & 0xff) / 255.0f, ((rgb >> 8) & 0xff) / 255.0f, (rgb & 0xff) / 255.0f };
         }

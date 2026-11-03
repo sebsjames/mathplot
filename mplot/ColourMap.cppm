@@ -172,6 +172,7 @@ export namespace mplot
         HSV1D,            // A 1D version of HSV, traverses a line across the HSV circle for a set value of hue,
                           // which determines what colour the value 1 will return. Useful for positive/negative ranges, but
                           // perceptual uniformity is not great.
+        HSVHue,           // Another 1D version of HSV, which traverses all the hue values (with sat and val fixed).
 
         Duochrome,    // Two fixed hues, vary saturation of each with two input numbers.
         Trichrome,    // As for Duochrome, but with three inputs
@@ -396,6 +397,7 @@ export namespace mplot
             || t == ColourMapType::CET_C6
             || t == ColourMapType::CET_C7
             || t == ColourMapType::HSV
+            || t == ColourMapType::HSVHue
             || t == ColourMapType::DiscFourWhite
             || t == ColourMapType::DiscFourBlack
             || t == ColourMapType::DiscSixWhite
@@ -414,6 +416,7 @@ export namespace mplot
         // PU
         if (t == ColourMapType::HSV
             || t == ColourMapType::HSV1D
+            || t == ColourMapType::HSVHue
             || t == ColourMapType::Monochrome
             || t == ColourMapType::MonochromeRed
             || t == ColourMapType::MonochromeGreen
@@ -604,6 +607,8 @@ export namespace mplot
                 cmt = mplot::ColourMapType::HSV; break;
             case sm::crc32 ("hsv1d"sv):
                 cmt = mplot::ColourMapType::HSV1D; break;
+            case sm::crc32 ("hsvhue"sv):
+                cmt = mplot::ColourMapType::HSVHue; break;
             case sm::crc32 ("monochromegreen"sv):
                 cmt = mplot::ColourMapType::MonochromeGreen; break;
             case sm::crc32 ("monochromeblue"sv):
@@ -946,6 +951,11 @@ export namespace mplot
             case mplot::ColourMapType::HSV1D:
             {
                 s = "HSV1D";
+                break;
+            }
+            case mplot::ColourMapType::HSVHue:
+            {
+                s = "HSVHue";
                 break;
             }
             case mplot::ColourMapType::MonochromeGreen:
@@ -2685,6 +2695,11 @@ export namespace mplot
                 }
                 break;
             }
+            case ColourMapType::HSVHue:
+            {
+                c = ColourMap::hsv2rgb (datum, this->sat, this->val);
+                break;
+            }
             case ColourMapType::Fixed:
             {
                 c = ColourMap::hsv2rgb (this->hue, this->sat, this->val);
@@ -2741,6 +2756,12 @@ export namespace mplot
             case ColourMapType::HSV1D:
             {
                 this->setHue (0.0f); // sets hue and hue2 (the 'anti' or 'opposite' hue)
+                break;
+            }
+            case ColourMapType::HSVHue:
+            {
+                this->val = 1.0f; // default to full sat/val, but user can change if desired
+                this->sat = 1.0f;
                 break;
             }
             default:
@@ -3007,13 +3028,13 @@ export namespace mplot
         }
 
         //! HSB to RGB. std::array input/output
-        static std::array<float, 3> hsv2rgb (const std::array<float, 3>& hsv)
+        static constexpr std::array<float, 3> hsv2rgb (const std::array<float, 3>& hsv)
         {
             return ColourMap<T>::hsv2rgb (hsv[0], hsv[1], hsv[2]);
         }
 
         //! HSB to RGB. sm::vec input/output
-        static sm::vec<float, 3> hsv2rgb_vec (const sm::vec<float, 3>& hsv)
+        static constexpr sm::vec<float, 3> hsv2rgb_vec (const sm::vec<float, 3>& hsv)
         {
             std::array<float, 3> rgb_ar = ColourMap<T>::hsv2rgb (hsv[0], hsv[1], hsv[2]);
             sm::vec<float, 3> rgb;
@@ -3022,7 +3043,7 @@ export namespace mplot
         }
 
         //! Convert hue, saturation, value to RGB. single precision arguments.
-        static std::array<float,3> hsv2rgb (float h, float s, float v)
+        static constexpr std::array<float,3> hsv2rgb (float h, float s, float v)
         {
             std::array<float, 3> rgb = { 0.0f, 0.0f, 0.0f };
             std::int32_t i = floor(h * 6);
@@ -3043,19 +3064,19 @@ export namespace mplot
         }
 
         //! Convert RGB to HSV, receiving input and returning output as std::array
-        static std::array<float, 3> rgb2hsv (const std::array<float, 3>& rgb)
+        static constexpr std::array<float, 3> rgb2hsv (const std::array<float, 3>& rgb)
         {
             return ColourMap<T>::rgb2hsv (rgb[0], rgb[1], rgb[2]);
         }
 
         //! Convert RGB (given as std::uint32_t) to HSV, receiving input and returning output as std::array
-        static std::array<float, 3> rgb2hsv (const std::uint32_t rgb)
+        static constexpr std::array<float, 3> rgb2hsv (const std::uint32_t rgb)
         {
             return ColourMap<T>::rgb2hsv (ColourMap<T>::rgb_array (rgb));
         }
 
         //! Convert RGB to HSV, receiving input and returning output as sm::vec
-        static sm::vec<float, 3> rgb2hsv_vec (const sm::vec<float, 3>& rgb)
+        static constexpr sm::vec<float, 3> rgb2hsv_vec (const sm::vec<float, 3>& rgb)
         {
             sm::vec<float, 3> hsv = {};
             hsv.set_from (ColourMap<T>::rgb2hsv (rgb[0], rgb[1], rgb[2]));
@@ -3063,7 +3084,7 @@ export namespace mplot
         }
 
         //! Convert RGB (given as std::uint32_t) to HSV, returning output as sm::vec
-        static sm::vec<float, 3> rgb2hsv_vec (const std::uint32_t rgb)
+        static constexpr sm::vec<float, 3> rgb2hsv_vec (const std::uint32_t rgb)
         {
             sm::vec<float, 3> hsv = {};
             hsv.set_from (ColourMap<T>::rgb2hsv (ColourMap<T>::rgb_array (rgb)));
@@ -3071,7 +3092,7 @@ export namespace mplot
         }
 
         //! Convert RGB to hue, saturation, value. single precision arguments.
-        static std::array<float, 3> rgb2hsv (float r, float g, float b)
+        static constexpr std::array<float, 3> rgb2hsv (float r, float g, float b)
         {
             std::array<float, 3> hsv = { 0.0f, 0.0f, 0.0f };
             float min = 0.0f, max = 0.0f, delta = 0.0f;
@@ -3116,7 +3137,7 @@ export namespace mplot
         }
 
         // Convert hex colour value (e.g. 0x2971c3) into our usual array of floats in range [0, 1]
-        static std::array<float,3> rgb_array (const std::uint32_t rgb)
+        static constexpr std::array<float,3> rgb_array (const std::uint32_t rgb)
         {
             return std::array<float,3>{ ((rgb >> 16) & 0xff) / 255.0f, ((rgb >> 8) & 0xff) / 255.0f, (rgb & 0xff) / 255.0f };
         }

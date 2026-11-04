@@ -380,6 +380,21 @@ export namespace mplot
             if (found_model == true) { this->vm.erase (this->vm.begin() + modelId); }
         }
 
+        //! Remove the VisualModels in the vm stack from the one whose pointer matches the
+        //! VisualModel* vmp, to the end of the stack.
+        void removeVisualModels (mplot::VisualModel<glver>* vmp)
+        {
+            std::uint32_t modelId = 0;
+            bool found_model = false;
+            for (modelId = 0; modelId < this->vm.size(); ++modelId) {
+                if (this->vm[modelId].get() == vmp) {
+                    found_model = true;
+                    break;
+                }
+            }
+            if (found_model == true) { this->vm.erase (this->vm.begin() + modelId, this->vm.end()); }
+        }
+
         void clear () { this->vm.clear(); }
 
         void set_cursorpos (double _x, double _y) { this->cursorpos = {static_cast<float>(_x), static_cast<float>(_y)}; }

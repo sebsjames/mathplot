@@ -36,10 +36,10 @@ int main (int argc, char** argv)
     v.lightingEffects();
     v.rotateAboutNearest (true);
 
-    sm::vec<float> label_pos = { -0.1f, -0.15f, 0.0f };
+    sm::vec<float> label_pos = { -0.13f, -0.15f, 0.0f };
     // Choose font size 0.02 and bitmap density 64 (higher than default as the text is quite big on
     // the screen)
-    const mplot::TextFeatures tf(0.02f, 64);
+    const mplot::TextFeatures tf(0.008f, 48);
 
     // Create a HexGrid to show in the scene. Hexes outside the circular boundary will all be
     // discarded.
@@ -72,7 +72,7 @@ int main (int argc, char** argv)
     hgv_pu->showboundary = true;
     hgv_pu->hexVisMode = mplot::HexVisMode::HexInterp;
     hgv_pu->hex_size_factor = 0.95f;
-    hgv_pu->addLabel ("ellipse", label_pos, tf);
+    hgv_pu->addLabel ("ellipse drawing with algo::hexgrid::ellipse_indices", label_pos, tf);
     hgv_pu->finalize();
     v.addVisualModel (hgv_pu);
 

@@ -9,6 +9,7 @@
 #include <vector>
 #include <cmath>
 #include <map>
+#include <set>
 #include <list>
 #include <format>
 #include <tuple>
@@ -37,25 +38,31 @@ int main()
 
     // Create a HexGrid to show in the scene. Hexes outside the circular boundary will all be
     // discarded.
-    sm::hexgrid<float, sm::hexalign::point_up> hg1(0.005f, 0.605f, 0.0f);
-    hg1.set_elliptical_boundary (0.2f, 0.1f);
-    sm::vvec<float> data1 (hg1.num(), 0.0f);
+    sm::hexgrid<float, sm::hexalign::point_up> hg1(0.005f, 0.28f, 0.0f);
+    hg1.set_boundary_on_outer_edge();
+    sm::vvec<float> data1 (hg1.num(), 0.002f);
 
     // Mark indices
-    sm::vvec<std::uint32_t> ellipse_indices = sm::algo::hexgrid::ellipse_indices (hg1, 0.04f, 0.02f, sm::mathconst<float>::pi_over_3);
-    for (auto i : ellipse_indices) { data1[i] = 0.05f; }
+    std::set<std::uint32_t> ellipse_indices = sm::algo::hexgrid::ellipse_indices (hg1, 0.04f, 0.02f,
+                                                                                  sm::mathconst<float>::pi_over_3,
+                                                                                  sm::vec<float, 2>{-0.05f, 0.01f});
+    for (auto i : ellipse_indices) { data1[i] = 0.01f; }
+
+    std::set<std::uint32_t> ellipse2_indices = sm::algo::hexgrid::ellipse_indices (hg1, 0.04f, 0.02f,
+                                                                                   2.0f * sm::mathconst<float>::pi_over_3,
+                                                                                   sm::vec<float, 2>{0.05f, -0.01f});
+    for (auto i : ellipse2_indices) { data1[i] = 0.01f; }
 
     // Add a HexGridVisual to display the HexGrid within the sm::Visual scene
     sm::vec<float, 3> offset = { 0.0f, 0.0f, 0.0f };
     auto hgv_pu = std::make_unique<mplot::HexGridVisual<float, sm::hexalign::point_up, mplot::gl::version_4_1>>(&hg1, offset);
     hgv_pu->set_parent (v.get_id());
-    hgv_pu->cm.setType (mplot::ColourMapType::CET_L04);
+    hgv_pu->cm.setType (mplot::ColourMapType::CET_L18);
+    hgv_pu->colourScale.compute_scaling (0.0f, 0.015f);
     hgv_pu->setScalarData (&data1);
     hgv_pu->showboundary = true;
     hgv_pu->hexVisMode = mplot::HexVisMode::HexInterp;
     hgv_pu->hex_size_factor = 0.95f;
-    hgv_pu->hex_draw_threshold = 0.1f;
-    hgv_pu->hex_invisible_alpha = 0.5f;
     hgv_pu->addLabel ("ellipse", label_pos, tf);
     hgv_pu->finalize();
     v.addVisualModel (hgv_pu);

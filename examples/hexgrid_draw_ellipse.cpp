@@ -22,8 +22,13 @@ import mplot.visual;
 import mplot.visualdatamodel;
 import mplot.hexgridvisual;
 
-int main()
+int main (int argc, char** argv)
 {
+    float ex = 0.01f;
+    if (argc > 1) {
+        ex = std::stof (argv[1]);
+    }
+
     // Contructor args are width, height, title
     mplot::Visual<mplot::gl::version_4_1> v(1800, 1800, "mplot::HexGridVisual examples");
     v.setSceneTrans (sm::vec<float,3>{ float{-0.019244}, float{0.0875307}, float{-1.78171} });
@@ -46,12 +51,15 @@ int main()
     std::set<std::uint32_t> ellipse_indices = sm::algo::hexgrid::ellipse_indices (hg1, 0.04f, 0.02f,
                                                                                   sm::mathconst<float>::pi_over_3,
                                                                                   sm::vec<float, 2>{-0.05f, 0.01f});
-    for (auto i : ellipse_indices) { data1[i] = 0.01f; }
-
-    std::set<std::uint32_t> ellipse2_indices = sm::algo::hexgrid::ellipse_indices (hg1, 0.04f, 0.02f,
+    // Mark indices for a second ellipse
+    std::set<std::uint32_t> ellipse2_indices = sm::algo::hexgrid::ellipse_indices (hg1, 0.04f, 0.01f,
                                                                                    2.0f * sm::mathconst<float>::pi_over_3,
-                                                                                   sm::vec<float, 2>{0.05f, -0.01f});
-    for (auto i : ellipse2_indices) { data1[i] = 0.01f; }
+                                                                                   sm::vec<float, 2>{ex, -0.04f});
+    // Combine the sets
+    ellipse_indices.insert (ellipse2_indices.begin(), ellipse2_indices.end());
+
+    // Set data for the indices
+    for (auto i : ellipse_indices) { data1[i] = 0.01f; }
 
     // Add a HexGridVisual to display the HexGrid within the sm::Visual scene
     sm::vec<float, 3> offset = { 0.0f, 0.0f, 0.0f };
@@ -59,6 +67,7 @@ int main()
     hgv_pu->set_parent (v.get_id());
     hgv_pu->cm.setType (mplot::ColourMapType::CET_L18);
     hgv_pu->colourScale.compute_scaling (0.0f, 0.015f);
+    hgv_pu->zScale.null_scaling();
     hgv_pu->setScalarData (&data1);
     hgv_pu->showboundary = true;
     hgv_pu->hexVisMode = mplot::HexVisMode::HexInterp;

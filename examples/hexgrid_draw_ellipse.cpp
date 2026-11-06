@@ -88,6 +88,14 @@ int main (int argc, char** argv)
 
     sm::hexgrid<float, sm::hexalign::point_up> hg2 (1.64572e-05f, 0.000197486f, 0.0f);
     hg2.set_boundary_on_outer_edge();
+
+    // If the hexgrid has a transform, it is applied to render the hexgrid. Finding the ellipse
+    // indices is carried out on the pre-transformed hexgrid.
+    //sm::mat<float, 2> tfm = { -0.72559f, 0.688127f, 0.688127f, 0.72559f };
+    sm::mat<float, 2> tfm = sm::mat<float, 2>::identity();
+    tfm.rotate (0.1f);
+    hg2.transform (tfm);
+
     sm::vvec<float> data2 (hg2.num(), 0.002f);
     auto indices = sm::algo::hexgrid::ellipse_indices (hg2, 1.0f * 1.64572e-05f, 3.5f * 1.64572e-05f, 0.0f);
     for (auto vi : indices) { data2[vi] = 0.01f; }

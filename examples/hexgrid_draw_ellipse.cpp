@@ -72,6 +72,7 @@ int main (int argc, char** argv)
     hgv_pu->zScale.null_scaling();
     hgv_pu->setScalarData (&data1);
     hgv_pu->showboundary = true;
+    hgv_pu->showcentre = true;
     hgv_pu->hexVisMode = mplot::HexVisMode::HexInterp;
     hgv_pu->hex_size_factor = 0.95f;
     hgv_pu->addLabel ("ellipse drawing with algo::hexgrid::ellipse_indices", label_pos, tf);
@@ -97,14 +98,13 @@ int main (int argc, char** argv)
     hgv_pu->zScale.null_scaling();
     hgv_pu->setScalarData (&data2);
     hgv_pu->showboundary = true;
+    hgv_pu->showcentre = true;
     hgv_pu->hexVisMode = mplot::HexVisMode::HexInterp;
     hgv_pu->hex_size_factor = 0.95f;
     hgv_pu->addLabel ("tiny ellipse (1000x hexgrid size)", label_pos, tf);
     hgv_pu->finalize();
     auto ptr = v.addVisualModel (hgv_pu);
     ptr->scaleViewMatrix (1000);
-
-
 
     v.keepOpen();
 }

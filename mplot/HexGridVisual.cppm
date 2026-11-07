@@ -430,6 +430,14 @@ export namespace mplot
             }
         }
 
+        bool nan_or_inf (const float f)
+        {
+            if (std::isnan (f) == true || std::isinf (f) == true) {
+                return true;
+            }
+            return false;
+        }
+
         // Compute vertices for the patchwork quilt of hexes
         void computeHexes()
         {
@@ -491,13 +499,60 @@ export namespace mplot
                     _x = this->hg->d_x[hi];
                     _y = this->hg->d_y[hi];
                     // Use the linear scaled copy of the data, dcopy.
-                    datumC  = this->dcopy[hi]; // '_z'
+                    datumC = this->dcopy[hi]; // '_z'
+                    if (datumC == std::numeric_limits<T>::infinity()) {
+                        std::cout << "We got infinity, make datumC the mean of its neighbours\n";
+                        datumC = 0.0f;
+                        float nn = 0.0f;
+                        if (this->hg->has_n0(hi)) {
+                            if (this->nan_or_inf(this->dcopy[this->hg->n0(hi)]) == false) {
+                                datumC += this->dcopy[this->hg->n0(hi)]; // what if *this* is inf?
+                                nn += 1.0f;
+                            }
+                        }
+                        if (this->hg->has_n1(hi)) {
+                            if (this->nan_or_inf (this->dcopy[this->hg->n1(hi)]) == false) {
+                                datumC += this->dcopy[this->hg->n1(hi)];
+                                nn += 1.0f;
+                            }
+                        }
+                        if (this->hg->has_n2(hi)) {
+                            if (this->nan_or_inf (this->dcopy[this->hg->n2(hi)]) == false) {
+                                datumC += this->dcopy[this->hg->n2(hi)];
+                                nn += 1.0f;
+                            }
+                        }
+                        if (this->hg->has_n3(hi)) {
+                            if (this->nan_or_inf (this->dcopy[this->hg->n3(hi)]) == false) {
+                                datumC += this->dcopy[this->hg->n3(hi)];
+                                nn += 1.0f;
+                            }
+                        }
+                        if (this->hg->has_n4(hi)) {
+                            if (this->nan_or_inf (this->dcopy[this->hg->n4(hi)]) == false) {
+                                datumC += this->dcopy[this->hg->n4(hi)];
+                                nn += 1.0f;
+                            }
+                        }
+                        if (this->hg->has_n5(hi)) {
+                            if (this->nan_or_inf (this->dcopy[this->hg->n5(hi)]) == false) {
+                                datumC += this->dcopy[this->hg->n5(hi)];
+                                nn += 1.0f;
+                            }
+                        }
+                        if (nn > 0.0f) { datumC /= nn; }
+                        datumC *= 2.0f; // then twice as big as it's 'inf'
+
+                    }
+
+                    // Fixme: Add checks for nan or inf in neighbours here, too
                     datumN0 = this->hg->has_n0(hi) ? this->dcopy[this->hg->n0(hi)] : datumC; // datum Neighbour East
                     datumN1 = this->hg->has_n1(hi) ? this->dcopy[this->hg->n1(hi)] : datumC; // datum Neighbour North East
                     datumN2 = this->hg->has_n2(hi) ? this->dcopy[this->hg->n2(hi)] : datumC; // etc
                     datumN3 = this->hg->has_n3(hi) ? this->dcopy[this->hg->n3(hi)] : datumC;
                     datumN4 = this->hg->has_n4(hi) ? this->dcopy[this->hg->n4(hi)] : datumC;
                     datumN5 = this->hg->has_n5(hi) ? this->dcopy[this->hg->n5(hi)] : datumC;
+
                 } else {
                     // Get coordinates from dataCoords
                     _x = (*this->dataCoords)[hi][0];

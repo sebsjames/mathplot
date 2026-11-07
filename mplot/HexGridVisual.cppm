@@ -449,7 +449,7 @@ export namespace mplot
 
             std::uint32_t nhex = this->hg->num();
 
-            this->setupScaling();
+            this->setupScaling(); // sets dcopy content
 
             // x and y coords on the hexgrid. May be replaced if dataCoords has been set.
             float _x = 0.0f;
@@ -485,20 +485,10 @@ export namespace mplot
                 lt = scaler * lt;
             }
 
-            for (std::uint32_t hi = 0; hi < nhex; ++hi) {
-
-                float hex_alpha = 1.0f;
-                // If this hex is below hex_draw_threshold then draw an invisible hex and move on
-                if (this->scalarData != nullptr && this->hex_draw_threshold != 0.0f) {
-                    if (std::abs(this->dcolour[hi]) <= this->hex_draw_threshold) {
-                        hex_alpha = this->hex_invisible_alpha;
-                    }
-                }
-
-                if (this->dataCoords == nullptr) {
-                    _x = this->hg->d_x[hi];
-                    _y = this->hg->d_y[hi];
-                    // Use the linear scaled copy of the data, dcopy.
+            // If applicable, replace any infinities in dcopy
+            std::set<std::uint32_t> infinities;
+            if (this->dataCoords == nullptr) {
+                for (std::uint32_t hi = 0; hi < nhex; ++hi) {
                     datumC = this->dcopy[hi]; // '_z'
                     if (datumC == std::numeric_limits<T>::infinity()) {
                         std::cout << "We got infinity, make datumC the mean of its neighbours\n";
@@ -541,11 +531,27 @@ export namespace mplot
                             }
                         }
                         if (nn > 0.0f) { datumC /= nn; }
-                        datumC *= 2.0f; // then twice as big as it's 'inf'
-
+                        this->dcopy[hi] = datumC;
+                        infinities.insert (hi);
                     }
+                }
+            }
 
-                    // Fixme: Add checks for nan or inf in neighbours here, too
+            for (std::uint32_t hi = 0; hi < nhex; ++hi) {
+
+                float hex_alpha = 1.0f;
+                // If this hex is below hex_draw_threshold then draw an invisible hex and move on
+                if (this->scalarData != nullptr && this->hex_draw_threshold != 0.0f) {
+                    if (std::abs(this->dcolour[hi]) <= this->hex_draw_threshold) {
+                        hex_alpha = this->hex_invisible_alpha;
+                    }
+                }
+
+                if (this->dataCoords == nullptr) {
+                    _x = this->hg->d_x[hi];
+                    _y = this->hg->d_y[hi];
+                    // Use the linear scaled copy of the data, dcopy.
+                    datumC = this->dcopy[hi]; // '_z'
                     datumN0 = this->hg->has_n0(hi) ? this->dcopy[this->hg->n0(hi)] : datumC; // datum Neighbour East
                     datumN1 = this->hg->has_n1(hi) ? this->dcopy[this->hg->n1(hi)] : datumC; // datum Neighbour North East
                     datumN2 = this->hg->has_n2(hi) ? this->dcopy[this->hg->n2(hi)] : datumC; // etc

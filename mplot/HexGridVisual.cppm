@@ -430,13 +430,7 @@ export namespace mplot
             }
         }
 
-        bool nan_or_inf (const float f)
-        {
-            if (std::isnan (f) == true || std::isinf (f) == true) {
-                return true;
-            }
-            return false;
-        }
+        bool nan_or_inf (const float f) const { return (std::isnan (f) == true || std::isinf (f) == true); }
 
         // Compute vertices for the patchwork quilt of hexes
         void computeHexes()

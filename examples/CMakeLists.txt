@@ -187,12 +187,16 @@ if(HDF5_FOUND) # anneal.cppm uses HDF5
   target_link_libraries(anneal_asa ${HDF5_LIBRARIES} mathplot_examples)
 
   add_executable(anneal_asa_novis anneal_asa.cpp)
-  target_sources(anneal_asa_novis PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT_SOURCE_DIR}
-    FILES ${MPLOT_MATHS_CORE_MODULES}
+  set(ANNEAL_ASA_NOVIS_MODULES
+    ${MPLOT_MATHS_CORE_MODULES}
     ${MPLOT_MATHS_HEXGRID_MODULES}
     ${PROJECT_SOURCE_DIR}/maths/sm/anneal.cppm
     ${PROJECT_SOURCE_DIR}/maths/sm/hdfdata.cppm
     ${SM_CONFIG_MODULES}
+  )
+  list(REMOVE_DUPLICATES ANNEAL_ASA_NOVIS_MODULES)
+  target_sources(anneal_asa_novis PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT_SOURCE_DIR}
+    FILES ${ANNEAL_ASA_NOVIS_MODULES}
   )
   target_link_libraries(anneal_asa_novis ${HDF5_LIBRARIES})
 
@@ -308,10 +312,14 @@ target_link_libraries(cone mathplot_examples)
 add_executable(healpix healpix.cpp)
 target_link_libraries(healpix mathplot_examples)
 
+set(JSONCONFIG_MODULES
+  ${MPLOT_MATHS_CORE_MODULES}
+  ${SM_CONFIG_MODULES}
+)
+list(REMOVE_DUPLICATES JSONCONFIG_MODULES)
 add_executable(jsonconfig jsonconfig.cpp)
 target_sources(jsonconfig PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT_SOURCE_DIR}
-  FILES ${MPLOT_MATHS_CORE_MODULES}
-  ${SM_CONFIG_MODULES}
+  FILES ${JSONCONFIG_MODULES}
 )
 target_link_libraries(jsonconfig)
 

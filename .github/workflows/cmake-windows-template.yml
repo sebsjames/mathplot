@@ -59,6 +59,7 @@ jobs:
         -DCMAKE_BUILD_TYPE=${{ inputs.BUILD_TYPE }} `
         -DBUILD_TESTS=ON `
         -DBUILD_EXAMPLES=ON
+        -Werror=dev
 
     - name: Build
       run: cmake --build ${{ github.workspace }}\build --config ${{ inputs.BUILD_TYPE }}

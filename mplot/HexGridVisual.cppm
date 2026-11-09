@@ -552,7 +552,6 @@ export namespace mplot
                     datumN3 = this->hg->has_n3(hi) ? this->dcopy[this->hg->n3(hi)] : datumC;
                     datumN4 = this->hg->has_n4(hi) ? this->dcopy[this->hg->n4(hi)] : datumC;
                     datumN5 = this->hg->has_n5(hi) ? this->dcopy[this->hg->n5(hi)] : datumC;
-
                 } else {
                     // Get coordinates from dataCoords
                     _x = (*this->dataCoords)[hi][0];

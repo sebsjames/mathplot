@@ -1678,6 +1678,54 @@ export namespace mplot
             return c;
         }
 
+        //! Return the colour that represents infinity
+        static std::array<float, 3> infinityColour (ColourMapType _t)
+        {
+            std::array<float, 3> c = {0.0f, 0.0f, 0.0f};
+            switch (_t) {
+            case ColourMapType::Jet:
+            {
+                // Red is part of Jet, but purple isn't
+                c = {1.0, 0.0f, 0.5f}; // reddish purple
+                break;
+            }
+            case ColourMapType::Rainbow:
+            case ColourMapType::RainbowZeroBlack:
+            case ColourMapType::Magma:
+            {
+                c = {1.0, 1.0f, 1.0f}; // white
+                break;
+            }
+            case ColourMapType::RainbowZeroWhite:
+            {
+                break; // c is { 0, 0, 0 } black
+            }
+            case ColourMapType::MonochromeRed:
+            case ColourMapType::MonovalRed:
+            case ColourMapType::DivBlueRed:
+            case ColourMapType::CyclicDivBlueRed:
+            case ColourMapType::Acton:
+            {
+                c = {0.0, 1.0f, 0.0f}; // green
+                break;
+            }
+            case ColourMapType::GreyscaleInv:
+            {
+                // The 'inverted' greyscale tends to white for maximum signal
+                c = {1.0, 1.0f, 1.0f};
+                break;
+            }
+            default:
+            {
+                // Default to orange as the infinity colour
+                c = {1.0, 0.639f, 0.289f};
+                break;
+            }
+            }
+
+            return c;
+        }
+
         //! How many colour datums does the colour map require?
         static std::int32_t numDatums (ColourMapType _t, bool _act_2d = false)
         {
@@ -1757,11 +1805,15 @@ export namespace mplot
         {
             std::array<float, 3> c = {0.0f, 0.0f, 0.0f};
 
-            // Check for nan and return a 'nan' colour for the colour map as necessary
+            // Check for nan/infinity and return a 'nan' colour for the colour map as necessary
             if constexpr (std::is_same<std::decay_t<T>, double>::value == true
                           || std::is_same<std::decay_t<T>, float>::value == true) {
                 if (std::isnan(_datum1) == true || std::isnan(_datum2) == true) {
                     c = ColourMap<T>::nanColour (this->type);
+                    return c;
+                }
+                if (std::isinf(_datum1) == true || std::isinf(_datum2) == true) {
+                    c = ColourMap<T>::infinityColour(this->type);
                     return c;
                 }
             }
@@ -1845,11 +1897,15 @@ export namespace mplot
             }
             std::array<float, 3> clr = { 0.0f, 0.0f, 0.0f };
 
-            // Check for nan and return a 'nan' colour for the colour map
+            // Check for nan/infinity and return a 'nan' colour for the colour map
             if constexpr (std::is_same<std::decay_t<T>, double>::value == true
                           || std::is_same<std::decay_t<T>, float>::value == true) {
                 if (std::isnan(_datum1) == true || std::isnan(_datum2) == true || std::isnan(_datum3) == true) {
                     clr = ColourMap<T>::nanColour (this->type);
+                    return clr;
+                }
+                if (std::isinf(_datum1) == true || std::isinf(_datum2) == true || std::isinf(_datum3) == true) {
+                    clr = ColourMap<T>::infinityColour(this->type);
                     return clr;
                 }
             }
@@ -1921,10 +1977,11 @@ export namespace mplot
 
             std::array<float, 3> c = {0.0f, 0.0f, 0.0f};
 
-            // Check for nan and return a 'nan' colour for the colour map
+            // Check for nan/infinity and return a 'nan' or 'infinity' colour for the colour map
             if constexpr (std::is_same<std::decay_t<T>, double>::value == true
                           || std::is_same<std::decay_t<T>, float>::value == true) {
-                if (std::isnan(datum) == true) { c = ColourMap<T>::nanColour(this->type); return c; }
+                if (std::isnan(_datum) == true) { c = ColourMap<T>::nanColour(this->type); return c; }
+                if (std::isinf(_datum) == true) { c = ColourMap<T>::infinityColour(this->type); return c; }
             }
 
             switch (this->type) {

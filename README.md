@@ -54,7 +54,7 @@ git clone --recurse-submodules git@github.com:sebsjames/mathplot   # Get your co
 cd mathplot
 mkdir build         # Create a build directory
 cd build
-cmake .. -GNinja    # Call cmake to generate the makefiles
+CC=clang-20 CXX=clang++-20 cmake .. -GNinja    # Call cmake to generate the makefiles, specifying clang-20 compiler
 ninja graph1        # Compile a single one of the examples. Add VERBOSE=1 to see the compiler commands.
 ./examples/graph1   # Run the program. You should see a graph of a cubic function.
 # After closing the graph1 program, open its source code and modify something (see examples/graph2.cpp for ideas)

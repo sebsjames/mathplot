@@ -63,6 +63,10 @@ int main()
     sm::vvec<float> data1 = {};
     hexexample::orthogonal_sines (hg1, data1);
 
+    // Let's show what happens with infinities and NaN values in the data
+    data1[34] = std::numeric_limits<float>::infinity();
+    data1[39] = std::numeric_limits<float>::quiet_NaN();
+
     // Add a HexGridVisual to display the HexGrid within the sm::Visual scene
     sm::vec<float, 3> offset = { 0.0f, 0.0f, 0.0f };
     auto hgv_pu = std::make_unique<mplot::HexGridVisual<float, sm::hexalign::point_up, mplot::gl::version_4_1>>(&hg1, offset);

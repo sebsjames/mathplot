@@ -1,6 +1,3 @@
-# All #includes in test programs have to be #include <mplot/header.h>
-include_directories(BEFORE ${PROJECT_SOURCE_DIR})
-
 set(MATHPLOT_EXAMPLES_MODULES
   ${MPLOT_CORE_MODULES}
   ${MPLOT_READCURVES_MODULES}
@@ -18,6 +15,7 @@ target_sources(mathplot_examples PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT
   FILES ${MATHPLOT_EXAMPLES_MODULES}
 )
 set(MATHPLOT_EXAMPLES_INCLUDES
+  ${PROJECT_SOURCE_DIR}
   ${OPENGL_INCLUDE_DIR} ${GLFW3_INCLUDE_DIR} ${FREETYPE_INCLUDE_DIRS}
   ${PROJECT_SOURCE_DIR}/json/include
 )
@@ -59,7 +57,8 @@ target_sources(graph1 PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT_SOURCE_DIR
   ${PROJECT_SOURCE_DIR}/mplot/GraphVisual.cppm
 )
 target_include_directories(graph1 AFTER PRIVATE
-  ${OPENGL_INCLUDE_DIR} ${GLFW3_INCLUDE_DIR} ${FREETYPE_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/json/include
+  ${OPENGL_INCLUDE_DIR} ${GLFW3_INCLUDE_DIR} ${FREETYPE_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/json/include ${PROJECT_SOURCE_DIR}
+
 )
 target_link_libraries(graph1 OpenGL::GL glfw Freetype::Freetype glad mplot_fontdata)
 

@@ -30,6 +30,7 @@ macro(setup_module_variables_for_mathplot base_directory maths_directory json_di
     ${maths_directory}/sm/vvec.cppm
     ${maths_directory}/sm/scale.cppm
     ${maths_directory}/sm/centroid.cppm
+    ${maths_directory}/sm/vmat.cppm
     ${maths_directory}/sm/spline.cppm
     ${maths_directory}/sm/winder.cppm
   )

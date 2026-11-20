@@ -108,18 +108,8 @@ if(HDF5_FOUND)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${HDF5_DEFINITIONS}")
 endif()
 
-include_directories(${OPENGL_INCLUDE_DIR})
-if(HDF5_FOUND)
-  include_directories(${HDF5_INCLUDE_DIR})
-endif()
-include_directories(${GLFW3_INCLUDE_DIR})
-
 # New, text rendering dependencies
 find_package(Freetype REQUIRED)
-include_directories(${FREETYPE_INCLUDE_DIRS})
-
-# nlohmann is submoduled to get an up-to-date version (for C++ modules). This is used compiling json module.
-include_directories("${PROJECT_SOURCE_DIR}/json/include")
 
 # If Qt5 is present, then some optional Qt examples will be compiled
 find_package(Qt5 QUIET COMPONENTS Gui Core Widgets)
@@ -141,9 +131,6 @@ endif()
 
 # rapidxml is bundled in the source, but prefer packaged header
 check_include_file_cxx ("rapidxml/rapidxml.hpp" HAVE_RAPIDXML)
-if (NOT HAVE_RAPIDXML)
-  include_directories("${PROJECT_SOURCE_DIR}/include/rapidxml-1.13")
-endif() # else we have it in a directory included by default in the path
 
 #
 # sebsjames/maths module groups

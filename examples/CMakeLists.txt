@@ -17,6 +17,11 @@ add_library(mathplot_examples STATIC)
 target_sources(mathplot_examples PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT_SOURCE_DIR}
   FILES ${MATHPLOT_EXAMPLES_MODULES}
 )
+set(MATHPLOT_EXAMPLES_INCLUDES
+  ${OPENGL_INCLUDE_DIR} ${GLFW3_INCLUDE_DIR} ${FREETYPE_INCLUDE_DIRS}
+  ${PROJECT_SOURCE_DIR}/json/include
+)
+target_include_directories(mathplot_examples AFTER PRIVATE ${MATHPLOT_EXAMPLES_INCLUDES})
 target_link_libraries(mathplot_examples OpenGL::GL glfw Freetype::Freetype glad mplot_fontdata)
 
 add_executable(helloworld helloworld.cpp)
@@ -52,6 +57,9 @@ add_executable(graph1 graph1.cpp)
 target_sources(graph1 PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT_SOURCE_DIR}
   FILES ${MPLOT_CORE_MODULES}
   ${PROJECT_SOURCE_DIR}/mplot/GraphVisual.cppm
+)
+target_include_directories(graph1 AFTER PRIVATE
+  ${OPENGL_INCLUDE_DIR} ${GLFW3_INCLUDE_DIR} ${FREETYPE_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/json/include
 )
 target_link_libraries(graph1 OpenGL::GL glfw Freetype::Freetype glad mplot_fontdata)
 
@@ -141,6 +149,7 @@ if(HDF5_FOUND) # anneal.cppm uses HDF5
     ${PROJECT_SOURCE_DIR}/maths/sm/hdfdata.cppm
   )
   target_compile_definitions(rosenbrock_asa PUBLIC FLT=float VISUALISE)
+  target_include_directories(rosenbrock_asa AFTER PRIVATE ${HDF5_INCLUDE_DIR})
   target_link_libraries(rosenbrock_asa ${HDF5_LIBRARIES} mathplot_examples)
 endif()
 
@@ -184,6 +193,7 @@ if(HDF5_FOUND) # anneal.cppm uses HDF5
   # Adaptive Simulated Annealing algo on a made up objective
   add_executable(anneal_asa anneal_asa.cpp)
   target_compile_definitions(anneal_asa PUBLIC VISUALISE)
+  target_include_directories(anneal_asa AFTER PRIVATE ${HDF5_INCLUDE_DIR})
   target_sources(anneal_asa PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT_SOURCE_DIR}
     FILES ${ANNEAL_ASA_MODULES}
   )
@@ -201,11 +211,13 @@ if(HDF5_FOUND) # anneal.cppm uses HDF5
   target_sources(anneal_asa_novis PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT_SOURCE_DIR}
     FILES ${ANNEAL_ASA_NOVIS_MODULES}
   )
+  target_include_directories(anneal_asa_novis AFTER PRIVATE ${HDF5_INCLUDE_DIR} ${PROJECT_SOURCE_DIR}/json/include)
   target_link_libraries(anneal_asa_novis ${HDF5_LIBRARIES})
 
   # Adaptive Simulated Annealing algo on objective from Bohachevsky
   add_executable(anneal_boha anneal_asa.cpp)
   target_compile_definitions(anneal_boha PUBLIC USE_BOHACHEVSKY_FUNCTION VISUALISE)
+  target_include_directories(anneal_boha AFTER PRIVATE ${HDF5_INCLUDE_DIR})
   target_sources(anneal_boha PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT_SOURCE_DIR}
     FILES ${ANNEAL_ASA_MODULES}
   )
@@ -324,7 +336,7 @@ add_executable(jsonconfig jsonconfig.cpp)
 target_sources(jsonconfig PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT_SOURCE_DIR}
   FILES ${JSONCONFIG_MODULES}
 )
-target_link_libraries(jsonconfig)
+target_include_directories(jsonconfig AFTER PRIVATE ${PROJECT_SOURCE_DIR}/json/include)
 
 add_executable(ring ring.cpp)
 target_link_libraries(ring mathplot_examples)

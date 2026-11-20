@@ -16,7 +16,7 @@ target_sources(mathplot_examples PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT
 )
 set(MATHPLOT_EXAMPLES_INCLUDES
   ${PROJECT_SOURCE_DIR}
-  ${OPENGL_INCLUDE_DIR} ${GLFW3_INCLUDE_DIR} ${FREETYPE_INCLUDE_DIRS}
+  ${OPENGL_INCLUDE_DIR} ${GLFW3_INCLUDE_DIR} ${glfw3_DIR} ${FREETYPE_INCLUDE_DIRS}
   ${PROJECT_SOURCE_DIR}/json/include
 )
 target_include_directories(mathplot_examples AFTER PRIVATE ${MATHPLOT_EXAMPLES_INCLUDES})
@@ -57,7 +57,7 @@ target_sources(graph1 PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT_SOURCE_DIR
   ${PROJECT_SOURCE_DIR}/mplot/GraphVisual.cppm
 )
 target_include_directories(graph1 AFTER PRIVATE
-  ${OPENGL_INCLUDE_DIR} ${GLFW3_INCLUDE_DIR} ${FREETYPE_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/json/include ${PROJECT_SOURCE_DIR}
+  ${OPENGL_INCLUDE_DIR} ${GLFW3_INCLUDE_DIR} ${glfw3_DIR} ${FREETYPE_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/json/include ${PROJECT_SOURCE_DIR}
 
 )
 target_link_libraries(graph1 OpenGL::GL glfw Freetype::Freetype glad mplot_fontdata)

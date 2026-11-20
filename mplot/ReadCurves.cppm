@@ -622,7 +622,7 @@ export namespace mplot
                             } else {
                                 f = { v[i], v[i+1] };
                             }
-                            sm::bezcurve<float, 3> c(sm::vvec<sm::vec<float, 2>>{currentCoordinate, f});
+                            sm::bezcurve<float> c(sm::vvec<sm::vec<float, 2>>{currentCoordinate, f});
                             curves.add_curve (c);
                             currentCoordinate = f;
                         }
@@ -648,7 +648,7 @@ export namespace mplot
                             } else {
                                 f = { v[i], currentCoordinate[1] };
                             }
-                            sm::bezcurve<float, 3> c(sm::vvec<sm::vec<float, 2>>{currentCoordinate, f});
+                            sm::bezcurve<float> c(sm::vvec<sm::vec<float, 2>>{currentCoordinate, f});
                             curves.add_curve (c);
                             currentCoordinate = f;
                         }
@@ -672,13 +672,13 @@ export namespace mplot
                             if (cmd == 'v') { // delta coordinates
                                 if (v[i] != 0.0f) {
                                     f = { currentCoordinate[0], currentCoordinate[1] + v[i] };
-                                    sm::bezcurve<float, 3> c(sm::vvec<sm::vec<float, 2>>{currentCoordinate, f});
+                                    sm::bezcurve<float> c(sm::vvec<sm::vec<float, 2>>{currentCoordinate, f});
                                     curves.add_curve (c);
                                     currentCoordinate = f;
                                 }
                             } else {
                                 f = { currentCoordinate[0], v[i] };
-                                sm::bezcurve<float, 3> c(sm::vvec<sm::vec<float, 2>>{currentCoordinate, f});
+                                sm::bezcurve<float> c(sm::vvec<sm::vec<float, 2>>{currentCoordinate, f});
                                 curves.add_curve (c);
                                 currentCoordinate = f;
                             }
@@ -718,7 +718,7 @@ export namespace mplot
                                 } else {
                                     f = { v[i], v[i+1] };
                                 }
-                                sm::bezcurve<float, 3> c(sm::vvec<sm::vec<float, 2>>{currentCoordinate, f});
+                                sm::bezcurve<float> c(sm::vvec<sm::vec<float, 2>>{currentCoordinate, f});
                                 curves.add_curve (c);
                                 currentCoordinate = f;
                             }
@@ -750,7 +750,7 @@ export namespace mplot
                             c2 = { v[2],v[3] };
                             f = { v[4],v[5] };
                         }
-                        sm::bezcurve<float, 3> c(currentCoordinate, f, c1, c2);
+                        sm::bezcurve<float> c(currentCoordinate, f, c1, c2);
                         curves.add_curve (c);
                         currentCoordinate = f;
                     }
@@ -779,7 +779,7 @@ export namespace mplot
                             c2 = { v[0], v[1] };
                             f =  { v[2], v[3] };
                         }
-                        sm::bezcurve<float, 3> c(currentCoordinate, f, c1, c2);
+                        sm::bezcurve<float> c(currentCoordinate, f, c1, c2);
                         curves.add_curve (c);
                         currentCoordinate = f;
                     }
@@ -789,20 +789,20 @@ export namespace mplot
                 case 'Q':
                 case 'q': // Quadratic Bezier
                 {
-                    throw std::runtime_error ("Quadratic Bezier is unimplemented");
+                    throw std::runtime_error ("Quadratic Bezier is unimplemented (but it can be now)");
                     break;
                 }
                 case 'T':
                 case 't': // Shortcut quadratic Bezier
                 {
-                    throw std::runtime_error ("Shortcut quadratic Bezier is unimplemented");
+                    throw std::runtime_error ("Shortcut quadratic Bezier is unimplemented (but it can be now)");
                     break;
                 }
                 case 'Z':
                 case 'z': // straight line from current position to first point of path.
                 {
                     if (currentCoordinate != firstCoordinate) {
-                        sm::bezcurve<float, 3> c(sm::vvec<sm::vec<float, 2>>{currentCoordinate, firstCoordinate});
+                        sm::bezcurve<float> c(sm::vvec<sm::vec<float, 2>>{currentCoordinate, firstCoordinate});
                         curves.add_curve (c);
                         currentCoordinate = firstCoordinate;
                     }
@@ -871,7 +871,7 @@ export namespace mplot
             // to this->linePath
             const sm::vec<float, 2> p1 = { std::stof (x1), std::stof (y1) };
             const sm::vec<float, 2> p2 = { std::stof (x2), std::stof (y2) };
-            sm::bezcurve<float, 3> linecurve (sm::vvec<sm::vec<float, 2>>{p1, p2});
+            sm::bezcurve<float> linecurve (sm::vvec<sm::vec<float, 2>>{p1, p2});
             this->linePath.reset();
             this->linePath.initial_coordinate = p1;
             this->linePath.add_curve (linecurve);

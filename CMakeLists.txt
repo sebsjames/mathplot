@@ -101,6 +101,14 @@ else()
 endif()
 
 find_package(glfw3 3.2 REQUIRED)
+# GLFW does not set an include directory from find_package. On Linux,
+# this usually is ok, because GLFW is found in /usr/include or
+# /usr/local/include. However, on a Mac where GLFW was installed with
+# homebrew, the user may need to set the include directory so that the
+# compiler can find GLFW/glfw.h. Set /opt/homebrew/include for github
+# Mac CI.
+option(GLFW3_INCLUDE_DIR "Provide the path to the directory that holds the GLFW header directory" "")
+
 # Find the HDF5 library. To prefer the use of static linking of HDF5, set HDF5_USE_STATIC_LIBRARIES first
 #set(HDF5_USE_STATIC_LIBRARIES ON)
 find_package(HDF5)
@@ -108,18 +116,8 @@ if(HDF5_FOUND)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${HDF5_DEFINITIONS}")
 endif()
 
-include_directories(${OPENGL_INCLUDE_DIR})
-if(HDF5_FOUND)
-  include_directories(${HDF5_INCLUDE_DIR})
-endif()
-include_directories(${GLFW3_INCLUDE_DIR})
-
 # New, text rendering dependencies
 find_package(Freetype REQUIRED)
-include_directories(${FREETYPE_INCLUDE_DIRS})
-
-# nlohmann is submoduled to get an up-to-date version (for C++ modules). This is used compiling json module.
-include_directories("${PROJECT_SOURCE_DIR}/json/include")
 
 # If Qt5 is present, then some optional Qt examples will be compiled
 find_package(Qt5 QUIET COMPONENTS Gui Core Widgets)
@@ -141,9 +139,6 @@ endif()
 
 # rapidxml is bundled in the source, but prefer packaged header
 check_include_file_cxx ("rapidxml/rapidxml.hpp" HAVE_RAPIDXML)
-if (NOT HAVE_RAPIDXML)
-  include_directories("${PROJECT_SOURCE_DIR}/include/rapidxml-1.13")
-endif() # else we have it in a directory included by default in the path
 
 #
 # sebsjames/maths module groups

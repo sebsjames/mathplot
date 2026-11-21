@@ -30,6 +30,7 @@ macro(setup_module_variables_for_mathplot base_directory maths_directory json_di
     ${maths_directory}/sm/vvec.cppm
     ${maths_directory}/sm/scale.cppm
     ${maths_directory}/sm/centroid.cppm
+    ${maths_directory}/sm/vmat.cppm
     ${maths_directory}/sm/spline.cppm
     ${maths_directory}/sm/winder.cppm
   )
@@ -38,6 +39,7 @@ macro(setup_module_variables_for_mathplot base_directory maths_directory json_di
   set(MPLOT_MATHS_HEXGRID_MODULES
     ${maths_directory}/sm/nm_simplex.cppm
     ${maths_directory}/sm/binomial.cppm
+    ${maths_directory}/sm/vmat.cppm
     ${maths_directory}/sm/bezcoord.cppm
     ${maths_directory}/sm/bezcurve.cppm
     ${maths_directory}/sm/bezcurvepath.cppm
@@ -50,6 +52,7 @@ macro(setup_module_variables_for_mathplot base_directory maths_directory json_di
   set(MPLOT_MATHS_CARTGRID_MODULES
     ${maths_directory}/sm/nm_simplex.cppm
     ${maths_directory}/sm/binomial.cppm
+    ${maths_directory}/sm/vmat.cppm
     ${maths_directory}/sm/bezcoord.cppm
     ${maths_directory}/sm/bezcurve.cppm
     ${maths_directory}/sm/bezcurvepath.cppm

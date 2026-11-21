@@ -87,8 +87,7 @@ export namespace mplot
                 throw std::runtime_error (ee.str());
             }
 
-            // Work out how much memory to allocate - seek to the end
-            // of the file and find its size.
+            // Work out how much memory to allocate - seek to the end of the file and find its size.
             f.seekg (0, std::ios::end);
             this->sz = f.tellg();
             f.seekg (0);
@@ -237,11 +236,10 @@ export namespace mplot
         void init()
         {
             if (!this->root_node) {
-                // we are choosing to parse the XML declaration parse_no_data_nodes
-                // prevents RapidXML from using the somewhat surprising behaviour of
-                // having both values and data nodes, and having data nodes take
-                // precedence over values when printing >>> note that this will skip
-                // parsing of CDATA nodes <<<
+                // we are choosing to parse the XML declaration parse_no_data_nodes prevents
+                // RapidXML from using the somewhat surprising behaviour of having both values and
+                // data nodes, and having data nodes take precedence over values when printing >>>
+                // note that this will skip parsing of CDATA nodes <<<
                 this->doc.parse<rapidxml::parse_declaration_node|rapidxml::parse_no_data_nodes>(this->modeldata.data());
 
                 // Get the root node.
@@ -296,24 +294,23 @@ export namespace mplot
          */
         void readG (rapidxml::xml_node<>* g_node)
         {
-            // Within each <g>: Read the id attribute, then search out <path>
-            // elements and read those.
+            // Within each <g>: Read the id attribute, then search out <path> elements and read
+            // those.
             std::string g_id("");
             rapidxml::xml_attribute<>* id_attr = nullptr;
             if ((id_attr = g_node->first_attribute ("id"))) {
                 g_id = id_attr->value();
             } // else failed to get g_id
 
-            // Recursively search down any number of levels until a <path>
-            // node is found. Read it, then continue searching.
+            // Recursively search down any number of levels until a <path> node is found. Read it,
+            // then continue searching.
             rapidxml::xml_node<>* path_node = g_node;
             do {
                 path_node = this->findNodeRecursive (path_node, "path");
 
                 if (path_node != nullptr) {
-                    // See if path has an id that isn't the generic "path0000"
-                    // format. If so, use this to override the id from the <g>
-                    // element
+                    // See if path has an id that isn't the generic "path0000" format. If so, use
+                    // this to override the id from the <g> element
                     std::string p_id("");
                     rapidxml::xml_attribute<>* path_id_attr = nullptr;
                     // Check path id attribute...
@@ -451,13 +448,11 @@ export namespace mplot
         void setupScaling (const std::string& g_id)
         {
             if (g_id.find("mm") != std::string::npos) {
-                // Parse lines. Note that Inkscape will save a line as a path with
-                // implicit lineto in the form of a path with 2 pairs of
-                // coordinates in a move command. Adobe Illustrator uses a <line>
-                // element.
+                // Parse lines. Note that Inkscape will save a line as a path with implicit lineto
+                // in the form of a path with 2 pairs of coordinates in a move command. Adobe
+                // Illustrator uses a <line> element.
 
-                // Extract the length of the line in mm from the layer name
-                // _x33_mm means .33 mm
+                // Extract the length of the line in mm from the layer name _x33_mm means .33 mm
                 std::string mm(g_id);
                 mplot::tools::searchReplace ("x", ".", mm);
                 mplot::tools::searchReplace ("_", "", mm);
@@ -466,8 +461,8 @@ export namespace mplot
                 // dl is the length of the scale bar line
                 float dl = 0.0f;
                 dl = this->linePath.get_end_to_end();
-                // Having found the length of the line from the <line> or
-                // <path>, compute lineToMillimetres
+                // Having found the length of the line from the <line> or <path>, compute
+                // lineToMillimetres
                 this->lineToMillimetres[0] = 1;
                 this->lineToMillimetres[1] = dl > 0.0f ? mmf/dl : 1.0f;
             }
@@ -565,18 +560,16 @@ export namespace mplot
         {
             sm::bezcurvepath<float> curves = {};
 
-            // As we parse through the path, we have to keep track of the
-            // current coordinate position, as curves are specified from the
-            // position at the end of the previous curve.
+            // As we parse through the path, we have to keep track of the current coordinate
+            // position, as curves are specified from the position at the end of the previous curve.
             sm::vec<float, 2> currentCoordinate = {0.0f, 0.0f};
 
             // The first coordinate of the path. Can be required with a Z
             // command.
             sm::vec<float, 2> firstCoordinate = {0.0f, 0.0f};
 
-            // The last Bezier control points, c2, especially may be required
-            // in a shortcut Bezier command (s or S), hence declaring these
-            // outside the scope of the while loop.
+            // The last Bezier control points, c2, especially may be required in a shortcut Bezier
+            // command (s or S), hence declaring these outside the scope of the while loop.
             sm::vec<float, 2> c1 = {}; // Control point 1
             sm::vec<float, 2> c2 = {}; // Control point 2
             sm::vec<float, 2> f = {};  // Final point of curve

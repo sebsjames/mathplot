@@ -484,12 +484,12 @@ export namespace mplot
         sm::quaternion<float> parent_rotation = {};
 
         //! The text-model-specific view matrix and a scene matrix
-        sm::mat<float, 4> viewmatrix = {};
+        sm::mat<float, 4> viewmatrix = sm::mat<float, 4>::identity();
         //! Before, I wrote: We protect the scene matrix as updating it with the parent
         //! model's scene matrix likely involves also adding an additional
         //! translation. Now, I'm still slightly confused as to whether I *need* to have a
         //! copy of the scenematrix *here*.
-        sm::mat<float, 4> scenematrix = {};
+        sm::mat<float, 4> scenematrix = sm::mat<float, 4>::identity();
 
         //! The text string stored for debugging
         std::basic_string<char32_t> txt;

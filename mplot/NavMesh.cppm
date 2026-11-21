@@ -1260,14 +1260,14 @@ export namespace mplot
         {
             // I think this positions correctly now (which is all it has to do). It ignores scaling
             // in model_to_scene. Can be reduced to use fewer mat<>s.
-            sm::mat<float, 4> cam_mv_y;
+            sm::mat<float, 4> cam_mv_y = sm::mat<float, 4>::identity();
             cam_mv_y.translate (sm::vec<float>{0, hoverheight, 0});
 
             // The basis _x, _y, _z, where these are vectors in the model frame that define a camera frame
             sm::mat<float, 4> cam_to_model_rotn = sm::mat<float, 4>::frombasis (_x, _y, _z);
             // Get the rotation from scene frame to model
             sm::mat<float, 4> m_to_sc_rotn = model_to_scene.rotation_mat44();
-            sm::mat<float, 4> hp_m;
+            sm::mat<float, 4> hp_m = sm::mat<float, 4>::identity();
             hp_m.translate (hp_scene);
             sm::mat<float, 4> coord_rotn = hp_m * m_to_sc_rotn * cam_to_model_rotn * cam_mv_y;
 
@@ -1288,7 +1288,7 @@ export namespace mplot
             // Let's 'draw' the camera towards the model and then arrange its normal upwards wrt to the normal of the model.
             if (this->ti0 == std::numeric_limits<uint32_t>::max()) {
                 std::cout << __func__ << ": No hit/triangle normal\n";
-                return sm::mat<float, 4>{};
+                return sm::mat<float, 4>::identity();
             }
 
             // Place the camera on the model, and orient it randomly in the 'model plane'
@@ -1317,12 +1317,12 @@ export namespace mplot
             // Let's 'draw' the camera towards the model and then arrange its normal upwards wrt to the normal of the model.
             if (this->ti0 == std::numeric_limits<uint32_t>::max()) {
                 std::cout << __func__ << ": No hit/triangle normal\n";
-                return sm::mat<float, 4>{};
+                return sm::mat<float, 4>::identity();
             }
 
             if (fwds.length_sq() == 0.0f) {
                 std::cout << __func__ << ": fwds must be non-zero length\n";
-                return sm::mat<float, 4>{};
+                return sm::mat<float, 4>::identity();
             }
 
             // Project fwds onto the plane tn
@@ -1570,7 +1570,7 @@ export namespace mplot
             float rotn_angle = tn_frm.angle (_tn, r_axis);
             // If tn0 and _tn are identical, then rotn_angle will be NaN, but in that case we want no rotation
             if (std::isnan (rotn_angle)) { rotn_angle = 0.0f; }
-            sm::mat<float, 4> reorient_model; // reorientation transformation in sf between these two triangles
+            sm::mat<float, 4> reorient_model = sm::mat<float, 4>::identity(); // reorientation transformation in sf between these two triangles
             reorient_model.rotate (r_axis, rotn_angle);
             // The 'new' mv_rest
             sm::vec<float> mv_reoriented = (reorient_model * mv).less_one_dim();
@@ -1857,7 +1857,7 @@ export namespace mplot
                         float rotn_angle = tn0.angle (_tn, cd.tri_edge);
                         // If tn0 and _tn are identical, then rotn_angle will be NaN, but in that case we want no rotation
                         if (std::isnan (rotn_angle)) { rotn_angle = 0.0f; }
-                        sm::mat<float, 4> reorient_model; // reorientation transformation in sf
+                        sm::mat<float, 4> reorient_model = sm::mat<float, 4>::identity(); // reorientation transformation in sf
                         // No good if cd.tri_edge is (0,0,0)!
                         reorient_model.rotate (cd.tri_edge, rotn_angle);
 
@@ -1951,7 +1951,7 @@ export namespace mplot
 
             // Find the intersection point with the triangle ti0:
             sm::vec<float, 3> hov_sf = {};
-            sm::mat<float, 4> cam_to_surface;
+            sm::mat<float, 4> cam_to_surface = sm::mat<float, 4>::identity();
             bool isect = this->find_first_intersection (tv_sf, tn0, hov_sf, cam_to_surface,
                                                         cam_to_scene, model_to_scene, hoverheight);
             if (!isect) { throw std::runtime_error ("No initial intersection found"); }

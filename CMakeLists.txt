@@ -101,10 +101,13 @@ else()
 endif()
 
 find_package(glfw3 3.2 REQUIRED)
-if(APPLE)
-  # Hack to see if we can get github CI mac to find GLFW/glfw.h
-  set(GLFW3_INCLUDE_DIR "/opt/homebrew/include")
-endif()
+# GLFW does not set an include directory from find_package. On Linux,
+# this usually is ok, because GLFW is found in /usr/include or
+# /usr/local/include. However, on a Mac where GLFW was installed with
+# homebrew, the user may need to set the include directory so that the
+# compiler can find GLFW/glfw.h. Set /opt/homebrew/include for github
+# Mac CI.
+option(GLFW3_INCLUDE_DIR "Provide the path to the directory that holds the GLFW header directory" "")
 
 # Find the HDF5 library. To prefer the use of static linking of HDF5, set HDF5_USE_STATIC_LIBRARIES first
 #set(HDF5_USE_STATIC_LIBRARIES ON)

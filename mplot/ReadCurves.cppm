@@ -1,7 +1,9 @@
 /*!
  * \file
  *
- * A class for reading SVG files containing paths defining the outline of a neocortex.
+ * A class for reading SVG files containing paths defining the outline of a neocortex. Can be used
+ * in conjunction with sm::hexgrid to set domain boundaries from a path drawn in Adobe Illustrator
+ * or Inkscape.
  *
  * \author: Seb James
  * \date: July 2018

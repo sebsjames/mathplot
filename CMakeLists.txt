@@ -101,6 +101,11 @@ else()
 endif()
 
 find_package(glfw3 3.2 REQUIRED)
+if(APPLE)
+  # Hack to see if we can get github CI mac to find GLFW/glfw.h
+  set(GLFW3_INCLUDE_DIR "/opt/homebrew/include")
+endif()
+
 # Find the HDF5 library. To prefer the use of static linking of HDF5, set HDF5_USE_STATIC_LIBRARIES first
 #set(HDF5_USE_STATIC_LIBRARIES ON)
 find_package(HDF5)

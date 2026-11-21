@@ -180,7 +180,8 @@ export namespace mplot
     struct direction_data
     {
         direction_event event = direction_event::unknown;
-        sm::mat<float, 4> sceneview;         // a sceneview to move to, either instantaneously, or over a period of time
+        // a sceneview to move to, either instantaneously, or over a period of time
+        sm::mat<float, 4> sceneview = sm::mat<float, 4>::identity();
         sm::vec<float, 3> translation = {};  // A translation to apply to sceneview over time transform_time
         sm::vec<float, 3> orbit_centre = {}; // Centre of the orbit for timed_orbit
         sm::vec<float, 3> orbit_axis = sm::vec<float>::uz();
@@ -1282,8 +1283,8 @@ export namespace mplot
         // Rotate about the point this->rotation_centre. Subroutine for computeSceneview.
         void computeSceneview_about_rotation_centre()
         {
-            sm::mat<float, 4> sv_tr;
-            sm::mat<float, 4> sv_rot;
+            sm::mat<float, 4> sv_tr = sm::mat<float, 4>::identity();
+            sm::mat<float, 4> sv_rot = sm::mat<float, 4>::identity();
             sv_tr.translate (this->scenetrans_delta);
             // A rotation delta in world frame about the 'screen centre'
             sv_rot.translate (this->rotation_centre);
@@ -1349,7 +1350,7 @@ export namespace mplot
         // Compile-time function to create a rotate-about-y transform
         static constexpr sm::mat<float, 4> rotate_about_y()
         {
-            sm::mat<float, 4> r;
+            sm::mat<float, 4> r = sm::mat<float, 4>::identity();
             r.rotate (sm::vec<>::uy(), sm::mathconst<float>::pi);
             return r;
         }
@@ -1361,7 +1362,7 @@ export namespace mplot
 
         sm::mat<float, 4> update_viewmatrix_towards_target (const sm::mat<float, 4>& target)
         {
-            sm::mat<float, 4> fol_cur;
+            sm::mat<float, 4> fol_cur = sm::mat<float, 4>::identity();
 
             // Compute folcam_viewmatrix from sceneview (it's the inverse, along with a rotation)
             constexpr sm::mat<float, 4> rotn_y = rotate_about_y();
@@ -1397,7 +1398,7 @@ export namespace mplot
         {
             if (this->followedVM == nullptr) { return sm::mat<float, 4>::identity(); }
             // Target view from the followedVM
-            sm::mat<float, 4> rmat;
+            sm::mat<float, 4> rmat = sm::mat<float, 4>::identity();
             rmat.rotate (this->folcam_offset_rot);
             // To smooth this, I need to keep a time-average of followedVM->getViewMatrix()...
             sm::mat<float, 4> fol_targ = this->followedVM->getViewMatrix() * rmat;
@@ -1565,8 +1566,8 @@ export namespace mplot
 
                         // rather than computeSceneview_about_rotation_centre, we compute
                         // translation and rotation right here (this could probably be consolidated to use fewer mats)
-                        sm::mat<float, 4> sv_tr;
-                        sm::mat<float, 4> sv_rot;
+                        sm::mat<float, 4> sv_tr = sm::mat<float, 4>::identity();
+                        sm::mat<float, 4> sv_rot = sm::mat<float, 4>::identity();
                         sv_tr.translate (this->savedSceneview.translation());
                         sv_tr.translate (this->scenetrans_delta);
                         sv_rot.rotate (slerped);
@@ -1596,11 +1597,11 @@ export namespace mplot
                         propn = this->compute_min_jerk (static_cast<float>(this->currentAutoSceneviewChange.transform_time_frames), 1.0f,
                                                         static_cast<float>(since_frames));
                     }
-                    sm::mat<float, 4> orb_trans;
+                    sm::mat<float, 4> orb_trans = sm::mat<float, 4>::identity();
                     orb_trans.translate (this->currentAutoSceneviewChange.orbit_centre);
-                    sm::mat<float, 4> orb_trans_back;
+                    sm::mat<float, 4> orb_trans_back = sm::mat<float, 4>::identity();
                     orb_trans_back.translate (-this->currentAutoSceneviewChange.orbit_centre);
-                    sm::mat<float, 4> orb_rot;
+                    sm::mat<float, 4> orb_rot = sm::mat<float, 4>::identity();
                     orb_rot.rotate (this->currentAutoSceneviewChange.orbit_axis, propn * this->currentAutoSceneviewChange.orbit_angle);
                     this->sceneview = this->savedSceneview * orb_trans * orb_rot * orb_trans_back;
                 }
@@ -1722,7 +1723,7 @@ export namespace mplot
         float followedVM_rvel = 0.0f;
 
         //! Holds the viewmatrix of the followedVM the last time we called render
-        sm::mat<float, 4> followedLastViewMatrix;
+        sm::mat<float, 4> followedLastViewMatrix = sm::mat<float, 4>::identity();
 
         // Read-from-json code that is called from init_gl in all implementations:
         void read_scenetrans_from_json()
@@ -1818,26 +1819,26 @@ export namespace mplot
         float d_to_rotation_centre = -zDefault;
 
         //! The projection matrix is a member of this class. Value is set during setPerspective() or setOrthographic()
-        sm::mat<float, 4> projection;
+        sm::mat<float, 4> projection = sm::mat<float, 4>::identity();
 
         //! The inverse of the projection. Value is set during setPerspective() or setOrthographic()
-        sm::mat<float, 4> invproj;
+        sm::mat<float, 4> invproj = sm::mat<float, 4>::identity();
 
         //! The sceneview matrix, which changes as the user moves the view with mouse
         //! movements. Initialized in VisualOwnable constructor.
-        sm::mat<float, 4> sceneview;
+        sm::mat<float, 4> sceneview = sm::mat<float, 4>::identity();
         //! The non-rotating sceneview matrix, updated only from mouse translations (avoiding rotations)
-        sm::mat<float, 4> sceneview_tr;
+        sm::mat<float, 4> sceneview_tr = sm::mat<float, 4>::identity();
 
         //! Saved sceneview at mouse button down
-        sm::mat<float, 4> savedSceneview;
+        sm::mat<float, 4> savedSceneview = sm::mat<float, 4>::identity();
         //! Saved sceneview_tr
-        sm::mat<float, 4> savedSceneview_tr;
+        sm::mat<float, 4> savedSceneview_tr = sm::mat<float, 4>::identity();
 
         //! The sceneview when the user switched to a follow-me mode. This can become a target to return to when switching back.
-        sm::mat<float, 4> lastSceneview;
+        sm::mat<float, 4> lastSceneview = sm::mat<float, 4>::identity();
         //! translation only version of lastSceneview
-        sm::mat<float, 4> lastSceneview_tr;
+        sm::mat<float, 4> lastSceneview_tr = sm::mat<float, 4>::identity();
 
         // auto sceneview change. Active if visual_state::viewAutomation is set true in this->state.
         mplot::direction_data currentAutoSceneviewChange;

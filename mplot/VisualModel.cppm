@@ -1356,20 +1356,20 @@ export namespace mplot
     protected:
 
         //! The model-specific view matrix. Used to transform the pose of the model in the scene.
-        sm::mat<float, 4> viewmatrix = {};
+        sm::mat<float, 4> viewmatrix = sm::mat<float, 4>::identity();
         /*!
          * The scene view matrix. Each VisualModel has a copy of the scenematrix. It's set in
          * Visual::render. Different VisualModels may have different scenematrices (for example, the
          * CoordArrows has a different scenematrix from other VisualModels, and models marked
          * 'twodimensional' also have a different scenematrix).
          */
-        sm::mat<float, 4> scenematrix = {};
+        sm::mat<float, 4> scenematrix = sm::mat<float, 4>::identity();
 
         /*!
          * Instance scaling. This matrix can be used to control the scale of all instances of an
          * instanced VisualModel
          */
-        sm::mat<float, 4> instscale = {};
+        sm::mat<float, 4> instscale = sm::mat<float, 4>::identity();
 
         /*!
          * The colour for all instances. This is used if you don't set colour in your instance params.
@@ -2798,7 +2798,7 @@ export namespace mplot
                                std::array<float, 3> sc2,
                                sm::vec<float> abc,
                                std::int32_t rings = 10, std::int32_t segments = 12,
-                               sm::mat<float, 4> tr = sm::mat<float, 4>{})
+                               sm::mat<float, 4> tr = sm::mat<float, 4>::identity())
         {
             // We have two angular parameters t and t2. t in range 0-2pi and t2 in range 0-pi. t
             // gives the 'xy' ellipse; t2 gives the change in size of the xy ellipse as the z axis

@@ -40,7 +40,7 @@ export namespace mplot
     struct meshgroup
     {
         std::string name;
-        sm::mat<float, 4> transform;
+        sm::mat<float, 4> transform = sm::mat<float, 4>::identity();
         sm::vvec<std::uint32_t> indices;
         sm::vvec<sm::vec<float>> positions;
         sm::vvec<sm::vec<float>> normals;

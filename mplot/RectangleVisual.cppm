@@ -51,7 +51,7 @@ export namespace mplot
             c4 /= 2.0f;
 
             // Apply rotational transformation
-            sm::mat<float, 2> rotn;
+            sm::mat<float, 2> rotn = sm::mat<float, 2>::identity();
             rotn.rotate (this->angle * sm::mathconst<float>::deg2rad);
             c1 = rotn * c1;
             c2 = rotn * c2;

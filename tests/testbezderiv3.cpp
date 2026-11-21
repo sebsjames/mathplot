@@ -56,7 +56,7 @@ void draw (mplot::GraphVisual<float>* gv,
     dsb.markersize = sz;
 
     // Add the control points in similar colours
-    std::list<sm::bezcurve<FLT, 3>> theCurves = bcp.curves;
+    std::list<sm::bezcurve<FLT>> theCurves = bcp.curves;
     for (auto curv : theCurves) {
         sm::vvec<sm::vec<FLT, 2>> ctrlsd = curv.get_controls();
         sm::vvec<sm::vec<float, 2>> ctrls (ctrlsd.size());
@@ -113,9 +113,9 @@ int main (int argc, char** argv)
     };
 
     // First the analytical fit
-    sm::bezcurve<FLT, 3> cv1;
+    sm::bezcurve<FLT> cv1;
     cv1.fit (v);
-    sm::bezcurve<FLT, 3> cv2;
+    sm::bezcurve<FLT> cv2;
     cv2.fit (w);
 
     sm::bezcurvepath<FLT> bcp;

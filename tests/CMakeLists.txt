@@ -1,7 +1,7 @@
 # CTests
 
 # All #includes in test programs have to be #include "mplot/header.h"
-include_directories(BEFORE ${PROJECT_SOURCE_DIR})
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR})
 
 # Compile the modules that we use into a library
 set(MATHPLOT_TESTS_MODULES
@@ -21,6 +21,15 @@ add_library(mathplot_tests STATIC)
 target_sources(mathplot_tests PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT_SOURCE_DIR}
   FILES ${MATHPLOT_TESTS_MODULES}
 )
+set(MATHPLOT_EXAMPLES_INCLUDES
+  ${PROJECT_SOURCE_DIR}
+  ${OPENGL_INCLUDE_DIR} ${GLFW3_INCLUDE_DIR} ${FREETYPE_INCLUDE_DIRS}
+  ${PROJECT_SOURCE_DIR}/json/include
+)
+target_include_directories(mathplot_tests AFTER PRIVATE ${MATHPLOT_EXAMPLES_INCLUDES})
+if (NOT HAVE_RAPIDXML)
+  target_include_directories(mathplot_tests AFTER PRIVATE ${PROJECT_SOURCE_DIR}/include/rapidxml-1.13)
+endif() # else we have it in a directory included by default in the path
 
 # Test reading trial.svg
 set(TARGETTEST3 testreadcurves)
@@ -50,6 +59,7 @@ if(${glfw3_FOUND})
       ${PROJECT_SOURCE_DIR}/maths/sm/hdfdata.cppm
       ${PROJECT_SOURCE_DIR}/maths/sm/hexgrid_hdf.cppm
     )
+    target_include_directories(testhexgridsave AFTER PRIVATE ${HDF5_INCLUDE_DIR})
     target_link_libraries(testhexgridsave mathplot_tests ${HDF5_C_LIBRARIES} OpenGL::GL glfw Freetype::Freetype glad mplot_fontdata)
   endif(HDF5_FOUND)
 

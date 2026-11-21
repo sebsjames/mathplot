@@ -22,9 +22,9 @@ int main()
 
     // We package the spline fitting points in a fixed size container, as sm::spline must know at
     // compile time how many points there are.
-    sm::vec<sm::vec<double, 2>, 10> pts;
+    sm::vvec<sm::vec<double, 2>> pts(10);
     for (std::uint32_t i = 0; i < 10; ++i) { pts[i] = { x[i], y[i] }; }
-    sm::spline<double, 10> s (pts);
+    sm::spline<double> s (pts);
 
     sm::vvec<double> x1 (100);
     x1.linspace (0, 9);

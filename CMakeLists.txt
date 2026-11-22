@@ -141,10 +141,6 @@ check_include_file_cxx ("rapidxml/rapidxml.hpp" HAVE_RAPIDXML)
 include(${PROJECT_SOURCE_DIR}/maths/cmake/module_definitions.cmake)
 setup_module_variables_for_maths (${PROJECT_SOURCE_DIR}/maths)
 
-# Some examples use sm::config from sebsjames/maths_config. The core mathplot code doesn't use anything defined in here.
-include(${PROJECT_SOURCE_DIR}/maths_config/cmake/module_definitions.cmake)
-setup_module_variables_for_maths_config (${PROJECT_SOURCE_DIR}/maths_config ${PROJECT_SOURCE_DIR}/json ${PROJECT_SOURCE_DIR}/maths)
-
 # Include our own module defs
 include(${PROJECT_SOURCE_DIR}/cmake/module_definitions.cmake)
 setup_module_variables_for_mathplot (${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/maths)

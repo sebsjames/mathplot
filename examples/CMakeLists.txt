@@ -140,17 +140,13 @@ add_executable(rosenbrock rosenbrock.cpp)
 target_compile_definitions(rosenbrock PUBLIC FLT=float)
 target_link_libraries(rosenbrock mathplot_examples)
 
-if(HDF5_FOUND) # anneal.cppm uses HDF5
-  add_executable(rosenbrock_asa rosenbrock_asa.cpp)
-  target_sources(rosenbrock_asa PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT_SOURCE_DIR}
-    FILES
-    ${PROJECT_SOURCE_DIR}/maths/sm/anneal.cppm
-    ${PROJECT_SOURCE_DIR}/maths/sm/hdfdata.cppm
-  )
-  target_compile_definitions(rosenbrock_asa PUBLIC FLT=float VISUALISE)
-  target_include_directories(rosenbrock_asa AFTER PRIVATE ${HDF5_INCLUDE_DIR})
-  target_link_libraries(rosenbrock_asa ${HDF5_LIBRARIES} mathplot_examples)
-endif()
+add_executable(rosenbrock_asa rosenbrock_asa.cpp)
+target_sources(rosenbrock_asa PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT_SOURCE_DIR}
+  FILES
+  ${PROJECT_SOURCE_DIR}/maths/sm/anneal.cppm
+)
+target_compile_definitions(rosenbrock_asa PUBLIC FLT=float VISUALISE)
+target_link_libraries(rosenbrock_asa mathplot_examples)
 
 add_executable(convolve_rect convolve_rect.cpp)
 target_link_libraries(convolve_rect mathplot_examples)
@@ -182,47 +178,39 @@ target_link_libraries(cartgrid mathplot_examples)
 add_executable(cartgrid_colourbar_repeat cartgrid_colourbar_repeat.cpp)
 target_link_libraries(cartgrid_colourbar_repeat mathplot_examples)
 
-if(HDF5_FOUND) # anneal.cppm uses HDF5
-  set(ANNEAL_ASA_MODULES
-    ${PROJECT_SOURCE_DIR}/maths/sm/anneal.cppm
-    ${PROJECT_SOURCE_DIR}/maths/sm/hdfdata.cppm
-  )
-  list(REMOVE_DUPLICATES ANNEAL_ASA_MODULES)
+set(ANNEAL_ASA_MODULES
+  ${PROJECT_SOURCE_DIR}/maths/sm/anneal.cppm
+)
+list(REMOVE_DUPLICATES ANNEAL_ASA_MODULES)
 
-  # Adaptive Simulated Annealing algo on a made up objective
-  add_executable(anneal_asa anneal_asa.cpp)
-  target_compile_definitions(anneal_asa PUBLIC VISUALISE)
-  target_include_directories(anneal_asa AFTER PRIVATE ${HDF5_INCLUDE_DIR})
-  target_sources(anneal_asa PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT_SOURCE_DIR}
-    FILES ${ANNEAL_ASA_MODULES}
-  )
-  target_link_libraries(anneal_asa ${HDF5_LIBRARIES} mathplot_examples)
+# Adaptive Simulated Annealing algo on a made up objective
+add_executable(anneal_asa anneal_asa.cpp)
+target_compile_definitions(anneal_asa PUBLIC VISUALISE)
+target_sources(anneal_asa PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT_SOURCE_DIR}
+  FILES ${ANNEAL_ASA_MODULES}
+)
+target_link_libraries(anneal_asa mathplot_examples)
 
-  add_executable(anneal_asa_novis anneal_asa.cpp)
-  set(ANNEAL_ASA_NOVIS_MODULES
-    ${MPLOT_MATHS_CORE_MODULES}
-    ${MPLOT_MATHS_HEXGRID_MODULES}
-    ${PROJECT_SOURCE_DIR}/maths/sm/anneal.cppm
-    ${PROJECT_SOURCE_DIR}/maths/sm/hdfdata.cppm
-    ${SM_CONFIG_MODULES}
-  )
-  list(REMOVE_DUPLICATES ANNEAL_ASA_NOVIS_MODULES)
-  target_sources(anneal_asa_novis PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT_SOURCE_DIR}
-    FILES ${ANNEAL_ASA_NOVIS_MODULES}
-  )
-  target_include_directories(anneal_asa_novis AFTER PRIVATE ${HDF5_INCLUDE_DIR} ${PROJECT_SOURCE_DIR}/json/include)
-  target_link_libraries(anneal_asa_novis ${HDF5_LIBRARIES})
+add_executable(anneal_asa_novis anneal_asa.cpp)
+set(ANNEAL_ASA_NOVIS_MODULES
+  ${MPLOT_MATHS_CORE_MODULES}
+  ${MPLOT_MATHS_HEXGRID_MODULES}
+  ${PROJECT_SOURCE_DIR}/maths/sm/anneal.cppm
+  ${SM_CONFIG_MODULES}
+)
+list(REMOVE_DUPLICATES ANNEAL_ASA_NOVIS_MODULES)
+target_sources(anneal_asa_novis PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT_SOURCE_DIR}
+  FILES ${ANNEAL_ASA_NOVIS_MODULES}
+)
+target_include_directories(anneal_asa_novis AFTER PRIVATE ${PROJECT_SOURCE_DIR}/json/include)
 
-  # Adaptive Simulated Annealing algo on objective from Bohachevsky
-  add_executable(anneal_boha anneal_asa.cpp)
-  target_compile_definitions(anneal_boha PUBLIC USE_BOHACHEVSKY_FUNCTION VISUALISE)
-  target_include_directories(anneal_boha AFTER PRIVATE ${HDF5_INCLUDE_DIR})
-  target_sources(anneal_boha PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT_SOURCE_DIR}
-    FILES ${ANNEAL_ASA_MODULES}
-  )
-  target_link_libraries(anneal_boha ${HDF5_LIBRARIES} mathplot_examples)
-
-endif(HDF5_FOUND)
+# Adaptive Simulated Annealing algo on objective from Bohachevsky
+add_executable(anneal_boha anneal_asa.cpp)
+target_compile_definitions(anneal_boha PUBLIC USE_BOHACHEVSKY_FUNCTION VISUALISE)
+target_sources(anneal_boha PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT_SOURCE_DIR}
+  FILES ${ANNEAL_ASA_MODULES}
+)
+target_link_libraries(anneal_boha mathplot_examples)
 
 # Like HexGrid::resampleImage, this one uses an omp call that only works on Mac with
 # libomp, so avoid compiling this example on a Mac.

@@ -56,8 +56,8 @@ if(${glfw3_FOUND})
     add_executable(testhexgridsave testhexgridsave.cpp)
     target_sources(testhexgridsave PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT_SOURCE_DIR}
       FILES
-      ${PROJECT_SOURCE_DIR}/maths/sm/hdfdata.cppm
-      ${PROJECT_SOURCE_DIR}/maths/sm/hexgrid_hdf.cppm
+      ${PROJECT_SOURCE_DIR}/maths_hdf/sm/hdfdata.cppm
+      ${PROJECT_SOURCE_DIR}/maths_hdf/sm/hexgrid_hdf.cppm
     )
     target_include_directories(testhexgridsave AFTER PRIVATE ${HDF5_INCLUDE_DIR})
     target_link_libraries(testhexgridsave mathplot_tests ${HDF5_C_LIBRARIES} OpenGL::GL glfw Freetype::Freetype glad mplot_fontdata)

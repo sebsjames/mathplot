@@ -1,8 +1,5 @@
 # CTests
 
-# All #includes in test programs have to be #include "mplot/header.h"
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR})
-
 # Compile the modules that we use into a library
 set(MATHPLOT_TESTS_MODULES
   ${MPLOT_MATHS_CORE_MODULES}
@@ -37,7 +34,7 @@ set(SOURCETEST3 testreadcurves.cpp)
 add_executable(${TARGETTEST3} ${SOURCETEST3})
 target_link_libraries(testreadcurves mathplot_tests)
 # No longer add this test, because it contains linear curves, which sm::bezcurvepath no longer supports
-#add_test(testreadcurves ${TARGETTEST3})
+add_test(testreadcurves ${TARGETTEST3})
 
 # Test reading whiskerbarrels_withcentres.svg
 set(TARGETTEST31 testreadcurves_circles)
@@ -50,18 +47,6 @@ if(${glfw3_FOUND})
   # Test hexgrid3 (hexgrid2 with visualisation)
   add_executable(testhexgrid3 testhexgrid3.cpp)
   target_link_libraries(testhexgrid3 mathplot_tests OpenGL::GL glfw Freetype::Freetype glad mplot_fontdata)
-
-  if(HDF5_FOUND)
-    # Test hexgridsave (HexGrid's save feature)
-    add_executable(testhexgridsave testhexgridsave.cpp)
-    target_sources(testhexgridsave PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT_SOURCE_DIR}
-      FILES
-      ${PROJECT_SOURCE_DIR}/maths/sm/hdfdata.cppm
-      ${PROJECT_SOURCE_DIR}/maths/sm/hexgrid_hdf.cppm
-    )
-    target_include_directories(testhexgridsave AFTER PRIVATE ${HDF5_INCLUDE_DIR})
-    target_link_libraries(testhexgridsave mathplot_tests ${HDF5_C_LIBRARIES} OpenGL::GL glfw Freetype::Freetype glad mplot_fontdata)
-  endif(HDF5_FOUND)
 
   add_executable(testbighexgrid testbighexgrid.cpp)
   target_link_libraries(testbighexgrid mathplot_tests OpenGL::GL glfw Freetype::Freetype glad mplot_fontdata)

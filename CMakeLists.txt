@@ -109,13 +109,6 @@ find_package(glfw3 3.2 REQUIRED)
 # Mac CI.
 option(GLFW3_INCLUDE_DIR "Provide the path to the directory that holds the GLFW header directory" "")
 
-# Find the HDF5 library. To prefer the use of static linking of HDF5, set HDF5_USE_STATIC_LIBRARIES first
-#set(HDF5_USE_STATIC_LIBRARIES ON)
-find_package(HDF5)
-if(HDF5_FOUND)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${HDF5_DEFINITIONS}")
-endif()
-
 # New, text rendering dependencies
 find_package(Freetype REQUIRED)
 
@@ -148,14 +141,13 @@ check_include_file_cxx ("rapidxml/rapidxml.hpp" HAVE_RAPIDXML)
 include(${PROJECT_SOURCE_DIR}/maths/cmake/module_definitions.cmake)
 setup_module_variables_for_maths (${PROJECT_SOURCE_DIR}/maths)
 
-# Some examples use sm::config from sebsjames/maths_config. We don't use anything defined in here.
+# Some examples use sm::config from sebsjames/maths_config. The core mathplot code doesn't use anything defined in here.
 include(${PROJECT_SOURCE_DIR}/maths_config/cmake/module_definitions.cmake)
 setup_module_variables_for_maths_config (${PROJECT_SOURCE_DIR}/maths_config ${PROJECT_SOURCE_DIR}/json ${PROJECT_SOURCE_DIR}/maths)
 
 # Include our own module defs
 include(${PROJECT_SOURCE_DIR}/cmake/module_definitions.cmake)
 setup_module_variables_for_mathplot (${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/maths ${PROJECT_SOURCE_DIR}/json)
-
 
 # All the mathplot headers are here
 add_subdirectory(mplot)

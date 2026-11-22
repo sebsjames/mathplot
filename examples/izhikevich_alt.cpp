@@ -7,7 +7,6 @@
 #include <string>
 #include <iostream>
 
-import sm.config;
 import mplot.visual;
 import mplot.graphvisual;
 
@@ -15,7 +14,7 @@ import mplot.graphvisual;
 struct izhi
 {
     // state variables
-    float I = 0.0f;      // Input current
+    float I = 70.0f;     // Input current
     float u = 0.0f;      // 'The refractory variable'
     float v = -60.0f;    // 'Membrane voltage'
 
@@ -78,7 +77,7 @@ struct izhi
 };
 
 
-int main (int argc, char** argv)
+int main()
 {
     constexpr unsigned int N = 1000; // How many steps to run
     constexpr bool twodee = false;   // Should graphs be 2D only or rotatable?
@@ -92,39 +91,7 @@ int main (int argc, char** argv)
     sm::vvec<float> v(N, 0.0f);
     izhi iz;
 
-    // Set izhi params from config
-    std::string jsonfile ("../examples/izhikevich_alt.json");
-
-    bool user_file = false;
-    if (argc > 1) {
-        jsonfile = std::string (argv[1]);
-        user_file = true;
-    }
-
     std::string title = "Izhikevich Neuron Model";
-    sm::config config(jsonfile);
-    if (config.ready) {
-        // Parameters
-        iz.a = config.get<float> ("a", iz.a);
-        iz.b = config.get<float> ("b", iz.b);
-        iz.c = config.get<float> ("c", iz.c);
-        iz.d = config.get<float> ("d", iz.d);
-        iz.k = config.get<float> ("k", iz.k);
-        iz.vr = config.get<float> ("vr", iz.vr);
-        iz.vt = config.get<float> ("vt", iz.vt);
-        iz.vpeak = config.get<float> ("vpeak", iz.vpeak);
-        iz.CC = config.get<float> ("CC", iz.CC);
-
-        // Initial values of state vars
-        iz.u = config.get<float> ("u0", iz.u);
-        iz.v = config.get<float> ("v0", iz.v);
-
-        iz.I = config.get<float> ("I", iz.I);
-
-        title = config.get<std::string> ("description", title);
-    } else if (!config.ready && user_file == true) {
-        throw std::runtime_error ("Failed to open json file given by user");
-    } // else use defaults
 
     std::cout << "Model parameters:\na/b/c/d: " << iz.a << "/" << iz.b << "/" << iz.c << "/" << iz.d
               << "\nC=" << iz.CC << " vr="  << iz.vr << " vt=" << iz.vt << " k=" << iz.k << ", vpeak=" << iz.vpeak << std::endl;

@@ -3,10 +3,10 @@
  * equations as published in Izhikevich, Simple Model of Spiking Neurons, IEEE Transactions on
  * Neural Networks, Vol. 14. No. 6, 2003.
  */
+#include <cstdint>
 #include <memory>
 #include <string>
 
-import sm.config;
 import mplot.visual;
 import mplot.graphvisual;
 
@@ -50,7 +50,7 @@ struct izhi
     {
         u_nc.resize (Vn.size(), 0.0f);
         v_nc.resize (Vn.size(), 0.0f);
-        for (unsigned int i = 0; i < Vn.size(); ++i) {
+        for (std::uint32_t i = 0; i < Vn.size(); ++i) {
             v_nc[i] = A * Vn[i] * Vn[i] + B * Vn[i] + C + I / SI;
             u_nc[i] = Vn[i] * b;
         }
@@ -61,9 +61,9 @@ struct izhi
     {
         if (_u.size() != _v.size()) { return; }
         vecfield.resize (_u.size() * _v.size(), {0,0});
-        for (unsigned int j = 0; j < _u.size(); ++j) {
-            unsigned int shft = j * _v.size();
-            for (unsigned int i = 0; i < _v.size(); ++i) {
+        for (std::uint32_t j = 0; j < _u.size(); ++j) {
+            std::uint32_t shft = j * _v.size();
+            for (std::uint32_t i = 0; i < _v.size(); ++i) {
                 vecfield[i + shft] = { this->dv (_u[j], _v[i]), this->du (_u[j], _v[i]) };
             }
         }
@@ -73,7 +73,7 @@ struct izhi
 
 int main()
 {
-    constexpr unsigned int N = 1000; // How many steps to run
+    constexpr std::uint32_t N = 1000; // How many steps to run
     constexpr bool twodee = false;   // Should graphs be 2D only or rotatable?
 
     /*
@@ -85,28 +85,8 @@ int main()
     sm::vvec<float> v(N, 0.0f);
     izhi iz;
 
-    // Set izhi params from config
-    std::string jsonfile ("../examples/izhikevich.json");
-    sm::config config(jsonfile);
-    if (config.ready) {
-        // Parameters
-        iz.a = config.get<float> ("a", iz.a);
-        iz.b = config.get<float> ("b", iz.b);
-        iz.c = config.get<float> ("c", iz.c);
-        iz.d = config.get<float> ("d", iz.d);
-        iz.A = config.get<float> ("A", iz.A);
-        iz.B = config.get<float> ("B", iz.B);
-        iz.C = config.get<float> ("C", iz.C);
-        iz.T = config.get<float> ("T", iz.C);
-        iz.SI = config.get<float> ("SI", iz.SI);
-        iz.vpeak = config.get<float> ("vpeak", iz.vpeak);
-        // Initial values of state vars
-        iz.u = config.get<float> ("u0", iz.u);
-        iz.v = config.get<float> ("v0", iz.v);
-    }
-
     // Run sim
-    for (unsigned int i = 0; i < N; ++i) {
+    for (std::uint32_t i = 0; i < N; ++i) {
         iz.step();
         v[i] = iz.v;
         u[i] = iz.u;
@@ -130,7 +110,7 @@ int main()
      * Compute du/dv vector field
      */
 
-    static constexpr size_t qN = 50;
+    static constexpr std::uint32_t qN = 50;
     sm::vvec<float> qurng; // y axis
     sm::vvec<float> qvrng; // x axis
     qvrng.linspace (v_range.min, v_range.max, qN);
@@ -143,7 +123,7 @@ int main()
         (u_range.span()) / (qN-1)
     };
     sm::vec<float, 2> gridzero = { v_range.min, u_range.min };
-    sm::grid<unsigned int, float> grid (qN, qN, gridspacing, gridzero);
+    sm::grid<std::uint32_t, float> grid (qN, qN, gridspacing, gridzero);
 
     /*
      * Visualize results
@@ -229,8 +209,8 @@ int main()
     ds.quiver_arrowhead_prop = 0.35f;
     ds.quiver_thickness_gain = 1.5f;
     ds.markerstyle = mplot::markerstyle::quiver;
-    //ds.quiver_flagset.set (static_cast<unsigned int>(mplot::quiver_flags::show_zeros));
-    //ds.quiver_flagset.set (static_cast<unsigned int>(mplot::quiver_flags::marker_sphere));
+    //ds.quiver_flagset.set (static_cast<std::uint32_t>(mplot::quiver_flags::show_zeros));
+    //ds.quiver_flagset.set (static_cast<std::uint32_t>(mplot::quiver_flags::marker_sphere));
     gp->setdata (grid, du_dv_vecfield, ds);
     gp->finalize();
     vis.addVisualModel (gp);

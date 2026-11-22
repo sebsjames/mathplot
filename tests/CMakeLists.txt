@@ -1,8 +1,5 @@
 # CTests
 
-# All #includes in test programs have to be #include "mplot/header.h"
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR})
-
 # Compile the modules that we use into a library
 set(MATHPLOT_TESTS_MODULES
   ${MPLOT_MATHS_CORE_MODULES}
@@ -37,7 +34,7 @@ set(SOURCETEST3 testreadcurves.cpp)
 add_executable(${TARGETTEST3} ${SOURCETEST3})
 target_link_libraries(testreadcurves mathplot_tests)
 # No longer add this test, because it contains linear curves, which sm::bezcurvepath no longer supports
-#add_test(testreadcurves ${TARGETTEST3})
+add_test(testreadcurves ${TARGETTEST3})
 
 # Test reading whiskerbarrels_withcentres.svg
 set(TARGETTEST31 testreadcurves_circles)

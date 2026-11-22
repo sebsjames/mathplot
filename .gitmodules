@@ -7,6 +7,3 @@
 [submodule "maths_config"]
 	path = maths_config
 	url = https://github.com/sebsjames/maths_config
-[submodule "maths_hdf"]
-	path = maths_hdf
-	url = https://github.com/sebsjames/maths_hdf

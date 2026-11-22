@@ -53,7 +53,6 @@ import mplot.gl.util;
 import mplot.tools;
 import mplot.loadpng; // Use Lode Vandevenne's PNG encoder
 export import mplot.keys;
-import nlohmann.json;
 
 import sm.mathconst;
 export import sm.vec;
@@ -696,9 +695,8 @@ export namespace mplot
         }
 
     protected:
-        // Initialize OpenGL shaders, set some flags (Alpha, Anti-aliasing), read in any external
-        // state from json, and set up the coordinate arrows and any VisualTextModels that will be
-        // required to render the Visual.
+        // Initialize OpenGL shaders, set some flags (Alpha, Anti-aliasing) and set up the
+        // coordinate arrows and any VisualTextModels that will be required to render the Visual.
         void init_gl()
         {
             this->setContext(); // if managing context
@@ -734,8 +732,6 @@ export namespace mplot
             this->glfn->BlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             this->glfn->Disable (GL_CULL_FACE);
             mplot::gl::Util::checkError (__FILE__, __LINE__, this->glfn);
-
-            this->read_scenetrans_from_json();
 
             // Use coordArrowsOffset to set the location of the CoordArrows *scene*
             this->coordArrows = std::make_unique<mplot::CoordArrows<glver>>();
@@ -1725,37 +1721,6 @@ export namespace mplot
         //! Holds the viewmatrix of the followedVM the last time we called render
         sm::mat<float, 4> followedLastViewMatrix = sm::mat<float, 4>::identity();
 
-        // Read-from-json code that is called from init_gl in all implementations:
-        void read_scenetrans_from_json()
-        {
-            // If possible, read in scenetrans and rotation state from a special config file
-            try {
-                nlohmann::json vconf;
-                std::ifstream fi;
-                fi.open ("/tmp/Visual.json", std::ios::in);
-                fi >> vconf;
-                this->scenetrans_default[0] = vconf.contains("scenetrans_x") ? vconf["scenetrans_x"].get<float>() : this->scenetrans_default[0];
-                this->scenetrans_default[1] = vconf.contains("scenetrans_y") ? vconf["scenetrans_y"].get<float>() : this->scenetrans_default[1];
-                this->scenetrans_default[2] = vconf.contains("scenetrans_z") ? vconf["scenetrans_z"].get<float>() : this->scenetrans_default[2];
-
-                this->rotation_default.w = vconf.contains("scenerotn_w") ? vconf["scenerotn_w"].get<float>() : this->rotation_default.w;
-                this->rotation_default.x = vconf.contains("scenerotn_x") ? vconf["scenerotn_x"].get<float>() : this->rotation_default.x;
-                this->rotation_default.y = vconf.contains("scenerotn_y") ? vconf["scenerotn_y"].get<float>() : this->rotation_default.y;
-                this->rotation_default.z = vconf.contains("scenerotn_z") ? vconf["scenerotn_z"].get<float>() : this->rotation_default.z;
-
-                this->sceneview.set_identity();
-                this->sceneview.translate (this->scenetrans_default);
-                this->sceneview.rotate (this->rotation_default);
-                this->sceneview_tr.set_identity();
-                this->sceneview_tr.translate (this->scenetrans_default);
-                this->scenetrans_delta.zero();
-                this->rotation_delta.reset();
-
-            } catch (...) {
-                // No problem if we couldn't read /tmp/Visual.json
-            }
-        }
-
         //! The window (and OpenGL context) for this Visual
         mplot::win_t* window = nullptr;
 
@@ -1900,7 +1865,7 @@ export namespace mplot
                           << "Ctrl-k: Toggle rotate about central model or scene origin\n"
                           << "Ctrl-b: Toggle between 'rotate about vertical', or 'mathplot tilt'\n"
                           << "Ctrl-d: Switch the vertical axis used in 'rotate about vertical' mode\n"
-                          << "Ctrl-z: Show the current scenetrans/rotation and save to /tmp/Visual.json\n"
+                          << "Ctrl-z: Show the current scenetrans/rotation on stdout\n"
                           << "Ctrl-u: Reduce zNear cutoff plane\n"
                           << "Ctrl-i: Increase zNear cutoff plane\n"
                           << "Ctrl-j: Toggle bounding boxes\n"
@@ -1981,22 +1946,6 @@ export namespace mplot
                           <<  "\n    v.setSceneRotation (sm::quaternion<float>{ float{"
                           << rotn.w << "}, float{" << rotn.x << "}, float{"
                           << rotn.y << "}, float{" << rotn.z << "} });\n";
-                std::cout << "Writing scene trans/rotation into /tmp/Visual.json... ";
-                std::ofstream fout;
-                fout.open ("/tmp/Visual.json", std::ios::out|std::ios::trunc);
-                if (fout.is_open()) {
-                    fout << "{\"scenetrans_x\":" << scenetrans.x()
-                         << ", \"scenetrans_y\":" << scenetrans.y()
-                         << ", \"scenetrans_z\":" << scenetrans.z()
-                         << ",\n \"scenerotn_w\":" << rotn.w
-                         << ", \"scenerotn_x\":" <<  rotn.x
-                         << ", \"scenerotn_y\":" <<  rotn.y
-                         << ", \"scenerotn_z\":" <<  rotn.z << "}\n";
-                    fout.close();
-                    std::cout << "Success.\n";
-                } else {
-                    std::cout << "Failed.\n";
-                }
             }
 
             // Set selected model

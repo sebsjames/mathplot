@@ -147,7 +147,7 @@ setup_module_variables_for_maths_config (${PROJECT_SOURCE_DIR}/maths_config ${PR
 
 # Include our own module defs
 include(${PROJECT_SOURCE_DIR}/cmake/module_definitions.cmake)
-setup_module_variables_for_mathplot (${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/maths ${PROJECT_SOURCE_DIR}/json)
+setup_module_variables_for_mathplot (${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/maths)
 
 # All the mathplot headers are here
 add_subdirectory(mplot)

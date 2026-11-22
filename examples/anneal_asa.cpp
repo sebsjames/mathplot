@@ -18,7 +18,6 @@ import sm.hexgrid;
 import sm.algo.hexgrid;
 
 import sm.anneal;
-import sm.config;
 
 #ifdef VISUALISE
 import mplot.visual;
@@ -49,7 +48,7 @@ F objective (const sm::vvec<F>& params);
 F objective_boha (const sm::vvec<F>& params);
 F objective_hg (const sm::vvec<F>& params);
 
-int main (int argc, char** argv)
+int main()
 {
 #ifdef USE_BOHACHEVSKY_FUNCTION
     setup_objective_boha();
@@ -78,23 +77,6 @@ int main (int argc, char** argv)
     anneal.display_temperatures = false;
     anneal.display_reanneal = false;
 #endif
-    // Optionally, modify ASA parameters from a JSON config specified on the command line.
-    if (argc > 1) {
-        sm::config conf(argv[1]);
-        if (conf.ready) {
-            anneal.temperature_ratio_scale = (F)conf.get<double> ("temperature_ratio_scale", 1e-2);
-            anneal.temperature_anneal_scale = (F)conf.get<double> ("temperature_anneal_scale", 200.0);
-            anneal.cost_parameter_scale_ratio = (F)conf.get<double> ("cost_parameter_scale_ratio", 3.0);
-            anneal.acc_gen_reanneal_ratio = (F)conf.get<double> ("acc_gen_reanneal_ratio", 1e-6);
-            anneal.delta_param = (F)conf.get<double> ("delta_param", 0.01);
-            anneal.objective_repeat_precision = (F)conf.get<double> ("objective_repeat_precision", 1e-6);
-            anneal.f_x_best_repeat_max = conf.get<std::uint32_t> ("f_x_best_repeat_max", 15);
-            anneal.reanneal_after_steps = conf.get<std::uint32_t> ("reanneal_after_steps", 100);
-        } else {
-            std::cerr << "Failed to open JSON config in '" << argv[1]
-                      << "', continuing with default ASA parameters.\n";
-        }
-    }
     anneal.init();
 
 #ifdef VISUALISE

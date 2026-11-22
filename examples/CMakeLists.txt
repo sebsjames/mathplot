@@ -3,7 +3,6 @@ set(MATHPLOT_EXAMPLES_MODULES
   ${MPLOT_READCURVES_MODULES}
   ${MPLOT_ALL_VISUALMODEL_MODULES}
   ${PROJECT_SOURCE_DIR}/mplot/compoundray/Visual.cppm
-  ${SM_CONFIG_MODULES}
   ${PROJECT_SOURCE_DIR}/maths/sm/bootstrap.cppm
   ${PROJECT_SOURCE_DIR}/maths/sm/rungekutta4.cppm
   ${SM_HEXFFT_MODULES}
@@ -17,7 +16,6 @@ target_sources(mathplot_examples PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT
 set(MATHPLOT_EXAMPLES_INCLUDES
   ${PROJECT_SOURCE_DIR}
   ${OPENGL_INCLUDE_DIR} ${GLFW3_INCLUDE_DIR} ${FREETYPE_INCLUDE_DIRS}
-  ${PROJECT_SOURCE_DIR}/json/include
 )
 target_include_directories(mathplot_examples AFTER PRIVATE ${MATHPLOT_EXAMPLES_INCLUDES})
 target_link_libraries(mathplot_examples OpenGL::GL glfw Freetype::Freetype glad mplot_fontdata)
@@ -57,7 +55,7 @@ target_sources(graph1 PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT_SOURCE_DIR
   ${PROJECT_SOURCE_DIR}/mplot/GraphVisual.cppm
 )
 target_include_directories(graph1 AFTER PRIVATE
-  ${OPENGL_INCLUDE_DIR} ${GLFW3_INCLUDE_DIR} ${FREETYPE_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/json/include ${PROJECT_SOURCE_DIR}
+  ${OPENGL_INCLUDE_DIR} ${GLFW3_INCLUDE_DIR} ${FREETYPE_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}
 
 )
 target_link_libraries(graph1 OpenGL::GL glfw Freetype::Freetype glad mplot_fontdata)
@@ -196,13 +194,11 @@ set(ANNEAL_ASA_NOVIS_MODULES
   ${MPLOT_MATHS_CORE_MODULES}
   ${MPLOT_MATHS_HEXGRID_MODULES}
   ${PROJECT_SOURCE_DIR}/maths/sm/anneal.cppm
-  ${SM_CONFIG_MODULES}
 )
 list(REMOVE_DUPLICATES ANNEAL_ASA_NOVIS_MODULES)
 target_sources(anneal_asa_novis PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT_SOURCE_DIR}
   FILES ${ANNEAL_ASA_NOVIS_MODULES}
 )
-target_include_directories(anneal_asa_novis AFTER PRIVATE ${PROJECT_SOURCE_DIR}/json/include)
 
 # Adaptive Simulated Annealing algo on objective from Bohachevsky
 add_executable(anneal_boha anneal_asa.cpp)
@@ -290,9 +286,6 @@ target_link_libraries(graph_bar mathplot_examples)
 add_executable(graph_logist graph_logist.cpp)
 target_link_libraries(graph_logist mathplot_examples)
 
-add_executable(graph_logist2 graph_logist2.cpp)
-target_link_libraries(graph_logist2 mathplot_examples)
-
 add_executable(graph_randomwalk graph_randomwalk.cpp)
 target_sources(graph_randomwalk PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT_SOURCE_DIR}
   FILES
@@ -313,17 +306,6 @@ target_link_libraries(cone mathplot_examples)
 
 add_executable(healpix healpix.cpp)
 target_link_libraries(healpix mathplot_examples)
-
-set(JSONCONFIG_MODULES
-  ${MPLOT_MATHS_CORE_MODULES}
-  ${SM_CONFIG_MODULES}
-)
-list(REMOVE_DUPLICATES JSONCONFIG_MODULES)
-add_executable(jsonconfig jsonconfig.cpp)
-target_sources(jsonconfig PUBLIC FILE_SET CXX_MODULES BASE_DIRS ${PROJECT_SOURCE_DIR}
-  FILES ${JSONCONFIG_MODULES}
-)
-target_include_directories(jsonconfig AFTER PRIVATE ${PROJECT_SOURCE_DIR}/json/include)
 
 add_executable(ring ring.cpp)
 target_link_libraries(ring mathplot_examples)
@@ -511,9 +493,6 @@ target_link_libraries(draw_triangles mathplot_examples)
 add_executable(draw_triangles_intersections draw_triangles_intersections.cpp)
 target_link_libraries(draw_triangles_intersections mathplot_examples)
 
-add_executable(triangle_intersect triangle_intersect.cpp)
-target_link_libraries(triangle_intersect mathplot_examples)
-
 add_executable(voronoi_boundary voronoi_boundary.cpp)
 target_link_libraries(voronoi_boundary mathplot_examples)
 
@@ -646,9 +625,6 @@ target_link_libraries(zernike mathplot_examples)
 
 add_executable(vonmises vonmises.cpp)
 target_link_libraries(vonmises mathplot_examples)
-
-add_executable(show_boundingboxes show_boundingboxes.cpp)
-target_link_libraries(show_boundingboxes mathplot_examples)
 
 add_executable(trace_boundary trace_boundary.cpp)
 target_link_libraries(trace_boundary mathplot_examples)

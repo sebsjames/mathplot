@@ -4,9 +4,9 @@
 #
 
 # Sets up variables that define list of the modules used building
-# mathplot. Pass in the path to the mathplot root, the sebsjames/maths
-# root and to nlohmann/json
-macro(setup_module_variables_for_mathplot base_directory maths_directory json_directory)
+# mathplot. Pass in the path to the mathplot root and the
+# sebsjames/maths root
+macro(setup_module_variables_for_mathplot base_directory maths_directory)
 
   # These are set assuming a submoduled maths.
   set(MPLOT_MATHS_CORE_MODULES
@@ -123,7 +123,6 @@ macro(setup_module_variables_for_mathplot base_directory maths_directory json_di
     ${base_directory}/mplot/VisualDataModel.cppm
     ${base_directory}/mplot/healpix/healpix_bare.cppm
     ${base_directory}/mplot/fps/profiler.cppm
-    ${json_directory}/src/modules/json.cppm
   )
   list(REMOVE_DUPLICATES MPLOT_CORE_MODULES)
 

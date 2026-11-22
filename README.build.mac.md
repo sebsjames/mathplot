@@ -1,10 +1,10 @@
 # Build mathplot on Apple Mac
 
-You don't need to *build* mathplot to use the headers, but you *will* need to install the dependencies.
+You don't need to *build* mathplot to use the modules, but you *will* need to install the dependencies.
 
 The cmake-driven mathplot build process compiles a set of test and example programs which require all of the dependencies to be met.
 
-You'll need a C++ compiler that can compiler C++20 modules. That's *not* Apple Clang provided by XCode at present. Instead, you can brew install llvm.
+You'll need a C++ compiler that can compile C++20 modules. That's *not* Apple Clang provided by XCode at present. Instead, you can `brew install llvm`.
 
 ## Installation dependencies for Mac
 
@@ -43,7 +43,7 @@ compile glfw3 by hand.
 
 It's much cleaner to build each of the dependencies by hand. That
 means first installing cmake, which I do with a binary package from
-https://cmake.org/download/, and then compiling hdf5.
+https://cmake.org/download/ and then compiling any of the deps you need.
 
 After downloading and installing cmake using the MacOS installer, I
 add these lines to ~/.zprofile so that I can type cmake at the terminal:
@@ -59,26 +59,7 @@ The mathplot github actions for mac runners use brew to install
 dependencies. The command for the basic dependencies is
 
 ```sh
-brew install libomp glfw hdf5 llvm
-```
-
-#### HDF5
-
-Hierarchical data format is a standard format for saving binary
-data. `sm::hdfdata` wraps the HDF5 API and hence HDF5 is a required
-dependency to build all of the mathplot tests and is required if
-you are going to use `sm::hdfdata`. Build version 1.10.x.
-
-```sh
-mkdir -p ~/src
-cd ~/src
-tar xvf path/to/downloaded/hdf5-1.10.7.tar.gz
-cd hdf5-1.10.7
-mkdir build
-cd build
-cmake ..
-make
-sudo make install
+brew install libomp glfw llvm
 ```
 
 #### Qt5
@@ -86,13 +67,9 @@ sudo make install
 If present, the Qt5 components Core, Gui and Widgets components are used to compile some example Qt mathplot programs. I've not tested this on Mac.
 
 
-### Common manual dependency builds
-
-Whether or not you used mac ports to install hdf5, glfw3 also needs to be built separately (I've not investigated whether there is a mac ports version of glfw).
-
 #### glfw3
 
-The modern OpenGL code in mathplot requires the GL-window managing library GLFW3. Compile it like this:
+The modern OpenGL code in mathplot requires the GL-window managing library GLFW3. If you can't brew install, you can compile it like this:
 
 ```
 cd ~/src

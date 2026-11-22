@@ -13,22 +13,19 @@ import sm.vvec;
 import sm.bootstrap;
 import sm.random;
 import sm.histo;
-import sm.config;
 
 import mplot.visual;
 import mplot.graphvisual;
 
+// Test bootstrap computation of standard error of the mean for a distribution.
 int main()
 {
     int rtn = -1;
 
-    // Test bootstrap computation of standard error of the mean for a distribution.
-    sm::config conf ("../examples/bootstrap.json");
-
     // First, generate numbers from a normal distribution. Args of rand_normal constructor are mean, sigma.
-    double dist1_mean = conf.get<double>("dist1_mean", 5.0);
-    double dist1_sigma = conf.get<double>("dist1_sigma", 2.0);
-    unsigned int dist1_n = conf.get<unsigned int>("dist1_n", 1000);
+    double dist1_mean = 5.0;
+    double dist1_sigma = 1.0;
+    unsigned int dist1_n = 1000;
     sm::rand_normal<double, std::mt19937_64> rnorm (dist1_mean, dist1_sigma);
     sm::vvec<double> dist;
     dist.set_from (rnorm.get(dist1_n));
@@ -39,7 +36,7 @@ int main()
               << (dist.std()/std::sqrt(dist.size())) << std::endl;
 
     // Invoke the bootstrap to compute the standard error of the mean
-    unsigned int num_resamples = conf.get<unsigned int>("num_resamples", 1024);
+    unsigned int num_resamples = 1024;
     double eom = sm::bootstrap::error_of_mean<double> (dist, num_resamples);
     std::cout << "The bootstrapped, standard error of the mean is " << eom << std::endl;
 
@@ -72,9 +69,9 @@ int main()
     }
 
     // Bootstrapped t-test
-    double dist2_mean = conf.get<double>("dist2_mean", 5.0);
-    double dist2_sigma = conf.get<double>("dist2_sigma", 2.0);
-    unsigned int dist2_n = conf.get<unsigned int>("dist2_n", 1000);
+    double dist2_mean = 5.2;
+    double dist2_sigma = 1.0;
+    unsigned int dist2_n = 1000;
     sm::rand_normal<double, std::mt19937_64> rnorm2 (dist2_mean, dist2_sigma);
     sm::vvec<double> dist2;
     dist2.set_from (rnorm2.get(dist2_n));
@@ -108,7 +105,7 @@ int main()
         gv2->addLabel (bslbl, sm::vec<float>({1.1, 0.42, 0}), mplot::TextFeatures(0.05f));
         gv2->addLabel (std::string("ASL: ") + asl.str(), sm::vec<float>({1.1, 0.34, 0}), mplot::TextFeatures(0.05f));
         // A significance statement label
-        double sig_level = conf.get<double>("chosen_significance_level", 0.01);
+        double sig_level = 0.01;
         std::stringstream signif;
         if (asl[0] < asl[1]) {
             signif << "Discard the null hypothesis with significance level " << sig_level << ".\n"

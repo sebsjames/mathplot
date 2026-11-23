@@ -39,7 +39,7 @@ Mathplot can be **integrated with GUI frameworks** including [Qt](https://doc.qt
 * GCC (just [Bug 124888](https://gcc.gnu.org/bugzilla/show_bug.cgi?id=124888) to resolve)
 * VisualStudio
 
-## Dependencies
+### Dependencies
 
 mathplot depends on OpenGL for drawing commands, GLFW to manage windows and the OpenGL context, and Freetype to provide access to font management.
 For mathmatical operations, it depends on [sebsjames/maths](https://github.com/sebsjames/maths), which is a submodule.

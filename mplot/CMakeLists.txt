@@ -49,7 +49,6 @@ install(
   QuadsMeshVisual.cppm
   QuadsVisual.cppm
   QuiverVisual.cppm
-  ReadCurves.cppm
   RectangleVisual.cppm
   RhomboVisual.cppm
   RingVisual.cppm
@@ -99,15 +98,11 @@ target_include_directories(mplot_fontdata AFTER PRIVATE ${PROJECT_SOURCE_DIR})
 # There are also headers in sub directories
 add_subdirectory(gl) # GL common and compute code
 add_subdirectory(glad) # GLAD header library
-add_subdirectory(healpix) # Public, but slightly modified HEALPix headers
 
 # The Visual-in-a-Qt-Widget code
 add_subdirectory(qt)
 # wxWindows
 add_subdirectory(wx)
-
-# Compound ray glue code
-add_subdirectory(compoundray)
 
 # FPS profiling
 add_subdirectory(fps)

@@ -2,7 +2,6 @@ set(MATHPLOT_EXAMPLES_MODULES
   ${MPLOT_CORE_MODULES}
   ${MPLOT_READCURVES_MODULES}
   ${MPLOT_ALL_VISUALMODEL_MODULES}
-  ${PROJECT_SOURCE_DIR}/mplot/compoundray/Visual.cppm
   ${PROJECT_SOURCE_DIR}/maths/sm/bootstrap.cppm
   ${PROJECT_SOURCE_DIR}/maths/sm/rungekutta4.cppm
   ${SM_HEXFFT_MODULES}
@@ -230,10 +229,6 @@ target_link_libraries(colourbar_interactive mathplot_examples)
 
 add_executable(scatter_hex_mercator scatter_hex_mercator.cpp)
 target_link_libraries(scatter_hex_mercator mathplot_examples)
-
-# Utility prog to test your .svg boundary files
-add_executable(show_svg_boundary show_svg_boundary.cpp)
-target_link_libraries(show_svg_boundary mathplot_examples)
 
 add_executable(graph_coords graph_coords.cpp)
 target_link_libraries(graph_coords mathplot_examples)

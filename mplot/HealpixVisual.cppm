@@ -15,9 +15,9 @@ export module mplot.healpixvisual;
 import sm.scale;
 import sm.vec;
 import sm.vvec;
+import sm.healpix_bare;
 import mplot.visualmodel;
 import mplot.colourmap;
-import hp.bare;
 
 export namespace mplot
 {
@@ -90,19 +90,19 @@ export namespace mplot
 
             // Determine a good sphere size
             std::int64_t p0 = 0;
-            hp::t_ang ang = hp::ring2ang (this->nside, p0);
-            hp::t_vec pv = hp::loc2vec (hp::ang2loc (ang));
+            sm::hp::t_ang ang = sm::hp::ring2ang (this->nside, p0);
+            sm::hp::t_vec pv = sm::hp::loc2vec (sm::hp::ang2loc (ang));
             sm::vec<float> vpf0 = sm::vec<double>({pv.x, pv.y, pv.z}).as_float();
-            ang = hp::ring2ang (this->nside, p0+1);
-            pv = hp::loc2vec (hp::ang2loc (ang));
+            ang = sm::hp::ring2ang (this->nside, p0+1);
+            pv = sm::hp::loc2vec (sm::hp::ang2loc (ang));
             sm::vec<float> vpf1 = sm::vec<double>({pv.x, pv.y, pv.z}).as_float();
             float vvdist = (vpf0-vpf1).length();
 
             for (std::int64_t p = 0; p < n_p; ++p) {
                 // Convert ring index p to angle for this pixel
-                hp::t_ang ang = hp::ring2ang (this->nside, p);
+                sm::hp::t_ang ang = sm::hp::ring2ang (this->nside, p);
                 // Find the location of the pixel
-                hp::t_vec pv = hp::loc2vec (hp::ang2loc (ang));
+                sm::hp::t_vec pv = sm::hp::loc2vec (sm::hp::ang2loc (ang));
                 // Convert it into a sm::vec
                 sm::vec<float> vpf = sm::vec<double>({pv.x, pv.y, pv.z}).as_float();
 
@@ -116,8 +116,8 @@ export namespace mplot
             for (std::int32_t f = 0; f < 12; ++f) {
                 std::int64_t p = f << (k+k); // gets nested face start index
                 // nest2ang and ring2ang return same angle for 12 faces in a zeroth order healpix
-                hp::t_ang ang = hp::nest2ang (this->nside, p);
-                hp::t_vec pv = hp::loc2vec (hp::ang2loc (ang));
+                sm::hp::t_ang ang = sm::hp::nest2ang (this->nside, p);
+                sm::hp::t_vec pv = sm::hp::loc2vec (sm::hp::ang2loc (ang));
                 sm::vec<float> vpf = (sm::vec<double>({pv.x, pv.y, pv.z}) * this->r).as_float();
                 std::array<float, 3> sc = this->cm.convert (this->pixeldata[p]);
                 this->computeSphere (vpf, sc, this->r/30.0f, 18, 18);
@@ -206,23 +206,23 @@ export namespace mplot
                                                                    {11, {4 | 4<<8,  8  | 4<<8 }}  };
 
         // corners to be in rotated order
-        void fill_square (const std::array<hp::t_hpd, 4>& corners)
+        void fill_square (const std::array<sm::hp::t_hpd, 4>& corners)
         {
-            std::int64_t c0 = hp::hpd2nest (this->nside, corners[0]);
-            std::int64_t c2 = hp::hpd2nest (this->nside, corners[2]);
+            std::int64_t c0 = sm::hp::hpd2nest (this->nside, corners[0]);
+            std::int64_t c2 = sm::hp::hpd2nest (this->nside, corners[2]);
             this->indices.push_back (this->idx + c0);
-            this->indices.push_back (this->idx + hp::hpd2nest (this->nside, corners[1]));
+            this->indices.push_back (this->idx + sm::hp::hpd2nest (this->nside, corners[1]));
             this->indices.push_back (this->idx + c2);
             this->indices.push_back (this->idx + c0);
             this->indices.push_back (this->idx + c2);
-            this->indices.push_back (this->idx + hp::hpd2nest (this->nside, corners[3]));
+            this->indices.push_back (this->idx + sm::hp::hpd2nest (this->nside, corners[3]));
         }
 
-        void fill_triangle (const std::array<hp::t_hpd, 3>& corners)
+        void fill_triangle (const std::array<sm::hp::t_hpd, 3>& corners)
         {
-            this->indices.push_back (this->idx + hp::hpd2nest (this->nside, corners[0]));
-            this->indices.push_back (this->idx + hp::hpd2nest (this->nside, corners[1]));
-            this->indices.push_back (this->idx + hp::hpd2nest (this->nside, corners[2]));
+            this->indices.push_back (this->idx + sm::hp::hpd2nest (this->nside, corners[0]));
+            this->indices.push_back (this->idx + sm::hp::hpd2nest (this->nside, corners[1]));
+            this->indices.push_back (this->idx + sm::hp::hpd2nest (this->nside, corners[2]));
         }
 
         // corners to be in raster order
@@ -257,19 +257,19 @@ export namespace mplot
         void fill_channels_ne()
         {
             std::int64_t x = this->nside - 1, x2 = 0, y2 = this->nside - 1;
-            std::array<hp::t_hpd, 4> corners;
+            std::array<sm::hp::t_hpd, 4> corners;
 
             for (std::int32_t f = 0; f < 12; ++f) {
                 std::int32_t ne_face = face_map[f][0] & 0xff;
                 std::int32_t ne_dirn = face_map[f][0] >> 8;
                 if (ne_dirn == 2) { // NW edge on neighbour
                     for (std::int64_t y = 0; y < y2; y++) {
-                        corners = {hp::t_hpd{x, y,   f},  hp::t_hpd{x, y+1, f}, hp::t_hpd{y+1, y2, ne_face}, hp::t_hpd{y, y2, ne_face} };
+                        corners = {sm::hp::t_hpd{x, y,   f},  sm::hp::t_hpd{x, y+1, f}, sm::hp::t_hpd{y+1, y2, ne_face}, sm::hp::t_hpd{y, y2, ne_face} };
                         this->fill_square (corners);
                     }
                 } else if (ne_dirn == 4) { // SW edge on neighbour
                     for (std::int64_t y = 0; y < y2; y++) {
-                        corners = {hp::t_hpd{x, y,   f},  hp::t_hpd{x, y+1, f},  hp::t_hpd{x2, y+1, ne_face}, hp::t_hpd{x2, y, ne_face} };
+                        corners = {sm::hp::t_hpd{x, y,   f},  sm::hp::t_hpd{x, y+1, f},  sm::hp::t_hpd{x2, y+1, ne_face}, sm::hp::t_hpd{x2, y, ne_face} };
                         this->fill_square (corners);
                     }
                 }
@@ -287,19 +287,19 @@ export namespace mplot
         void fill_channels_se()
         {
             std::int64_t y = 0, x2 = 0, y2 = this->nside - 1;
-            std::array<hp::t_hpd, 4> corners;
+            std::array<sm::hp::t_hpd, 4> corners;
 
             for (std::int32_t f = 0; f < 12; ++f) {
                 std::int32_t se_face = face_map[f][1] & 0xff;
                 std::int32_t se_dirn = face_map[f][1] >> 8;
                 if (se_dirn == 2) { // NW edge on neighbour
                     for (std::int64_t x = 0; x < this->nside - 1; x++) {
-                        corners = {hp::t_hpd{x, y, f},  hp::t_hpd{x+1, y, f}, hp::t_hpd{x+1, y2, se_face}, hp::t_hpd{x, y2, se_face} };
+                        corners = {sm::hp::t_hpd{x, y, f},  sm::hp::t_hpd{x+1, y, f}, sm::hp::t_hpd{x+1, y2, se_face}, sm::hp::t_hpd{x, y2, se_face} };
                         this->fill_square (corners);
                     }
                 } else if (se_dirn == 4) { // SW edge on neighbour
                     for (std::int64_t x = 0; x < this->nside - 1; x++) {
-                        corners = {hp::t_hpd{x, y, f},  hp::t_hpd{x+1, y, f}, hp::t_hpd{x2, x+1, se_face}, hp::t_hpd{x2, x, se_face} };
+                        corners = {sm::hp::t_hpd{x, y, f},  sm::hp::t_hpd{x+1, y, f}, sm::hp::t_hpd{x2, x+1, se_face}, sm::hp::t_hpd{x2, x, se_face} };
                         this->fill_square (corners);
                     }
                 }
@@ -309,38 +309,38 @@ export namespace mplot
         void fill_six_squares()
         {
             std::int64_t max = this->nside-1;
-            std::array<hp::t_hpd, 4> corners = { hp::t_hpd{0, 0, 1}, hp::t_hpd{0, max, 6}, hp::t_hpd{max, max, 9}, hp::t_hpd{max, 0, 5} } ;
+            std::array<sm::hp::t_hpd, 4> corners = { sm::hp::t_hpd{0, 0, 1}, sm::hp::t_hpd{0, max, 6}, sm::hp::t_hpd{max, max, 9}, sm::hp::t_hpd{max, 0, 5} } ;
             this->fill_square (corners);
-            corners = { hp::t_hpd{max, max, 0}, hp::t_hpd{max, max, 1}, hp::t_hpd{max, max, 2}, hp::t_hpd{max, max, 3} } ;
+            corners = { sm::hp::t_hpd{max, max, 0}, sm::hp::t_hpd{max, max, 1}, sm::hp::t_hpd{max, max, 2}, sm::hp::t_hpd{max, max, 3} } ;
             this->fill_square (corners);
-            corners = { hp::t_hpd{0, 0, 8}, hp::t_hpd{0, 0, 9}, hp::t_hpd{0, 0, 10}, hp::t_hpd{0, 0, 11} } ;
+            corners = { sm::hp::t_hpd{0, 0, 8}, sm::hp::t_hpd{0, 0, 9}, sm::hp::t_hpd{0, 0, 10}, sm::hp::t_hpd{0, 0, 11} } ;
             this->fill_square (corners);
-            corners = { hp::t_hpd{0, 0, 0}, hp::t_hpd{0, max, 5}, hp::t_hpd{max, max, 8}, hp::t_hpd{max, 0, 4} } ;
+            corners = { sm::hp::t_hpd{0, 0, 0}, sm::hp::t_hpd{0, max, 5}, sm::hp::t_hpd{max, max, 8}, sm::hp::t_hpd{max, 0, 4} } ;
             this->fill_square (corners);
-            corners = { hp::t_hpd{0, 0, 2}, hp::t_hpd{0, max, 7}, hp::t_hpd{max, max, 10}, hp::t_hpd{max, 0, 6} } ;
+            corners = { sm::hp::t_hpd{0, 0, 2}, sm::hp::t_hpd{0, max, 7}, sm::hp::t_hpd{max, max, 10}, sm::hp::t_hpd{max, 0, 6} } ;
             this->fill_square (corners);
-            corners = { hp::t_hpd{0, 0, 3}, hp::t_hpd{0, max, 4}, hp::t_hpd{max, max, 11}, hp::t_hpd{max, 0, 7} } ;
+            corners = { sm::hp::t_hpd{0, 0, 3}, sm::hp::t_hpd{0, max, 4}, sm::hp::t_hpd{max, max, 11}, sm::hp::t_hpd{max, 0, 7} } ;
             this->fill_square (corners);
         }
 
         void fill_eight_triangles()
         {
             std::int64_t max = this->nside-1;
-            std::array<hp::t_hpd, 3> corners = { hp::t_hpd{0, 0, 6}, hp::t_hpd{max, 0, 9}, hp::t_hpd{0, max, 10} } ;
+            std::array<sm::hp::t_hpd, 3> corners = { sm::hp::t_hpd{0, 0, 6}, sm::hp::t_hpd{max, 0, 9}, sm::hp::t_hpd{0, max, 10} } ;
             this->fill_triangle (corners);
-            corners = { hp::t_hpd{0, 0, 7}, hp::t_hpd{max, 0, 10}, hp::t_hpd{0, max, 11} } ;
+            corners = { sm::hp::t_hpd{0, 0, 7}, sm::hp::t_hpd{max, 0, 10}, sm::hp::t_hpd{0, max, 11} } ;
             this->fill_triangle (corners);
-            corners = { hp::t_hpd{0, 0, 4}, hp::t_hpd{max, 0, 11}, hp::t_hpd{0, max, 8} } ;
+            corners = { sm::hp::t_hpd{0, 0, 4}, sm::hp::t_hpd{max, 0, 11}, sm::hp::t_hpd{0, max, 8} } ;
             this->fill_triangle (corners);
-            corners = { hp::t_hpd{0, 0, 5}, hp::t_hpd{max, 0, 8}, hp::t_hpd{0, max, 9} } ;
+            corners = { sm::hp::t_hpd{0, 0, 5}, sm::hp::t_hpd{max, 0, 8}, sm::hp::t_hpd{0, max, 9} } ;
             this->fill_triangle (corners);
-            corners = { hp::t_hpd{max, max, 4}, hp::t_hpd{max, 0, 3}, hp::t_hpd{0, max, 0} } ;
+            corners = { sm::hp::t_hpd{max, max, 4}, sm::hp::t_hpd{max, 0, 3}, sm::hp::t_hpd{0, max, 0} } ;
             this->fill_triangle (corners);
-            corners = { hp::t_hpd{max, max, 5}, hp::t_hpd{max, 0, 0}, hp::t_hpd{0, max, 1} } ;
+            corners = { sm::hp::t_hpd{max, max, 5}, sm::hp::t_hpd{max, 0, 0}, sm::hp::t_hpd{0, max, 1} } ;
             this->fill_triangle (corners);
-            corners = { hp::t_hpd{max, max, 6}, hp::t_hpd{max, 0, 1}, hp::t_hpd{0, max, 2} } ;
+            corners = { sm::hp::t_hpd{max, max, 6}, sm::hp::t_hpd{max, 0, 1}, sm::hp::t_hpd{0, max, 2} } ;
             this->fill_triangle (corners);
-            corners = { hp::t_hpd{max, max, 7}, hp::t_hpd{max, 0, 2}, hp::t_hpd{0, max, 3} } ;
+            corners = { sm::hp::t_hpd{max, max, 7}, sm::hp::t_hpd{max, 0, 2}, sm::hp::t_hpd{0, max, 3} } ;
             this->fill_triangle (corners);
 
         }
@@ -387,10 +387,10 @@ export namespace mplot
 
             for (std::int64_t p = 0; p < n_p; ++p) {
                 // Convert nest index p to angle for this pixel
-                hp::t_ang ang = hp::nest2ang (this->nside, p);
+                sm::hp::t_ang ang = sm::hp::nest2ang (this->nside, p);
 
                 // Find the location of the pixel
-                hp::t_vec pv = hp::loc2vec (hp::ang2loc (ang));
+                sm::hp::t_vec pv = sm::hp::loc2vec (sm::hp::ang2loc (ang));
                 // Convert it into a sm::vec and modify according to radius and relief
                 float _r = this->r;
                 if (this->relief == true) { _r += scaled_relief[p]; }
@@ -435,7 +435,7 @@ export namespace mplot
                     if (nside_down > 1) {
 
                         // find_quad_neighbour need one of the 'x' 'y' values relating to this p
-                        hp::t_hpd xyf = hp::nest2hpd (nside_down, i);
+                        sm::hp::t_hpd xyf = sm::hp::nest2hpd (nside_down, i);
 
                         // Find the neighbour quad 'forwards'
                         sm::vec<std::int64_t, 2> i_fwd = { i_up[1], i_up[3] };
@@ -544,10 +544,10 @@ export namespace mplot
         std::int64_t get_nside() const { return this->nside; }
 
         // Wrapper around nest2ang. Convert nest_index to angle for this pixel
-        hp::t_ang get_angles (std::int64_t nest_index) { return hp::nest2ang (this->nside, nest_index); }
+        sm::hp::t_ang get_angles (std::int64_t nest_index) { return sm::hp::nest2ang (this->nside, nest_index); }
 
         // Get the angles for the index nest_index from the map angles.
-        hp::t_ang lookup_angles (std::int64_t nest_index) const { return this->angles.at(nest_index); }
+        sm::hp::t_ang lookup_angles (std::int64_t nest_index) const { return this->angles.at(nest_index); }
 
         // Populate the angles lookup map (at end of initialize vertices)
         void populate_angles()
@@ -558,7 +558,7 @@ export namespace mplot
         }
 
         // It's faster to have a lookup map of the angles, rather than call get_angles_slow() each time.
-        std::unordered_map<std::int64_t, hp::t_ang> angles;
+        std::unordered_map<std::int64_t, sm::hp::t_ang> angles;
 
         // Set true to make use of the angles lookup map, which is populated at the end
         // of initializeVertices

@@ -2,13 +2,13 @@
 
 #include <memory>
 
-import mplot.compoundray.visual;
+import mplot.visual;
 import mplot.rhombovisual;
 
 int main()
 {
     // Create a scene
-    mplot::compoundray::Visual v(1024, 768, "A cube");
+    mplot::Visual v(1024, 768, "A cube");
     v.showCoordArrows (true);
     v.lightingEffects();
 

@@ -11,13 +11,12 @@ import sm.grid;
 import sm.quaternion;
 import mplot.loadpng;
 import mplot.colourmap;
-import mplot.compoundray.visual;
+import mplot.visual;
 import mplot.curvytellyvisual;
 
 int main()
 {
-    // compoundray::Visual is a version of Visual that can output compound-ray compatible glTF
-    mplot::compoundray::Visual<> v(1600, 1000, "CurvyTellyVisual as a chequered pipe");
+    mplot::Visual<> v(1600, 1000, "CurvyTellyVisual as a chequered pipe");
 
     // Make a Grid to display the stripes.
     // In x, make it as many wide as there will be facets on the tube.

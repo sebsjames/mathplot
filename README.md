@@ -44,7 +44,7 @@ This quick start shows dependency installation for Linux, because on this platfo
 ```bash
 # Install dependencies for building graph1.cpp and all the other examples (assuming Debian-like OS)
 sudo apt install build-essential cmake git ninja-build \
-                 librapidxml-dev freeglut3-dev libglu1-mesa-dev libxmu-dev \
+                 freeglut3-dev libglu1-mesa-dev libxmu-dev \
                  libxi-dev libglfw3-dev libfreetype-dev
 
 # Install a very up to date compiler
@@ -150,7 +150,7 @@ For more info on how to set up CMake files to build a program using mathplot (an
 Authorship of Mathplot code is given in each file. Copyright in
 the software is owned by the authors. Refer to [morphologica](https://github.com/ABRG-Models/morphologica) for historical code authorship details (some of the code distributed here was written by contributors to morphologica). The original idea to use OpenGL to graph hexagonal grids came from [Stuart Wilson](https://github.com/stuartwilson). [Seb James](https://github.com/sebjameswml) reimplemented Stuart's hexgrid plotting code in modern OpenGL and developed morphologica into a general purpose visualization library. In 2025, [Seb](https://github.com/sebsjames) changed the name to *Mathplot* to indicate to new developers what functionality the library provides.
 
-Mathplot is made possible by a number of third party projects whose source code is included in this repository. These include [lodepng](https://github.com/lvandeve/lodepng), [rapidxml](http://rapidxml.sourceforge.net/), [incbin](https://github.com/graphitemaster/incbin), [UniformBicone](https://github.com/wlenthe/UniformBicone), [jcvoronoi](https://github.com/JCash/voronoi) and the [HEALPix implementation from Astrometry.net](https://astrometry.net/). Thanks to the authors of these projects!
+Mathplot is made possible by a number of third party projects whose source code is included in this repository. These include [lodepng](https://github.com/lvandeve/lodepng), and [incbin](https://github.com/graphitemaster/incbin). Colourmaps come from [UniformBicone](https://github.com/wlenthe/UniformBicone), [Fabio Crameri](https://www.fabiocrameri.ch/colourmaps/), [Colorcet](https://colorcet.com/gallery.html) and matplotlib. Thanks to the authors of these projects!
 
 Mathplot is distributed under the terms of the Apache License, version 2 (see
 [LICENSE.txt](https://github.com/sebsjames/mathplot/blob/main/LICENSE.txt)).

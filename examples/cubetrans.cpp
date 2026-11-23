@@ -7,7 +7,7 @@
 
 import sm.mat;
 
-import mplot.compoundray.visual;
+import mplot.visual;
 import mplot.rhombovisual;
 import mplot.vectorvisual;
 import mplot.spherevisual;
@@ -15,7 +15,7 @@ import mplot.spherevisual;
 int main()
 {
     // Create a scene
-    mplot::compoundray::Visual v(1024, 768, "A cube");
+    mplot::Visual v(1024, 768, "A cube");
     v.showCoordArrows (true);
     v.coordArrowsInScene (true);
     v.lightingEffects();

@@ -12,11 +12,11 @@
 import sm.vec;
 import sm.vvec;
 import sm.geometry;
+import sm.healpix_bare;
 import mplot.colourmap;
 import mplot.visual;
 import mplot.healpixvisual;
 import mplot.sphericalprojectionvisual;
-import hp.bare;
 
 int main (int argc, char** argv)
 {
@@ -37,7 +37,7 @@ int main (int argc, char** argv)
     for (int64_t p = 0; p < hpv->n_pixels(); ++p) {
         hpv->pixeldata[p] = 0.5f * static_cast<float>(p) / hpv->n_pixels();
         // Mark circles for the x, y and z axes to check they line up
-        hp::t_vec pv = hp::nest2vec (hpv->get_nside(), p);
+        sm::hp::t_vec pv = sm::hp::nest2vec (hpv->get_nside(), p);
         auto v = sm::vec<double>({pv.x, pv.y, pv.z});
         if (v.angle (sm::vec<double>::ux()) < 0.05) {
             hpv->pixeldata[p] = 0.6;
@@ -65,7 +65,7 @@ int main (int argc, char** argv)
     for (uint32_t i = 0; i < hpvp->pixeldata.size(); ++i) {
 
         // ang.theta is co-latitude (and needs re-casting to be longitude), ang.phi is a longitude
-        hp::t_ang ang = hp::nest2ang (hpvp->get_nside(), i);
+        sm::hp::t_ang ang = sm::hp::nest2ang (hpvp->get_nside(), i);
 
         // ang.theta is pi for the South pole and 0 for the North pole
         // latitude should be in range -pi/2 (S) < lat <= pi/2 (N)

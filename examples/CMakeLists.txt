@@ -2,7 +2,6 @@ set(MATHPLOT_EXAMPLES_MODULES
   ${MPLOT_CORE_MODULES}
   ${MPLOT_READCURVES_MODULES}
   ${MPLOT_ALL_VISUALMODEL_MODULES}
-  ${PROJECT_SOURCE_DIR}/mplot/compoundray/Visual.cppm
   ${PROJECT_SOURCE_DIR}/maths/sm/bootstrap.cppm
   ${PROJECT_SOURCE_DIR}/maths/sm/rungekutta4.cppm
   ${SM_HEXFFT_MODULES}

@@ -105,9 +105,6 @@ add_subdirectory(qt)
 # wxWindows
 add_subdirectory(wx)
 
-# Compound ray glue code
-add_subdirectory(compoundray)
-
 # FPS profiling
 add_subdirectory(fps)
 

@@ -130,9 +130,6 @@ else()
   message(STATUS "NOT compiling wx examples (no wxWidgets library found)")
 endif()
 
-# rapidxml is bundled in the source, but prefer packaged header
-check_include_file_cxx ("rapidxml/rapidxml.hpp" HAVE_RAPIDXML)
-
 #
 # sebsjames/maths module groups
 #

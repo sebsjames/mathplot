@@ -50,7 +50,6 @@ install(
   QuadsMeshVisual.cppm
   QuadsVisual.cppm
   QuiverVisual.cppm
-  ReadCurves.cppm
   RectangleVisual.cppm
   RhomboVisual.cppm
   RingVisual.cppm

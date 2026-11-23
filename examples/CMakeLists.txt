@@ -231,10 +231,6 @@ target_link_libraries(colourbar_interactive mathplot_examples)
 add_executable(scatter_hex_mercator scatter_hex_mercator.cpp)
 target_link_libraries(scatter_hex_mercator mathplot_examples)
 
-# Utility prog to test your .svg boundary files
-add_executable(show_svg_boundary show_svg_boundary.cpp)
-target_link_libraries(show_svg_boundary mathplot_examples)
-
 add_executable(graph_coords graph_coords.cpp)
 target_link_libraries(graph_coords mathplot_examples)
 

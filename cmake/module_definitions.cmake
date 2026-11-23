@@ -63,15 +63,6 @@ macro(setup_module_variables_for_mathplot base_directory maths_directory)
     ${maths_directory}/sm/cartgrid.cppm
   )
 
-  # Modules in addition to core required for ReadCurves.cppm
-  set(MPLOT_MATHS_READCURVES_MODULES
-    ${maths_directory}/sm/nm_simplex.cppm
-    ${maths_directory}/sm/binomial.cppm
-    ${maths_directory}/sm/bezcoord.cppm
-    ${maths_directory}/sm/bezcurve.cppm
-    ${maths_directory}/sm/bezcurvepath.cppm
-  )
-
   # Maths used in individual VisualModels, but not the mathplot core
   set(MPLOT_MATHS_VISUALMODEL_MODULES
     ${maths_directory}/sm/histo.cppm
@@ -125,12 +116,6 @@ macro(setup_module_variables_for_mathplot base_directory maths_directory)
     ${base_directory}/mplot/fps/profiler.cppm
   )
   list(REMOVE_DUPLICATES MPLOT_CORE_MODULES)
-
-  set(MPLOT_READCURVES_MODULES
-    ${base_directory}/mplot/tools.cppm
-    ${base_directory}/include/rapidxml-1.13/rapidxml/rapidxml.cppm
-    ${base_directory}/mplot/ReadCurves.cppm
-  )
 
   # (Possibly) all the VisualModel modules. Usually, you will make
   # your own list of just the ones you want to compile.

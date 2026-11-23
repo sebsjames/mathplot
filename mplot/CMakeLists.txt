@@ -100,7 +100,6 @@ target_include_directories(mplot_fontdata AFTER PRIVATE ${PROJECT_SOURCE_DIR})
 # There are also headers in sub directories
 add_subdirectory(gl) # GL common and compute code
 add_subdirectory(glad) # GLAD header library
-add_subdirectory(healpix) # Public, but slightly modified HEALPix headers
 
 # The Visual-in-a-Qt-Widget code
 add_subdirectory(qt)

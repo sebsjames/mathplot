@@ -33,6 +33,7 @@ macro(setup_module_variables_for_mathplot base_directory maths_directory)
     ${maths_directory}/sm/vmat.cppm
     ${maths_directory}/sm/spline.cppm
     ${maths_directory}/sm/winder.cppm
+    ${maths_directory}/sm/healpix_bare.cppm
   )
 
   # The modules required for hexgrids
@@ -121,7 +122,6 @@ macro(setup_module_variables_for_mathplot base_directory maths_directory)
     ${base_directory}/mplot/graphstyles.cppm
     ${base_directory}/mplot/DatasetStyle.cppm
     ${base_directory}/mplot/VisualDataModel.cppm
-    ${base_directory}/mplot/healpix/healpix_bare.cppm
     ${base_directory}/mplot/fps/profiler.cppm
   )
   list(REMOVE_DUPLICATES MPLOT_CORE_MODULES)

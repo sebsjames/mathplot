@@ -25,7 +25,7 @@ export namespace mplot
         BezCurvePathVisual(const sm::vec<float> _offset) { this->viewmatrix.translate (_offset); }
 
         // The path to visualize
-        sm::bezcurvepath<T, N>* bcp = nullptr;
+        sm::bezcurvepath<T>* bcp = nullptr;
 
         // The step size for segments in the path (we visualize as a sequence of straight lines)
         T step = T{0.1};

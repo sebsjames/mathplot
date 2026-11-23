@@ -17,7 +17,6 @@ install(
   colourmaps_cet.cppm
   colourmaps_crameri.cppm
   ConeVisual.cppm
-  ConfigVisual.cppm
   CoordArrows.cppm
   CurvyTellyVisual.cppm
   CyclicColourVisual.cppm

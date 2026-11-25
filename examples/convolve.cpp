@@ -17,7 +17,8 @@ import mplot.visualdatamodel;
 import mplot.hexgridvisual;
 
 // Draw HexGridVisuals for the input, the kernel and the convolved output
-void draw_set (mplot::Visual<>& v, sm::vec<float, 3> offset, const sm::hexgrid<float>& hg, const sm::hexgrid<float>& kern_hg,
+void draw_set (mplot::Visual<>& v, sm::vec<float, 3> offset,
+               const sm::hexgrid<float>& hg, const sm::hexgrid<float>& kern_hg,
                const sm::vvec<float>& data, const sm::vvec<float>& kern_data, const sm::vvec<float>& convolved)
 {
     // Visualize the 3 maps
@@ -55,12 +56,12 @@ void draw_set (mplot::Visual<>& v, sm::vec<float, 3> offset, const sm::hexgrid<f
 
 int main()
 {
-    mplot::Visual v(800,600,"Convolution window");
+    mplot::Visual v(800, 600, "Convolution window");
     v.backgroundBlack();
 
     // Create an elliptical hexgrid for the input/output domains
-    sm::hexgrid<float> hg(0.01, 3, 0);
-    hg.set_elliptical_boundary (0.45, 0.3);
+    sm::hexgrid<float> hg (0.01f, 3.0f, 0.0f);
+    hg.set_elliptical_boundary (0.45f, 0.3f);
 
     // Populate a vector of floats with random data
     sm::vvec<float> input_rand (hg.num(), 0.0f);
@@ -68,15 +69,15 @@ int main()
 
     // Create a circular HexGrid to contain the Gaussian convolution kernel
     constexpr float sigma = 0.025f;
-    sm::hexgrid<float> kernel_hg(0.01, 20.0f * sigma, 0);
+    sm::hexgrid<float> kernel_hg(0.01f, 20.0f * sigma, 0.0f);
     kernel_hg.set_circular_boundary (6.0f * sigma);
     sm::vvec<float> kern_data_gauss (kernel_hg.num(), 0.0f);
 
     // Once-only parts of the calculation of the Gaussian.
-    constexpr float one_over_sigma_root_2_pi = 1 / sigma * 2.506628275;
+    constexpr float one_over_sigma_root_2_pi = 1.0f / sigma * 2.506628275f;
     constexpr float two_sigma_sq = 2.0f * sigma * sigma;
     // Gaussian dist. result, and a running sum of the results:
-    float sum = 0;
+    float sum = 0.0f;
     for (auto& k : kernel_hg.hexen) {
         // Gaussian profile based on the hex's distance from centre, which is
         // already computed in each Hex as Hex::r
@@ -91,7 +92,7 @@ int main()
     sm::algo::hexgrid::convolve (hg, kernel_hg, kern_data_gauss, input_rand, convolved);
 
     // Call the drawing function
-    sm::vec<float, 3> offset = { -0.5, 0.0, 0.0 };
+    sm::vec<float, 3> offset = { -0.5f, 0.0f, 0.0f };
     draw_set (v, offset, hg, kernel_hg, input_rand, kern_data_gauss, convolved);
 
     v.keepOpen();

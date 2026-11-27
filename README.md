@@ -12,12 +12,21 @@
 
 [![Mentioned in Awesome C++](https://awesome.re/mentioned-badge.svg)](https://github.com/myd7349/awesome-cpp?tab=readme-ov-file#data-visualization)
 
-**Modular C++20 library code to visualize numerical simulations using modern OpenGL.**
+## Modular C++20 library code to visualize numerical simulations with OpenGL
 
 Mathplot is a library for drawing **3D data visualization** objects such as graphs, surfaces and grids.
 Take a look at the [**screenshot gallery**](https://sebsjames.github.io/mathplot/#gallery) to see some examples.
 
-Mathplot is compatible with **Linux** (including **Raspberry Pi**), **Mac OS** and **Windows**, *but* compiler support is still patchy.  On Linux or Mac, you need to use LLVM/clang version 20 or higher (Apple Clang from Xcode does not support C++ modules). GCC is currently [known not to compile the code](https://github.com/sebsjames/mathplot/issues/148). On Windows, [VisualStudio also seems to have a modules-related bug](https://github.com/sebsjames/mathplot/issues/149) as it does not compile the code either.
+## How does it compare to Matplot++ or ImPlot? 
+
+Mathplot has a similar name to Matplot++ and covers the same need - scientific graphics.
+Choose mathplot for the lack of a gnuplot dependency, the native speed of OpenGL graphics and the quality of its 3D output.
+
+Mathplot's built in scientific primitives and colourmaps make it a better choice than ImPlot for your numerical and scientific data visualization. You can easily [use mathplot alongside Dear Imgui](https://github.com/mathplot_imgui).
+
+## Compatibility
+
+Mathplot is compatible with **Linux** (including **Raspberry Pi**), **Mac OS** and **Windows**, *but* compiler support for C++ module code is still patchy.  On Linux or Mac, you need to use LLVM/clang version 20 or higher (Apple Clang from Xcode does not support C++ modules). GCC is currently [known not to compile the code](https://github.com/sebsjames/mathplot/issues/148). On Windows, [VisualStudio also seems to have a modules-related bug](https://github.com/sebsjames/mathplot/issues/149) as it does not compile the code either.
 
 You'll find all of the **library code** in the [**mplot**](https://github.com/sebsjames/mathplot/tree/main/mplot) directory and you can find **example code** [here](https://github.com/sebsjames/mathplot/tree/main/examples). There is also a **template project** [that uses mathplot](https://github.com/sebsjames/mathplot_template) to help you incorporate the library into your own work.
 
